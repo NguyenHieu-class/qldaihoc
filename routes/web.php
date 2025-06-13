@@ -9,6 +9,9 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\DegreeController;
+use App\Http\Controllers\TeachingRateController;
+use App\Http\Controllers\DegreeCoefficientController;
+use App\Http\Controllers\ClassSizeCoefficientController;
 use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\SemesterController;
 use Illuminate\Support\Facades\Route;
@@ -64,6 +67,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     // Quản lý giáo viên
     Route::resource('teachers', TeacherController::class);
+
+    // Quản lý hệ số và mức lương giảng dạy
+    Route::resource('teaching-rates', TeachingRateController::class);
+    Route::resource('degree-coefficients', DegreeCoefficientController::class);
+    Route::resource('class-size-coefficients', ClassSizeCoefficientController::class);
 });
 
 // Nhóm route yêu cầu xác thực và quyền admin hoặc giáo viên
