@@ -19,6 +19,7 @@ class Grade extends Model
         'total_score',
         'semester',
         'academic_year',
+        'note',
     ];
 
     /**

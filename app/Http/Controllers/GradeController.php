@@ -91,6 +91,7 @@ class GradeController extends Controller
             'assignment_score' => 'nullable|numeric|min:0|max:10',
             'semester' => 'required|string',
             'academic_year' => 'required|integer|min:2000|max:' . (date('Y') + 10),
+            'note' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
@@ -159,6 +160,7 @@ class GradeController extends Controller
             'assignment_score' => 'nullable|numeric|min:0|max:10',
             'semester' => 'required|string',
             'academic_year' => 'required|integer|min:2000|max:' . (date('Y') + 10),
+            'note' => 'nullable|string',
         ]);
 
         if ($validator->fails()) {
