@@ -20,14 +20,14 @@
                         @method('PUT')
 
                         <div class="row mb-3">
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label for="teacher_id" class="form-label">{{ __('Mã giáo viên') }} <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('teacher_id') is-invalid @enderror" id="teacher_id" name="teacher_id" value="{{ old('teacher_id', $teacher->teacher_id) }}" required>
                                 @error('teacher_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-md-6">
+                            <div class="col-md-4">
                                 <label for="faculty_id" class="form-label">{{ __('Khoa') }} <span class="text-danger">*</span></label>
                                 <select class="form-select @error('faculty_id') is-invalid @enderror" id="faculty_id" name="faculty_id" required>
                                     <option value="">{{ __('-- Chọn khoa --') }}</option>
@@ -38,6 +38,20 @@
                                     @endforeach
                                 </select>
                                 @error('faculty_id')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-4">
+                                <label for="degree_id" class="form-label">{{ __('Học vị') }} <span class="text-danger">*</span></label>
+                                <select class="form-select @error('degree_id') is-invalid @enderror" id="degree_id" name="degree_id" required>
+                                    <option value="">{{ __('-- Chọn học vị --') }}</option>
+                                    @foreach($degrees as $degree)
+                                        <option value="{{ $degree->id }}" {{ (old('degree_id', $teacher->degree_id) == $degree->id) ? 'selected' : '' }}>
+                                            {{ $degree->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('degree_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

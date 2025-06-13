@@ -20,6 +20,7 @@ class Teacher extends Model
         'phone',
         'address',
         'faculty_id',
+        'degree_id',
         'user_id',
     ];
 
@@ -33,6 +34,14 @@ class Teacher extends Model
     public function faculty(): BelongsTo
     {
         return $this->belongsTo(Faculty::class);
+    }
+
+    /**
+     * Lấy học vị của giáo viên
+     */
+    public function degree(): BelongsTo
+    {
+        return $this->belongsTo(Degree::class);
     }
 
     /**

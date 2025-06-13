@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Faculty;
+use App\Models\Degree;
 use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -47,7 +48,8 @@ class TeacherController extends Controller
     public function create()
     {
         $faculties = Faculty::all();
-        return view('teachers.create', compact('faculties'));
+        $degrees = Degree::all();
+        return view('teachers.create', compact('faculties', 'degrees'));
     }
 
     /**
@@ -65,6 +67,7 @@ class TeacherController extends Controller
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'faculty_id' => 'required|exists:faculties,id',
+            'degree_id' => 'required|exists:degrees,id',
             'create_account' => 'boolean',
             'password' => 'required_if:create_account,1|nullable|min:8',
         ]);
@@ -117,7 +120,7 @@ class TeacherController extends Controller
      */
     public function show(Teacher $teacher)
     {
-        $teacher->load('faculty');
+        $teacher->load('faculty', 'degree');
         return view('teachers.show', compact('teacher'));
     }
 
@@ -127,7 +130,8 @@ class TeacherController extends Controller
     public function edit(Teacher $teacher)
     {
         $faculties = Faculty::all();
-        return view('teachers.edit', compact('teacher', 'faculties'));
+        $degrees = Degree::all();
+        return view('teachers.edit', compact('teacher', 'faculties', 'degrees'));
     }
 
     /**
@@ -145,6 +149,7 @@ class TeacherController extends Controller
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'faculty_id' => 'required|exists:faculties,id',
+            'degree_id' => 'required|exists:degrees,id',
         ]);
 
         if ($validator->fails()) {
