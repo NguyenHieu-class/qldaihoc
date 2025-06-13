@@ -49,22 +49,12 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-2">
-                                <select name="semester" class="form-select">
+                            <div class="col-md-3">
+                                <select name="semester_id" class="form-select">
                                     <option value="">{{ __('-- Tất cả học kỳ --') }}</option>
                                     @foreach($semesters as $semester)
-                                        <option value="{{ $semester }}" {{ request('semester') == $semester ? 'selected' : '' }}>
-                                            {{ $semester }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-                            <div class="col-md-2">
-                                <select name="academic_year" class="form-select">
-                                    <option value="">{{ __('-- Tất cả năm học --') }}</option>
-                                    @foreach($academicYears as $year)
-                                        <option value="{{ $year }}" {{ request('academic_year') == $year ? 'selected' : '' }}>
-                                            {{ $year }}
+                                        <option value="{{ $semester->id }}" {{ request('semester_id') == $semester->id ? 'selected' : '' }}>
+                                            {{ $semester->name }} ({{ $semester->academicYear->name }})
                                         </option>
                                     @endforeach
                                 </select>

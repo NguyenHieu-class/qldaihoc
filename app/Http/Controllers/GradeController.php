@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Grade;
 use App\Models\Student;
 use App\Models\Subject;
+use App\Models\Semester;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -28,13 +29,8 @@ class GradeController extends Controller
         }
         
         // Lọc theo học kỳ
-        if ($request->has('semester') && $request->semester) {
-            $query->where('semester', $request->semester);
-        }
-        
-        // Lọc theo năm học
-        if ($request->has('academic_year') && $request->academic_year) {
-            $query->where('academic_year', $request->academic_year);
+        if ($request->has('semester_id') && $request->semester_id) {
+            $query->where('semester_id', $request->semester_id);
         }
         
         // Lọc theo lớp học
@@ -58,10 +54,9 @@ class GradeController extends Controller
         $students = Student::with('class')->get();
         $subjects = Subject::all();
         $classes = \App\Models\Classes::with('major.faculty')->get();
-        $semesters = Grade::distinct()->pluck('semester');
-        $academicYears = Grade::distinct()->orderBy('academic_year', 'desc')->pluck('academic_year');
-        
-        return view('grades.index', compact('grades', 'students', 'subjects', 'classes', 'semesters', 'academicYears'));
+        $semesters = Semester::with('academicYear')->get();
+
+        return view('grades.index', compact('grades', 'students', 'subjects', 'classes', 'semesters'));
     }
 
     /**
@@ -71,11 +66,9 @@ class GradeController extends Controller
     {
         $students = Student::with('class')->get();
         $subjects = Subject::all();
-        $semesters = ['Học kỳ 1', 'Học kỳ 2', 'Học kỳ hè'];
-        $currentYear = date('Y');
-        $academicYears = range($currentYear - 5, $currentYear + 1);
-        
-        return view('grades.create', compact('students', 'subjects', 'semesters', 'academicYears'));
+        $semesters = Semester::with('academicYear')->get();
+
+        return view('grades.create', compact('students', 'subjects', 'semesters'));
     }
 
     /**
@@ -89,8 +82,7 @@ class GradeController extends Controller
             'midterm_score' => 'nullable|numeric|min:0|max:10',
             'final_score' => 'nullable|numeric|min:0|max:10',
             'assignment_score' => 'nullable|numeric|min:0|max:10',
-            'semester' => 'required|string',
-            'academic_year' => 'required|integer|min:2000|max:' . (date('Y') + 10),
+            'semester_id' => 'required|exists:semesters,id',
             'note' => 'nullable|string',
         ]);
 
@@ -100,11 +92,14 @@ class GradeController extends Controller
                 ->withInput();
         }
 
+        $semester = Semester::with('academicYear')->find($request->semester_id);
+        $year = (int) substr($semester->academicYear->name, 0, 4);
+
         // Kiểm tra xem đã có điểm cho sinh viên, môn học, học kỳ và năm học này chưa
         $existingGrade = Grade::where('student_id', $request->student_id)
             ->where('subject_id', $request->subject_id)
-            ->where('semester', $request->semester)
-            ->where('academic_year', $request->academic_year)
+            ->where('semester', $semester->name)
+            ->where('academic_year', $year)
             ->first();
             
         if ($existingGrade) {
@@ -114,7 +109,12 @@ class GradeController extends Controller
         }
 
         // Tạo điểm mới
-        $grade = new Grade($request->all());
+        $data = $request->all();
+        $data['semester_id'] = $semester->id;
+        $data['semester'] = $semester->name;
+        $data['academic_year'] = $year;
+
+        $grade = new Grade($data);
         
         // Tính điểm tổng kết
         $grade->total_score = $grade->calculateTotalScore();
@@ -140,11 +140,9 @@ class GradeController extends Controller
     {
         $students = Student::with('class')->get();
         $subjects = Subject::all();
-        $semesters = ['Học kỳ 1', 'Học kỳ 2', 'Học kỳ hè'];
-        $currentYear = date('Y');
-        $academicYears = range($currentYear - 5, $currentYear + 1);
-        
-        return view('grades.edit', compact('grade', 'students', 'subjects', 'semesters', 'academicYears'));
+        $semesters = Semester::with('academicYear')->get();
+
+        return view('grades.edit', compact('grade', 'students', 'subjects', 'semesters'));
     }
 
     /**
@@ -158,8 +156,7 @@ class GradeController extends Controller
             'midterm_score' => 'nullable|numeric|min:0|max:10',
             'final_score' => 'nullable|numeric|min:0|max:10',
             'assignment_score' => 'nullable|numeric|min:0|max:10',
-            'semester' => 'required|string',
-            'academic_year' => 'required|integer|min:2000|max:' . (date('Y') + 10),
+            'semester_id' => 'required|exists:semesters,id',
             'note' => 'nullable|string',
         ]);
 
@@ -169,11 +166,14 @@ class GradeController extends Controller
                 ->withInput();
         }
 
+        $semester = Semester::with('academicYear')->find($request->semester_id);
+        $year = (int) substr($semester->academicYear->name, 0, 4);
+
         // Kiểm tra xem đã có điểm cho sinh viên, môn học, học kỳ và năm học này chưa (trừ điểm hiện tại)
         $existingGrade = Grade::where('student_id', $request->student_id)
             ->where('subject_id', $request->subject_id)
-            ->where('semester', $request->semester)
-            ->where('academic_year', $request->academic_year)
+            ->where('semester', $semester->name)
+            ->where('academic_year', $year)
             ->where('id', '!=', $grade->id)
             ->first();
             
@@ -184,7 +184,12 @@ class GradeController extends Controller
         }
 
         // Cập nhật điểm
-        $grade->update($request->all());
+        $data = $request->all();
+        $data['semester_id'] = $semester->id;
+        $data['semester'] = $semester->name;
+        $data['academic_year'] = $year;
+
+        $grade->update($data);
         
         // Tính lại điểm tổng kết
         $grade->updateTotalScore();
