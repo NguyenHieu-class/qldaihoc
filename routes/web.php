@@ -8,6 +8,7 @@ use App\Http\Controllers\MajorController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\DegreeController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -49,7 +50,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     
     // Quản lý môn học
     Route::resource('subjects', SubjectController::class);
-    
+
+    // Quản lý học vị
+    Route::resource('degrees', DegreeController::class);
+
     // Quản lý giáo viên
     Route::resource('teachers', TeacherController::class);
 });

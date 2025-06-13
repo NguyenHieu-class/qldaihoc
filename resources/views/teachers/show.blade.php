@@ -35,6 +35,10 @@
                                     <p>{{ $teacher->faculty->name }}</p>
                                 </div>
                                 <div class="col-md-6 mb-3">
+                                    <h6 class="fw-bold">{{ __('Học vị:') }}</h6>
+                                    <p>{{ $teacher->degree->name ?? '' }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
                                     <h6 class="fw-bold">{{ __('Email:') }}</h6>
                                     <p>{{ $teacher->email }}</p>
                                 </div>
