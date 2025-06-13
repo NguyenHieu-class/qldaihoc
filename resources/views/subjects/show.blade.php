@@ -35,6 +35,10 @@
                             <div class="col-md-8">{{ $subject->credits }}</div>
                         </div>
                         <div class="row mt-2">
+                            <div class="col-md-4 fw-bold">{{ __('Độ khó:') }}</div>
+                            <div class="col-md-8">{{ $subject->difficulty_ratio }}</div>
+                        </div>
+                        <div class="row mt-2">
                             <div class="col-md-4 fw-bold">{{ __('Mô tả:') }}</div>
                             <div class="col-md-8">{{ $subject->description ?: __('Không có mô tả') }}</div>
                         </div>

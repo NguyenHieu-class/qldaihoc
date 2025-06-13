@@ -53,6 +53,7 @@ class SubjectController extends Controller
             'code' => 'required|string|max:50|unique:subjects',
             'credits' => 'required|integer|min:1|max:10',
             'description' => 'nullable|string',
+            'difficulty_ratio' => 'nullable|numeric',
         ]);
 
         if ($validator->fails()) {
@@ -94,6 +95,7 @@ class SubjectController extends Controller
             'code' => 'required|string|max:50|unique:subjects,code,' . $subject->id,
             'credits' => 'required|integer|min:1|max:10',
             'description' => 'nullable|string',
+            'difficulty_ratio' => 'nullable|numeric',
         ]);
 
         if ($validator->fails()) {
