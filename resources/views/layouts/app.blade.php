@@ -249,6 +249,11 @@
                                         <i class="fas fa-chalkboard-teacher"></i> Quản lý giáo viên
                                     </a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" href="{{ route('reports.sections') }}">
+                                        <i class="fas fa-chart-pie"></i> Báo cáo
+                                    </a>
+                                </li>
                             @endif
                             
                             @if(Auth::user()->role == 'admin' || Auth::user()->role == 'teacher')
