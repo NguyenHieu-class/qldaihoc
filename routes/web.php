@@ -8,6 +8,8 @@ use App\Http\Controllers\MajorController;
 use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
+use App\Http\Controllers\CourseOfferingController;
+use App\Http\Controllers\ClassSectionController;
 use App\Http\Controllers\DegreeController;
 use App\Http\Controllers\TeachingRateController;
 use App\Http\Controllers\DegreeCoefficientController;
@@ -72,6 +74,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('teaching-rates', TeachingRateController::class);
     Route::resource('degree-coefficients', DegreeCoefficientController::class);
     Route::resource('class-size-coefficients', ClassSizeCoefficientController::class);
+
+    // Mở môn học
+    Route::resource('course-offerings', CourseOfferingController::class);
+
+    // Lớp học phần
+    Route::post('class-sections/generate', [ClassSectionController::class, 'generate'])->name('class-sections.generate');
+    Route::resource('class-sections', ClassSectionController::class);
 });
 
 // Nhóm route yêu cầu xác thực và quyền admin hoặc giáo viên

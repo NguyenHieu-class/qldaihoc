@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\ClassSection;
 
 class Teacher extends Model
 {
@@ -59,4 +61,12 @@ class Teacher extends Model
     {
         return "{$this->first_name} {$this->last_name}";
     }
-} 
+
+    /**
+     * Các lớp học phần do giáo viên giảng dạy
+     */
+    public function classSections(): HasMany
+    {
+        return $this->hasMany(ClassSection::class);
+    }
+}
