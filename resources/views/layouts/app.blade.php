@@ -231,6 +231,18 @@
                                         <i class="fas fa-book-open"></i> Quản lý môn học
                                     </a>
                                 </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('course-offerings.*') ? 'active' : '' }}" href="{{ route('course-offerings.index') }}">
+                                        <i class="fas fa-calendar-alt"></i> Mở môn học
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('class-sections.*') ? 'active' : '' }}" href="{{ route('class-sections.index') }}">
+                                        <i class="fas fa-list"></i> Lớp học phần
+                                    </a>
+                                </li>
                                 
                                 <li class="nav-item">
                                     <a class="nav-link {{ request()->routeIs('teachers.*') ? 'active' : '' }}" href="{{ route('teachers.index') }}">

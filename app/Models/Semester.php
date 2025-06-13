@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\CourseOffering;
 
 class Semester extends Model
 {
@@ -27,5 +28,13 @@ class Semester extends Model
     public function grades(): HasMany
     {
         return $this->hasMany(Grade::class);
+    }
+
+    /**
+     * Các môn học được mở trong học kỳ
+     */
+    public function courseOfferings(): HasMany
+    {
+        return $this->hasMany(CourseOffering::class);
     }
 }

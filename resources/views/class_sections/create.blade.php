@@ -1,0 +1,98 @@
+@extends('layouts.app')
+
+@section('content')
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>{{ request('auto') ? __('Tạo lớp học phần tự động') : __('Thêm lớp học phần') }}</span>
+                    <a href="{{ route('class-sections.index') }}" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-arrow-left"></i> {{ __('Quay lại') }}
+                    </a>
+                </div>
+                <div class="card-body">
+                    @include('partials.alerts')
+                    @if(request('auto'))
+                        <form method="POST" action="{{ route('class-sections.generate') }}">
+                            @csrf
+                            <div class="mb-3">
+                                <label class="form-label">{{ __('Môn học') }} <span class="text-danger">*</span></label>
+                                <select class="form-select" name="subject_id" required>
+                                    <option value="">{{ __('-- Chọn môn học --') }}</option>
+                                    @foreach($subjects as $subject)
+                                        <option value="{{ $subject->id }}">{{ $subject->code }} - {{ $subject->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">{{ __('Giáo viên') }} <span class="text-danger">*</span></label>
+                                <select class="form-select" name="teacher_id" required>
+                                    <option value="">{{ __('-- Chọn giáo viên --') }}</option>
+                                    @foreach($teachers as $teacher)
+                                        <option value="{{ $teacher->id }}">{{ $teacher->full_name }} - {{ $teacher->faculty->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">{{ __('Phòng') }}</label>
+                                <input type="text" class="form-control" name="room" value="{{ old('room') }}">
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-magic"></i> {{ __('Tạo tự động') }}
+                                </button>
+                            </div>
+                        </form>
+                    @else
+                        <form method="POST" action="{{ route('class-sections.store') }}">
+                            @csrf
+                            <div class="mb-3">
+                                <label class="form-label">{{ __('Mã lớp') }} <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" name="code" value="{{ old('code') }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">{{ __('Môn học') }} <span class="text-danger">*</span></label>
+                                <select class="form-select" name="subject_id" required>
+                                    <option value="">{{ __('-- Chọn môn học --') }}</option>
+                                    @foreach($subjects as $subject)
+                                        <option value="{{ $subject->id }}" {{ old('subject_id') == $subject->id ? 'selected' : '' }}>{{ $subject->code }} - {{ $subject->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">{{ __('Giáo viên') }} <span class="text-danger">*</span></label>
+                                <select class="form-select" name="teacher_id" required>
+                                    <option value="">{{ __('-- Chọn giáo viên --') }}</option>
+                                    @foreach($teachers as $teacher)
+                                        <option value="{{ $teacher->id }}" {{ old('teacher_id') == $teacher->id ? 'selected' : '' }}>{{ $teacher->full_name }} - {{ $teacher->faculty->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ __('Phòng') }}</label>
+                                    <input type="text" class="form-control" name="room" value="{{ old('room') }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">{{ __('Số tiết') }}</label>
+                                    <input type="number" class="form-control" name="period_count" value="{{ old('period_count', 0) }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">{{ __('Số SV') }}</label>
+                                    <input type="number" class="form-control" name="student_count" value="{{ old('student_count', 0) }}">
+                                </div>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> {{ __('Lưu') }}
+                                </button>
+                            </div>
+                        </form>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endsection
