@@ -45,6 +45,14 @@
                         </div>
 
                         <div class="mb-3">
+                            <label for="difficulty_ratio" class="form-label">{{ __('Độ khó') }}</label>
+                            <input type="number" step="0.1" class="form-control @error('difficulty_ratio') is-invalid @enderror" id="difficulty_ratio" name="difficulty_ratio" value="{{ old('difficulty_ratio', $subject->difficulty_ratio) }}">
+                            @error('difficulty_ratio')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
                             <label for="description" class="form-label">{{ __('Mô tả') }}</label>
                             <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="3">{{ old('description', $subject->description) }}</textarea>
                             @error('description')

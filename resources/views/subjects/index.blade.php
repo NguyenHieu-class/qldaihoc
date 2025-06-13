@@ -53,6 +53,7 @@
                                     <th width="15%">{{ __('Mã môn học') }}</th>
                                     <th width="35%">{{ __('Tên môn học') }}</th>
                                     <th width="10%">{{ __('Số tín chỉ') }}</th>
+                                    <th width="10%">{{ __('Độ khó') }}</th>
                                     <th width="20%">{{ __('Mô tả') }}</th>
                                     @if(auth()->user()->role == 'admin')
                                     <th width="15%">{{ __('Thao tác') }}</th>
@@ -63,10 +64,11 @@
                                 @forelse($subjects as $key => $subject)
                                 <tr>
                                     <td>{{ $subjects->firstItem() + $key }}</td>
-                                    <td>{{ $subject->code }}</td>
-                                    <td>{{ $subject->name }}</td>
-                                    <td>{{ $subject->credits }}</td>
-                                    <td>{{ Str::limit($subject->description, 50) }}</td>
+                                   <td>{{ $subject->code }}</td>
+                                   <td>{{ $subject->name }}</td>
+                                   <td>{{ $subject->credits }}</td>
+                                   <td>{{ $subject->difficulty_ratio }}</td>
+                                   <td>{{ Str::limit($subject->description, 50) }}</td>
                                     @if(auth()->user()->role == 'admin')
                                     <td>
                                         <div class="d-flex">
@@ -89,7 +91,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="{{ auth()->user()->role == 'admin' ? '6' : '5' }}" class="text-center">{{ __('Không có dữ liệu') }}</td>
+                                    <td colspan="{{ auth()->user()->role == 'admin' ? '7' : '6' }}" class="text-center">{{ __('Không có dữ liệu') }}</td>
                                 </tr>
                                 @endforelse
                             </tbody>
