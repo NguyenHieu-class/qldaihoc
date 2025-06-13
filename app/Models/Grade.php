@@ -17,6 +17,7 @@ class Grade extends Model
         'final_score',
         'assignment_score',
         'total_score',
+        'semester_id',
         'semester',
         'academic_year',
         'note',
@@ -36,6 +37,14 @@ class Grade extends Model
     public function subject(): BelongsTo
     {
         return $this->belongsTo(Subject::class);
+    }
+
+    /**
+     * Get the semester of the grade
+     */
+    public function semester(): BelongsTo
+    {
+        return $this->belongsTo(Semester::class);
     }
 
     /**

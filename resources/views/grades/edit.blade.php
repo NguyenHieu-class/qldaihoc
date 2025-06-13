@@ -66,14 +66,16 @@
                                 @enderror
                             </div>
                             <div class="col-md-4">
-                                <label for="semester" class="form-label">{{ __('Học kỳ') }} <span class="text-danger">*</span></label>
-                                <select class="form-select @error('semester') is-invalid @enderror" id="semester" name="semester" required>
+                                <label for="semester_id" class="form-label">{{ __('Học kỳ') }} <span class="text-danger">*</span></label>
+                                <select class="form-select @error('semester_id') is-invalid @enderror" id="semester_id" name="semester_id" required>
                                     <option value="">{{ __('-- Chọn học kỳ --') }}</option>
-                                    <option value="1" {{ old('semester', $grade->semester) == '1' ? 'selected' : '' }}>{{ __('Học kỳ 1') }}</option>
-                                    <option value="2" {{ old('semester', $grade->semester) == '2' ? 'selected' : '' }}>{{ __('Học kỳ 2') }}</option>
-                                    <option value="3" {{ old('semester', $grade->semester) == '3' ? 'selected' : '' }}>{{ __('Học kỳ 3') }}</option>
+                                    @foreach($semesters as $semester)
+                                        <option value="{{ $semester->id }}" {{ old('semester_id', $grade->semester_id) == $semester->id ? 'selected' : '' }}>
+                                            {{ $semester->name }} ({{ $semester->academicYear->name }})
+                                        </option>
+                                    @endforeach
                                 </select>
-                                @error('semester')
+                                @error('semester_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
