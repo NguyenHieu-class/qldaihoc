@@ -122,6 +122,16 @@
             padding: 12px 16px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
+
+        /* Sidebar collapse on small screens */
+        @media (max-width: 768px) {
+            body.sidebar-collapsed .sidebar {
+                display: none;
+            }
+            body.sidebar-collapsed .content {
+                margin-left: 0 !important;
+            }
+        }
     </style>
     
     @stack('styles')
@@ -133,6 +143,9 @@
                 <a class="navbar-brand" href="{{ url('/') }}">
                     <i class="fas fa-graduation-cap me-2"></i>Quản lý sinh viên
                 </a>
+                <button id="sidebarToggle" class="btn btn-outline-light d-md-none me-2" type="button">
+                    <i class="fas fa-bars"></i>
+                </button>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -200,121 +213,133 @@
                             </div>
                         </div>
                         
-                        <ul class="nav flex-column">
-                            <li class="nav-item">
-                                <a class="nav-link {{ request()->routeIs('dashboard.*') ? 'active' : '' }}" href="{{ route('dashboard.index') }}">
-                                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                                </a>
-                            </li>
-                            
-                            @if(Auth::user()->role == 'admin')
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('faculties.*') ? 'active' : '' }}" href="{{ route('faculties.index') }}">
-                                        <i class="fas fa-building"></i> Quản lý khoa
-                                    </a>
-                                </li>
-                                
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('majors.*') ? 'active' : '' }}" href="{{ route('majors.index') }}">
-                                        <i class="fas fa-book"></i> Quản lý ngành học
-                                    </a>
-                                </li>
-                                
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('classes.*') ? 'active' : '' }}" href="{{ route('classes.index') }}">
-                                        <i class="fas fa-users"></i> Quản lý lớp học
-                                    </a>
-                                </li>
-                                
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('subjects.*') ? 'active' : '' }}" href="{{ route('subjects.index') }}">
-                                        <i class="fas fa-book-open"></i> Quản lý môn học
-                                    </a>
-                                </li>
+                        <div class="nav flex-column">
+                            <a class="nav-link {{ request()->routeIs('dashboard.*') ? 'active' : '' }}" href="{{ route('dashboard.index') }}">
+                                <i class="fas fa-tachometer-alt"></i> Dashboard
+                            </a>
 
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('course-offerings.*') ? 'active' : '' }}" href="{{ route('course-offerings.index') }}">
-                                        <i class="fas fa-calendar-alt"></i> Mở môn học
-                                    </a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('class-sections.*') ? 'active' : '' }}" href="{{ route('class-sections.index') }}">
-                                        <i class="fas fa-list"></i> Lớp học phần
-                                    </a>
-                                </li>
-                                
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('teachers.*') ? 'active' : '' }}" href="{{ route('teachers.index') }}">
-                                        <i class="fas fa-chalkboard-teacher"></i> Quản lý giáo viên
-                                    </a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('academic-years.*') ? 'active' : '' }}" href="{{ route('academic-years.index') }}">
-                                        <i class="fas fa-calendar-alt"></i> Quản lý năm học
-                                    </a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('semesters.*') ? 'active' : '' }}" href="{{ route('semesters.index') }}">
-                                        <i class="fas fa-calendar"></i> Quản lý học kỳ
-                                    </a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('degrees.*') ? 'active' : '' }}" href="{{ route('degrees.index') }}">
-                                        <i class="fas fa-award"></i> Quản lý học vị
-                                    </a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('teaching-rates.*') ? 'active' : '' }}" href="{{ route('teaching-rates.index') }}">
-                                        <i class="fas fa-money-bill-wave"></i> Mức lương giảng dạy
-                                    </a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('degree-coefficients.*') ? 'active' : '' }}" href="{{ route('degree-coefficients.index') }}">
-                                        <i class="fas fa-percentage"></i> Hệ số học vị
-                                    </a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('class-size-coefficients.*') ? 'active' : '' }}" href="{{ route('class-size-coefficients.index') }}">
-                                        <i class="fas fa-users-cog"></i> Hệ số sĩ số lớp
-                                    </a>
-                                </li>
-
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" href="{{ route('reports.sections') }}">
-                                        <i class="fas fa-chart-pie"></i> Báo cáo
-                                    </a>
-                                </li>
-                            @endif
-                            
                             @if(Auth::user()->role == 'admin' || Auth::user()->role == 'teacher')
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('students.*') ? 'active' : '' }}" href="{{ route('students.index') }}">
-                                        <i class="fas fa-user-graduate"></i> Quản lý sinh viên
+                                <div class="nav-group">
+                                    <a class="nav-link" data-bs-toggle="collapse" href="#managementMenu" role="button" aria-expanded="true" aria-controls="managementMenu">
+                                        <i class="fas fa-users-cog"></i> Quản lý
                                     </a>
-                                </li>
-                                
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('grades.*') ? 'active' : '' }}" href="{{ route('grades.index') }}">
-                                        <i class="fas fa-chart-bar"></i> Quản lý điểm số
-                                    </a>
-                                </li>
+                                    <div class="collapse show" id="managementMenu">
+                                        <ul class="nav flex-column ms-3">
+                                            @if(Auth::user()->role == 'admin')
+                                                <li class="nav-item">
+                                                    <a class="nav-link {{ request()->routeIs('faculties.*') ? 'active' : '' }}" href="{{ route('faculties.index') }}">
+                                                        <i class="fas fa-building"></i> Quản lý khoa
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link {{ request()->routeIs('majors.*') ? 'active' : '' }}" href="{{ route('majors.index') }}">
+                                                        <i class="fas fa-book"></i> Quản lý ngành học
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link {{ request()->routeIs('classes.*') ? 'active' : '' }}" href="{{ route('classes.index') }}">
+                                                        <i class="fas fa-users"></i> Quản lý lớp học
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link {{ request()->routeIs('subjects.*') ? 'active' : '' }}" href="{{ route('subjects.index') }}">
+                                                        <i class="fas fa-book-open"></i> Quản lý môn học
+                                                    </a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link {{ request()->routeIs('teachers.*') ? 'active' : '' }}" href="{{ route('teachers.index') }}">
+                                                        <i class="fas fa-chalkboard-teacher"></i> Quản lý giáo viên
+                                                    </a>
+                                                </li>
+                                            @endif
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request()->routeIs('students.*') ? 'active' : '' }}" href="{{ route('students.index') }}">
+                                                    <i class="fas fa-user-graduate"></i> Quản lý sinh viên
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request()->routeIs('grades.*') ? 'active' : '' }}" href="{{ route('grades.index') }}">
+                                                    <i class="fas fa-chart-bar"></i> Quản lý điểm số
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
                             @endif
-                            
+
+                            @if(Auth::user()->role == 'admin')
+                                <div class="nav-group">
+                                    <a class="nav-link" data-bs-toggle="collapse" href="#configMenu" role="button" aria-expanded="true" aria-controls="configMenu">
+                                        <i class="fas fa-sliders-h"></i> Cấu hình
+                                    </a>
+                                    <div class="collapse show" id="configMenu">
+                                        <ul class="nav flex-column ms-3">
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request()->routeIs('academic-years.*') ? 'active' : '' }}" href="{{ route('academic-years.index') }}">
+                                                    <i class="fas fa-calendar-alt"></i> Quản lý năm học
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request()->routeIs('semesters.*') ? 'active' : '' }}" href="{{ route('semesters.index') }}">
+                                                    <i class="fas fa-calendar"></i> Quản lý học kỳ
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request()->routeIs('degrees.*') ? 'active' : '' }}" href="{{ route('degrees.index') }}">
+                                                    <i class="fas fa-award"></i> Quản lý học vị
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request()->routeIs('degree-coefficients.*') ? 'active' : '' }}" href="{{ route('degree-coefficients.index') }}">
+                                                    <i class="fas fa-percentage"></i> Hệ số học vị
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request()->routeIs('class-size-coefficients.*') ? 'active' : '' }}" href="{{ route('class-size-coefficients.index') }}">
+                                                    <i class="fas fa-users-cog"></i> Hệ số sĩ số lớp
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request()->routeIs('teaching-rates.*') ? 'active' : '' }}" href="{{ route('teaching-rates.index') }}">
+                                                    <i class="fas fa-money-bill-wave"></i> Mức lương giảng dạy
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="nav-group">
+                                    <a class="nav-link" data-bs-toggle="collapse" href="#operationsMenu" role="button" aria-expanded="true" aria-controls="operationsMenu">
+                                        <i class="fas fa-cogs"></i> Nghiệp vụ
+                                    </a>
+                                    <div class="collapse show" id="operationsMenu">
+                                        <ul class="nav flex-column ms-3">
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request()->routeIs('course-offerings.*') ? 'active' : '' }}" href="{{ route('course-offerings.index') }}">
+                                                    <i class="fas fa-calendar-alt"></i> Mở môn học
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request()->routeIs('class-sections.*') ? 'active' : '' }}" href="{{ route('class-sections.index') }}">
+                                                    <i class="fas fa-list"></i> Lớp học phần
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" href="{{ route('reports.sections') }}">
+                                                    <i class="fas fa-chart-pie"></i> Báo cáo
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            @endif
+
                             @if(Auth::user()->role == 'student' && Auth::user()->student)
-                                <li class="nav-item">
-                                    <a class="nav-link {{ request()->routeIs('students.transcript') ? 'active' : '' }}" href="{{ route('students.transcript', Auth::user()->student->id) }}">
-                                        <i class="fas fa-chart-line"></i> Bảng điểm
-                                    </a>
-                                </li>
+                                <a class="nav-link {{ request()->routeIs('students.transcript') ? 'active' : '' }}" href="{{ route('students.transcript', Auth::user()->student->id) }}">
+                                    <i class="fas fa-chart-line"></i> Bảng điểm
+                                </a>
                             @endif
-                        </ul>
+                        </div>
                     </div>
                 </div>
                 
@@ -346,7 +371,9 @@
             const sidebarToggle = document.getElementById('sidebarToggle');
             if (sidebarToggle) {
                 sidebarToggle.addEventListener('click', function() {
-                    document.body.classList.toggle('sidebar-collapsed');
+                    if (window.innerWidth < 768) {
+                        document.body.classList.toggle('sidebar-collapsed');
+                    }
                 });
             }
         });
