@@ -38,6 +38,10 @@
                                 <label class="form-label">{{ __('Phòng') }}</label>
                                 <input type="text" class="form-control" name="room" value="{{ old('room') }}">
                             </div>
+                            <div class="mb-3">
+                                <label class="form-label">{{ __('Số lớp cần tạo') }} <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" name="number_of_sections" value="{{ old('number_of_sections', 1) }}" min="1">
+                            </div>
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-success">
                                     <i class="fas fa-magic"></i> {{ __('Tạo tự động') }}
