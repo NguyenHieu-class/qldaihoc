@@ -5,8 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\CourseOffering;
 use App\Models\ClassSection;
+use App\Models\Faculty;
 
 class Subject extends Model
 {
@@ -18,6 +20,7 @@ class Subject extends Model
         'credits',
         'description',
         'difficulty_ratio',
+        'faculty_id',
     ];
 
     /**
@@ -42,5 +45,13 @@ class Subject extends Model
     public function classSections(): HasMany
     {
         return $this->hasMany(ClassSection::class);
+    }
+
+    /**
+     * Khoa quản lý môn học
+     */
+    public function faculty(): BelongsTo
+    {
+        return $this->belongsTo(Faculty::class);
     }
 }

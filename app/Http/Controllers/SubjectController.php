@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Subject;
+use App\Models\Faculty;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -13,7 +14,11 @@ class SubjectController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Subject::query();
+        $query = Subject::with('faculty');
+
+        if ($request->has('faculty_id') && $request->faculty_id) {
+            $query->where('faculty_id', $request->faculty_id);
+        }
         
         // Tìm kiếm theo tên hoặc mã môn học
         if ($request->has('search') && $request->search) {
@@ -31,8 +36,9 @@ class SubjectController extends Controller
         
         $subjects = $query->paginate(10);
         $creditOptions = Subject::distinct()->orderBy('credits')->pluck('credits');
-        
-        return view('subjects.index', compact('subjects', 'creditOptions'));
+        $faculties = Faculty::all();
+
+        return view('subjects.index', compact('subjects', 'creditOptions', 'faculties'));
     }
 
     /**
@@ -40,7 +46,8 @@ class SubjectController extends Controller
      */
     public function create()
     {
-        return view('subjects.create');
+        $faculties = Faculty::all();
+        return view('subjects.create', compact('faculties'));
     }
 
     /**
@@ -54,6 +61,7 @@ class SubjectController extends Controller
             'credits' => 'required|integer|min:1|max:10',
             'description' => 'nullable|string',
             'difficulty_ratio' => 'nullable|numeric',
+            'faculty_id' => 'required|exists:faculties,id',
         ]);
 
         if ($validator->fails()) {
@@ -82,7 +90,8 @@ class SubjectController extends Controller
      */
     public function edit(Subject $subject)
     {
-        return view('subjects.edit', compact('subject'));
+        $faculties = Faculty::all();
+        return view('subjects.edit', compact('subject', 'faculties'));
     }
 
     /**
@@ -96,6 +105,7 @@ class SubjectController extends Controller
             'credits' => 'required|integer|min:1|max:10',
             'description' => 'nullable|string',
             'difficulty_ratio' => 'nullable|numeric',
+            'faculty_id' => 'required|exists:faculties,id',
         ]);
 
         if ($validator->fails()) {
