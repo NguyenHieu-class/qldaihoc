@@ -21,10 +21,10 @@
                             <input type="text" class="form-control" name="code" value="{{ old('code', $classSection->code) }}" required>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">{{ __('Môn học') }} <span class="text-danger">*</span></label>
-                            <select class="form-select" name="subject_id" required>
-                                @foreach($subjects as $subject)
-                                    <option value="{{ $subject->id }}" {{ $classSection->subject_id == $subject->id ? 'selected' : '' }}>{{ $subject->code }} - {{ $subject->name }}</option>
+                            <label class="form-label">{{ __('Mở môn học') }} <span class="text-danger">*</span></label>
+                            <select class="form-select" name="course_offering_id" required>
+                                @foreach($courseOfferings as $offering)
+                                    <option value="{{ $offering->id }}" {{ $classSection->course_offering_id == $offering->id ? 'selected' : '' }}>{{ $offering->subject->code }} - {{ $offering->subject->name }} ({{ $offering->semester->name }})</option>
                                 @endforeach
                             </select>
                         </div>

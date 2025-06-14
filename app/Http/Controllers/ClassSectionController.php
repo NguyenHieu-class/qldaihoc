@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ClassSection;
 use App\Models\Subject;
+use App\Models\CourseOffering;
 use App\Models\Teacher;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -12,22 +13,30 @@ class ClassSectionController extends Controller
 {
     public function index()
     {
-        $sections = ClassSection::with(['subject', 'teacher.faculty'])->paginate(10);
+        $sections = ClassSection::with(['subject', 'teacher.faculty', 'courseOffering.subject'])->paginate(10);
         return view('class_sections.index', compact('sections'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        $subjects = Subject::all();
-        $teachers = Teacher::with('faculty')->get();
-        return view('class_sections.create', compact('subjects', 'teachers'));
+        $courseOfferings = CourseOffering::with(['subject', 'semester.academicYear'])
+            ->when($request->semester_id, function ($q) use ($request) {
+                $q->where('semester_id', $request->semester_id);
+            })
+            ->get();
+        $teachers = Teacher::with('faculty')
+            ->when($request->faculty_id, function ($q) use ($request) {
+                $q->where('faculty_id', $request->faculty_id);
+            })
+            ->get();
+        return view('class_sections.create', compact('courseOfferings', 'teachers'));
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'code' => 'required|unique:class_sections,code',
-            'subject_id' => 'required|exists:subjects,id',
+            'course_offering_id' => 'required|exists:course_offerings,id',
             'teacher_id' => 'required|exists:teachers,id',
             'room' => 'nullable|string',
             'period_count' => 'required|integer|min:0',
@@ -36,22 +45,32 @@ class ClassSectionController extends Controller
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
-        ClassSection::create($request->all());
+        $offering = CourseOffering::find($request->course_offering_id);
+
+        ClassSection::create([
+            'code' => $request->code,
+            'course_offering_id' => $offering->id,
+            'subject_id' => $offering->subject_id,
+            'teacher_id' => $request->teacher_id,
+            'room' => $request->room,
+            'period_count' => $request->period_count,
+            'student_count' => $request->student_count,
+        ]);
         return redirect()->route('class-sections.index')->with('success', 'Đã lưu lớp học phần.');
     }
 
     public function edit(ClassSection $classSection)
     {
-        $subjects = Subject::all();
+        $courseOfferings = CourseOffering::with(['subject', 'semester.academicYear'])->get();
         $teachers = Teacher::with('faculty')->get();
-        return view('class_sections.edit', compact('classSection', 'subjects', 'teachers'));
+        return view('class_sections.edit', compact('classSection', 'courseOfferings', 'teachers'));
     }
 
     public function update(Request $request, ClassSection $classSection)
     {
         $validator = Validator::make($request->all(), [
             'code' => 'required|unique:class_sections,code,' . $classSection->id,
-            'subject_id' => 'required|exists:subjects,id',
+            'course_offering_id' => 'required|exists:course_offerings,id',
             'teacher_id' => 'required|exists:teachers,id',
             'room' => 'nullable|string',
             'period_count' => 'required|integer|min:0',
@@ -60,7 +79,17 @@ class ClassSectionController extends Controller
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
-        $classSection->update($request->all());
+        $offering = CourseOffering::find($request->course_offering_id);
+
+        $classSection->update([
+            'code' => $request->code,
+            'course_offering_id' => $offering->id,
+            'subject_id' => $offering->subject_id,
+            'teacher_id' => $request->teacher_id,
+            'room' => $request->room,
+            'period_count' => $request->period_count,
+            'student_count' => $request->student_count,
+        ]);
         return redirect()->route('class-sections.index')->with('success', 'Đã cập nhật lớp học phần.');
     }
 
@@ -76,14 +105,15 @@ class ClassSectionController extends Controller
     public function generate(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'subject_id' => 'required|exists:subjects,id',
+            'course_offering_id' => 'required|exists:course_offerings,id',
             'teacher_id' => 'required|exists:teachers,id',
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
-        $subject = Subject::find($request->subject_id);
+        $offering = CourseOffering::with('subject')->find($request->course_offering_id);
+        $subject = $offering->subject;
         $prefix = $subject->code . 'N';
         $last = ClassSection::where('code', 'like', $prefix.'%')
             ->orderBy('code', 'desc')
@@ -96,7 +126,8 @@ class ClassSectionController extends Controller
 
         ClassSection::create([
             'code' => $code,
-            'subject_id' => $request->subject_id,
+            'course_offering_id' => $offering->id,
+            'subject_id' => $offering->subject_id,
             'teacher_id' => $request->teacher_id,
             'room' => $request->room,
             'period_count' => $request->period_count ?? 0,
