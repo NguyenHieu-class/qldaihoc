@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Student extends Model
 {
@@ -50,6 +51,22 @@ class Student extends Model
     public function grades(): HasMany
     {
         return $this->hasMany(Grade::class);
+    }
+
+    /**
+     * Các lớp học phần sinh viên đã đăng ký
+     */
+    public function classSections(): BelongsToMany
+    {
+        return $this->belongsToMany(ClassSection::class, 'enrollments')->withTimestamps();
+    }
+
+    /**
+     * Các đăng ký lớp học phần
+     */
+    public function enrollments(): HasMany
+    {
+        return $this->hasMany(Enrollment::class);
     }
 
     /**

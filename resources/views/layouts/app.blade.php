@@ -338,6 +338,9 @@
                                 <a class="nav-link {{ request()->routeIs('students.transcript') ? 'active' : '' }}" href="{{ route('students.transcript', Auth::user()->student->id) }}">
                                     <i class="fas fa-chart-line"></i> Bảng điểm
                                 </a>
+                                <a class="nav-link {{ request()->routeIs('enrollments.*') ? 'active' : '' }}" href="{{ route('enrollments.index') }}">
+                                    <i class="fas fa-book-open"></i> Đăng ký lớp
+                                </a>
                             @endif
                         </div>
                     </div>

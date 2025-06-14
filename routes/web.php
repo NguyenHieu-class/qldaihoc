@@ -99,3 +99,10 @@ Route::middleware(['auth', 'role:admin,teacher'])->group(function () {
 Route::get('/students/{student}/transcript', [GradeController::class, 'studentTranscript'])
     ->name('students.transcript')
     ->middleware('auth');
+
+// Đăng ký lớp học phần cho sinh viên
+Route::middleware(['auth', 'role:student'])->group(function () {
+    Route::get('enrollments', [\App\Http\Controllers\EnrollmentController::class, 'index'])->name('enrollments.index');
+    Route::post('class-sections/{classSection}/enroll', [\App\Http\Controllers\EnrollmentController::class, 'store'])->name('enrollments.store');
+    Route::delete('enrollments/{enrollment}', [\App\Http\Controllers\EnrollmentController::class, 'destroy'])->name('enrollments.destroy');
+});
