@@ -219,11 +219,22 @@
                             </a>
 
                             @if(Auth::user()->role == 'admin' || Auth::user()->role == 'teacher')
+                                @php
+                                    $isActive = request()->routeIs(
+                                        'faculties.*',
+                                        'majors.*',
+                                        'classes.*',
+                                        'subjects.*',
+                                        'teachers.*',
+                                        'students.*',
+                                        'grades.*'
+                                    );
+                                @endphp
                                 <div class="nav-group">
-                                    <a class="nav-link" data-bs-toggle="collapse" href="#managementMenu" role="button" aria-expanded="true" aria-controls="managementMenu">
+                                    <a class="nav-link" data-bs-toggle="collapse" href="#managementMenu" role="button" aria-expanded="{{ $isActive ? 'true' : 'false' }}" aria-controls="managementMenu">
                                         <i class="fas fa-users-cog"></i> Quản lý
                                     </a>
-                                    <div class="collapse show" id="managementMenu">
+                                    <div class="collapse {{ $isActive ? 'show' : '' }}" id="managementMenu">
                                         <ul class="nav flex-column ms-3">
                                             @if(Auth::user()->role == 'admin')
                                                 <li class="nav-item">
@@ -268,11 +279,21 @@
                             @endif
 
                             @if(Auth::user()->role == 'admin')
+                                @php
+                                    $isActive = request()->routeIs(
+                                        'academic-years.*',
+                                        'semesters.*',
+                                        'degrees.*',
+                                        'degree-coefficients.*',
+                                        'class-size-coefficients.*',
+                                        'teaching-rates.*'
+                                    );
+                                @endphp
                                 <div class="nav-group">
-                                    <a class="nav-link" data-bs-toggle="collapse" href="#configMenu" role="button" aria-expanded="true" aria-controls="configMenu">
+                                    <a class="nav-link" data-bs-toggle="collapse" href="#configMenu" role="button" aria-expanded="{{ $isActive ? 'true' : 'false' }}" aria-controls="configMenu">
                                         <i class="fas fa-sliders-h"></i> Cấu hình
                                     </a>
-                                    <div class="collapse show" id="configMenu">
+                                    <div class="collapse {{ $isActive ? 'show' : '' }}" id="configMenu">
                                         <ul class="nav flex-column ms-3">
                                             <li class="nav-item">
                                                 <a class="nav-link {{ request()->routeIs('academic-years.*') ? 'active' : '' }}" href="{{ route('academic-years.index') }}">
@@ -309,10 +330,17 @@
                                 </div>
 
                                 <div class="nav-group">
-                                    <a class="nav-link" data-bs-toggle="collapse" href="#operationsMenu" role="button" aria-expanded="true" aria-controls="operationsMenu">
+                                    @php
+                                        $isActive = request()->routeIs(
+                                            'course-offerings.*',
+                                            'class-sections.*',
+                                            'reports.*'
+                                        );
+                                    @endphp
+                                    <a class="nav-link" data-bs-toggle="collapse" href="#operationsMenu" role="button" aria-expanded="{{ $isActive ? 'true' : 'false' }}" aria-controls="operationsMenu">
                                         <i class="fas fa-cogs"></i> Nghiệp vụ
                                     </a>
-                                    <div class="collapse show" id="operationsMenu">
+                                    <div class="collapse {{ $isActive ? 'show' : '' }}" id="operationsMenu">
                                         <ul class="nav flex-column ms-3">
                                             <li class="nav-item">
                                                 <a class="nav-link {{ request()->routeIs('course-offerings.*') ? 'active' : '' }}" href="{{ route('course-offerings.index') }}">
