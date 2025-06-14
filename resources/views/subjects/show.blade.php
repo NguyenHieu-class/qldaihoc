@@ -35,8 +35,8 @@
                             <div class="col-md-8">{{ $subject->credits }}</div>
                         </div>
                         <div class="row mt-2">
-                            <div class="col-md-4 fw-bold">{{ __('Độ khó:') }}</div>
-                            <div class="col-md-8">{{ $subject->difficulty_ratio }}</div>
+                            <div class="col-md-4 fw-bold">{{ __('Hệ số học phần:') }}</div>
+                            <div class="col-md-8">{{ $subject->coefficient }}</div>
                         </div>
                         <div class="row mt-2">
                             <div class="col-md-4 fw-bold">{{ __('Mô tả:') }}</div>

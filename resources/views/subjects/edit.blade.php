@@ -58,9 +58,9 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="difficulty_ratio" class="form-label">{{ __('Độ khó') }}</label>
-                            <input type="number" step="0.1" class="form-control @error('difficulty_ratio') is-invalid @enderror" id="difficulty_ratio" name="difficulty_ratio" value="{{ old('difficulty_ratio', $subject->difficulty_ratio) }}">
-                            @error('difficulty_ratio')
+                            <label for="coefficient" class="form-label">{{ __('Hệ số học phần') }}</label>
+                            <input type="number" step="0.1" class="form-control @error('coefficient') is-invalid @enderror" id="coefficient" name="coefficient" value="{{ old('coefficient', $subject->coefficient) }}">
+                            @error('coefficient')
                                 <div class="invalid-feedback">{{ $message }}</div>
                             @enderror
                         </div>

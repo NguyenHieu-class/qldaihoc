@@ -19,7 +19,7 @@ class TeachingPaymentServiceTest extends TestCase
     {
         Degree::create(['id' => 1, 'name' => 'Dr', 'coefficient' => 1.5]);
         $teacher = new Teacher(['degree_id' => 1]);
-        $subject = new Subject(['difficulty_ratio' => 1.2]);
+        $subject = new Subject(['coefficient' => 1.2]);
 
         TeachingRate::unguard();
         TeachingRate::create(['id' => 1, 'amount' => 100]);

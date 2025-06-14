@@ -61,7 +61,7 @@
                                     <th width="15%">{{ __('Mã môn học') }}</th>
                                     <th width="35%">{{ __('Tên môn học') }}</th>
                                     <th width="10%">{{ __('Số tín chỉ') }}</th>
-                                    <th width="10%">{{ __('Độ khó') }}</th>
+                                    <th width="10%">{{ __('Hệ số học phần') }}</th>
                                     <th width="20%">{{ __('Khoa') }}</th>
                                     <th width="20%">{{ __('Mô tả') }}</th>
                                     @if(auth()->user()->role == 'admin')
@@ -76,7 +76,7 @@
                                    <td>{{ $subject->code }}</td>
                                    <td>{{ $subject->name }}</td>
                                    <td>{{ $subject->credits }}</td>
-                                   <td>{{ $subject->difficulty_ratio }}</td>
+                                   <td>{{ $subject->coefficient }}</td>
                                    <td>{{ $subject->faculty->name ?? '' }}</td>
                                    <td>{{ Str::limit($subject->description, 50) }}</td>
                                     @if(auth()->user()->role == 'admin')
