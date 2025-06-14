@@ -37,7 +37,13 @@
                                 <tr>
                                     <td>{{ $sections->firstItem() + $key }}</td>
                                     <td>{{ $section->code }}</td>
-                                    <td>{{ $section->subject->code }} - {{ $section->subject->name }}</td>
+                                    <td>
+                                        @if($section->courseOffering)
+                                            {{ $section->courseOffering->subject->code }} - {{ $section->courseOffering->subject->name }}
+                                        @else
+                                            {{ $section->subject->code }} - {{ $section->subject->name }}
+                                        @endif
+                                    </td>
                                     <td>{{ $section->teacher->full_name }} - {{ $section->teacher->faculty->name }}</td>
                                     <td>{{ $section->room }}</td>
                                     <td>{{ $section->period_count }}</td>

@@ -12,6 +12,7 @@ class ClassSection extends Model
 
     protected $fillable = [
         'code',
+        'course_offering_id',
         'subject_id',
         'teacher_id',
         'room',
@@ -27,5 +28,10 @@ class ClassSection extends Model
     public function teacher(): BelongsTo
     {
         return $this->belongsTo(Teacher::class);
+    }
+
+    public function courseOffering(): BelongsTo
+    {
+        return $this->belongsTo(CourseOffering::class);
     }
 }
