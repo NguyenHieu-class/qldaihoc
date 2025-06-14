@@ -5,6 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Student;
+use App\Models\Enrollment;
 
 class ClassSection extends Model
 {
@@ -33,5 +37,21 @@ class ClassSection extends Model
     public function courseOffering(): BelongsTo
     {
         return $this->belongsTo(CourseOffering::class);
+    }
+
+    /**
+     * Sinh viên đăng ký lớp học phần
+     */
+    public function students(): BelongsToMany
+    {
+        return $this->belongsToMany(Student::class, 'enrollments')->withTimestamps();
+    }
+
+    /**
+     * Các đăng ký lớp học phần
+     */
+    public function enrollments(): HasMany
+    {
+        return $this->hasMany(Enrollment::class);
     }
 }
