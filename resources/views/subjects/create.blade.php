@@ -19,6 +19,19 @@
                         @csrf
 
                         <div class="mb-3">
+                            <label for="faculty_id" class="form-label">{{ __('Khoa') }} <span class="text-danger">*</span></label>
+                            <select class="form-select @error('faculty_id') is-invalid @enderror" id="faculty_id" name="faculty_id" required>
+                                <option value="">{{ __('-- Chọn khoa --') }}</option>
+                                @foreach($faculties as $faculty)
+                                    <option value="{{ $faculty->id }}" {{ old('faculty_id') == $faculty->id ? 'selected' : '' }}>{{ $faculty->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('faculty_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="mb-3">
                             <label for="name" class="form-label">{{ __('Tên môn học') }} <span class="text-danger">*</span></label>
                             <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name') }}" required>
                             @error('name')

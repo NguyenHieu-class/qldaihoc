@@ -29,7 +29,15 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-7">
+                            <div class="col-md-3">
+                                <select name="faculty_id" class="form-select">
+                                    <option value="">{{ __('-- Tất cả khoa --') }}</option>
+                                    @foreach($faculties as $faculty)
+                                        <option value="{{ $faculty->id }}" {{ request('faculty_id') == $faculty->id ? 'selected' : '' }}>{{ $faculty->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-5">
                                 <div class="input-group">
                                     <input type="text" name="search" class="form-control" placeholder="{{ __('Tìm kiếm theo tên hoặc mã môn học...') }}" value="{{ request('search') }}">
                                     <button class="btn btn-outline-secondary" type="submit">
@@ -37,7 +45,7 @@
                                     </button>
                                 </div>
                             </div>
-                            <div class="col-md-2">
+                            <div class="col-md-1">
                                 <a href="{{ route('subjects.index') }}" class="btn btn-outline-secondary w-100">
                                     <i class="fas fa-redo"></i> {{ __('Làm mới') }}
                                 </a>
@@ -54,6 +62,7 @@
                                     <th width="35%">{{ __('Tên môn học') }}</th>
                                     <th width="10%">{{ __('Số tín chỉ') }}</th>
                                     <th width="10%">{{ __('Độ khó') }}</th>
+                                    <th width="20%">{{ __('Khoa') }}</th>
                                     <th width="20%">{{ __('Mô tả') }}</th>
                                     @if(auth()->user()->role == 'admin')
                                     <th width="15%">{{ __('Thao tác') }}</th>
@@ -68,6 +77,7 @@
                                    <td>{{ $subject->name }}</td>
                                    <td>{{ $subject->credits }}</td>
                                    <td>{{ $subject->difficulty_ratio }}</td>
+                                   <td>{{ $subject->faculty->name ?? '' }}</td>
                                    <td>{{ Str::limit($subject->description, 50) }}</td>
                                     @if(auth()->user()->role == 'admin')
                                     <td>

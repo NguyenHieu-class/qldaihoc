@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CourseOffering;
 use App\Models\Subject;
 use App\Models\Semester;
+use App\Models\Faculty;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -16,11 +17,16 @@ class CourseOfferingController extends Controller
         return view('course_offerings.index', compact('courseOfferings'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        $subjects = Subject::all();
+        $subjectsQuery = Subject::query();
+        if ($request->has('faculty_id') && $request->faculty_id) {
+            $subjectsQuery->where('faculty_id', $request->faculty_id);
+        }
+        $subjects = $subjectsQuery->get();
         $semesters = Semester::with('academicYear')->get();
-        return view('course_offerings.create', compact('subjects', 'semesters'));
+        $faculties = Faculty::all();
+        return view('course_offerings.create', compact('subjects', 'semesters', 'faculties'));
     }
 
     public function store(Request $request)
@@ -36,11 +42,16 @@ class CourseOfferingController extends Controller
         return redirect()->route('course-offerings.index')->with('success', 'Đã lưu thông tin.');
     }
 
-    public function edit(CourseOffering $courseOffering)
+    public function edit(CourseOffering $courseOffering, Request $request)
     {
-        $subjects = Subject::all();
+        $subjectsQuery = Subject::query();
+        if ($request->has('faculty_id') && $request->faculty_id) {
+            $subjectsQuery->where('faculty_id', $request->faculty_id);
+        }
+        $subjects = $subjectsQuery->get();
         $semesters = Semester::with('academicYear')->get();
-        return view('course_offerings.edit', compact('courseOffering', 'subjects', 'semesters'));
+        $faculties = Faculty::all();
+        return view('course_offerings.edit', compact('courseOffering', 'subjects', 'semesters', 'faculties'));
     }
 
     public function update(Request $request, CourseOffering $courseOffering)
