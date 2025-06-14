@@ -107,6 +107,7 @@ class ClassSectionController extends Controller
         $validator = Validator::make($request->all(), [
             'course_offering_id' => 'required|exists:course_offerings,id',
             'teacher_id' => 'required|exists:teachers,id',
+            'number_of_sections' => 'required|integer|min:1',
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
@@ -122,18 +123,24 @@ class ClassSectionController extends Controller
         if ($last) {
             $num = intval(substr($last->code, strlen($prefix))) + 1;
         }
-        $code = $prefix . str_pad($num, 2, '0', STR_PAD_LEFT);
+        $createdCodes = [];
+        for ($i = 0; $i < $request->number_of_sections; $i++) {
+            $code = $prefix . str_pad($num + $i, 2, '0', STR_PAD_LEFT);
 
-        ClassSection::create([
-            'code' => $code,
-            'course_offering_id' => $offering->id,
-            'subject_id' => $offering->subject_id,
-            'teacher_id' => $request->teacher_id,
-            'room' => $request->room,
-            'period_count' => $request->period_count ?? 0,
-            'student_count' => $request->student_count ?? 0,
-        ]);
+            ClassSection::create([
+                'code' => $code,
+                'course_offering_id' => $offering->id,
+                'subject_id' => $offering->subject_id,
+                'teacher_id' => $request->teacher_id,
+                'room' => $request->room,
+                'period_count' => $request->period_count ?? 0,
+                'student_count' => $request->student_count ?? 0,
+            ]);
 
-        return redirect()->route('class-sections.index')->with('success', 'Đã tạo lớp học phần ' . $code);
+            $createdCodes[] = $code;
+        }
+
+        return redirect()->route('class-sections.index')
+            ->with('success', 'Đã tạo lớp học phần: ' . implode(', ', $createdCodes));
     }
 }
