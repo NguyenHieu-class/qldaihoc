@@ -17,7 +17,7 @@ class SubjectFactory extends Factory
             'code' => strtoupper($this->faker->unique()->lexify('SUB??')),
             'credits' => 3,
             'description' => $this->faker->sentence,
-            'difficulty_ratio' => 1,
+            'coefficient' => 1,
             'faculty_id' => Faculty::factory(),
         ];
     }

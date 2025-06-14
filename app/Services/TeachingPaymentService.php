@@ -21,8 +21,8 @@ class TeachingPaymentService
             ->where('max_students', '>=', $studentCount)
             ->value('coefficient') ?? 1;
 
-        $difficulty = $subject->difficulty_ratio ?? 1;
+        $coefficient = $subject->coefficient ?? 1;
 
-        return $base * $degreeCoefficient * $classCoefficient * $difficulty * $periods;
+        return $base * $degreeCoefficient * $classCoefficient * $coefficient * $periods;
     }
 }

@@ -59,7 +59,7 @@ class ReportController extends Controller
                         $q->where('semester_id', $semester->id);
                     })
                     ->join('subjects', 'class_sections.subject_id', '=', 'subjects.id')
-                    ->sum(DB::raw('class_sections.period_count * subjects.difficulty_ratio'));
+                    ->sum(DB::raw('class_sections.period_count * subjects.coefficient'));
                 $rows[] = [
                     'semester' => $semester->name . ' ' . $semester->academicYear->name,
                     'periods' => $periods,

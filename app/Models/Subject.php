@@ -19,7 +19,7 @@ class Subject extends Model
         'code',
         'credits',
         'description',
-        'difficulty_ratio',
+        'coefficient',
         'faculty_id',
     ];
 

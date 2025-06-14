@@ -166,7 +166,7 @@ class SubjectSeeder extends Seeder
         ];
 
         foreach ($subjects as $subject) {
-            Subject::create($subject);
+            Subject::create($subject + ['coefficient' => 1]);
         }
     }
 }
