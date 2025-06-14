@@ -249,6 +249,43 @@
                                         <i class="fas fa-chalkboard-teacher"></i> Quản lý giáo viên
                                     </a>
                                 </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('academic-years.*') ? 'active' : '' }}" href="{{ route('academic-years.index') }}">
+                                        <i class="fas fa-calendar-alt"></i> Quản lý năm học
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('semesters.*') ? 'active' : '' }}" href="{{ route('semesters.index') }}">
+                                        <i class="fas fa-calendar"></i> Quản lý học kỳ
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('degrees.*') ? 'active' : '' }}" href="{{ route('degrees.index') }}">
+                                        <i class="fas fa-award"></i> Quản lý học vị
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('teaching-rates.*') ? 'active' : '' }}" href="{{ route('teaching-rates.index') }}">
+                                        <i class="fas fa-money-bill-wave"></i> Mức lương giảng dạy
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('degree-coefficients.*') ? 'active' : '' }}" href="{{ route('degree-coefficients.index') }}">
+                                        <i class="fas fa-percentage"></i> Hệ số học vị
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a class="nav-link {{ request()->routeIs('class-size-coefficients.*') ? 'active' : '' }}" href="{{ route('class-size-coefficients.index') }}">
+                                        <i class="fas fa-users-cog"></i> Hệ số sĩ số lớp
+                                    </a>
+                                </li>
+
                                 <li class="nav-item">
                                     <a class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" href="{{ route('reports.sections') }}">
                                         <i class="fas fa-chart-pie"></i> Báo cáo
