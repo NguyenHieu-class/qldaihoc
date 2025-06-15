@@ -21,6 +21,13 @@ class DatabaseSeeder extends Seeder
             SubjectSeeder::class,      // Tạo môn học
             TeacherSeeder::class,      // Tạo giáo viên (phụ thuộc vào khoa và tài khoản)
             StudentSeeder::class,      // Tạo sinh viên (phụ thuộc vào lớp học và tài khoản)
+            AcademicYearSeeder::class, // Tạo năm học
+            SemesterSeeder::class,     // Tạo học kỳ (phụ thuộc năm học)
+            TeachingRateSeeder::class, // Tạo mức lương giảng dạy
+            DegreeCoefficientSeeder::class, // Tạo hệ số học vị
+            ClassSizeCoefficientSeeder::class, // Tạo hệ số sĩ số lớp
+            CourseOfferingSeeder::class, // Tạo các học phần và lớp học phần
+            EnrollmentSeeder::class,  // Đăng ký lớp học phần
             GradeSeeder::class,        // Tạo điểm số (phụ thuộc vào sinh viên và môn học)
         ]);
     }
