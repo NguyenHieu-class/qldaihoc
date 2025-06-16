@@ -13,23 +13,64 @@
                 </div>
                 <div class="card-body">
                     @include('partials.alerts')
+
+                    <div class="mb-3">
+                        <form action="{{ route('course-offerings.create') }}" method="GET" class="row g-3">
+                            <div class="col-md-4">
+                                <select name="academic_year_id" class="form-select">
+                                    <option value="">{{ __('-- Năm học --') }}</option>
+                                    @foreach($academicYears as $year)
+                                        <option value="{{ $year->id }}" {{ request('academic_year_id') == $year->id ? 'selected' : '' }}>{{ $year->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select name="semester_id" class="form-select">
+                                    <option value="">{{ __('-- Học kỳ --') }}</option>
+                                    @foreach($semesters as $s)
+                                        <option value="{{ $s->id }}" {{ request('semester_id') == $s->id ? 'selected' : '' }}>{{ $s->name }} ({{ $s->academicYear->name }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select name="faculty_id" class="form-select">
+                                    <option value="">{{ __('-- Khoa --') }}</option>
+                                    @foreach($faculties as $faculty)
+                                        <option value="{{ $faculty->id }}" {{ request('faculty_id') == $faculty->id ? 'selected' : '' }}>{{ $faculty->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-1">
+                                <button type="submit" class="btn btn-outline-primary w-100">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
                     <form method="POST" action="{{ route('course-offerings.store') }}">
                         @csrf
                         <div class="mb-3">
-                            <label for="subject_id" class="form-label">{{ __('Môn học') }} <span class="text-danger">*</span></label>
-                            <select class="form-select" id="subject_id" name="subject_id" required>
-                                <option value="">{{ __('-- Chọn môn học --') }}</option>
-                                @foreach($subjects as $subject)
-                                    <option value="{{ $subject->id }}" {{ old('subject_id') == $subject->id ? 'selected' : '' }}>{{ $subject->code }} - {{ $subject->name }}</option>
-                                @endforeach
-                            </select>
+                            <label class="form-label">{{ __('Môn học') }} <span class="text-danger">*</span></label>
+                            <div class="ms-2">
+                                @forelse($subjects as $subject)
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="subject_ids[]" id="subject_{{ $subject->id }}" value="{{ $subject->id }}" {{ in_array($subject->id, old('subject_ids', [])) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="subject_{{ $subject->id }}">
+                                            {{ $subject->code }} - {{ $subject->name }}
+                                        </label>
+                                    </div>
+                                @empty
+                                    <p class="text-muted">{{ __('Không có môn học') }}</p>
+                                @endforelse
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="semester_id" class="form-label">{{ __('Học kỳ') }} <span class="text-danger">*</span></label>
                             <select class="form-select" id="semester_id" name="semester_id" required>
                                 <option value="">{{ __('-- Chọn học kỳ --') }}</option>
                                 @foreach($semesters as $semester)
-                                    <option value="{{ $semester->id }}" {{ old('semester_id') == $semester->id ? 'selected' : '' }}>{{ $semester->name }} ({{ $semester->academicYear->name }})</option>
+                                    <option value="{{ $semester->id }}" {{ old('semester_id', request('semester_id')) == $semester->id ? 'selected' : '' }}>{{ $semester->name }} ({{ $semester->academicYear->name }})</option>
                                 @endforeach
                             </select>
                         </div>

@@ -20,25 +20,42 @@ class CourseOfferingController extends Controller
     public function create(Request $request)
     {
         $subjectsQuery = Subject::query();
-        if ($request->has('faculty_id') && $request->faculty_id) {
+        if ($request->filled('faculty_id')) {
             $subjectsQuery->where('faculty_id', $request->faculty_id);
         }
         $subjects = $subjectsQuery->get();
-        $semesters = Semester::with('academicYear')->get();
+
+        $semestersQuery = Semester::with('academicYear');
+        if ($request->filled('academic_year_id')) {
+            $semestersQuery->where('academic_year_id', $request->academic_year_id);
+        }
+        $semesters = $semestersQuery->get();
+
         $faculties = Faculty::all();
-        return view('course_offerings.create', compact('subjects', 'semesters', 'faculties'));
+        $academicYears = \App\Models\AcademicYear::all();
+
+        return view('course_offerings.create', compact('subjects', 'semesters', 'faculties', 'academicYears'));
     }
 
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'subject_id' => 'required|exists:subjects,id',
+            'subject_ids' => 'required|array',
+            'subject_ids.*' => 'exists:subjects,id',
             'semester_id' => 'required|exists:semesters,id',
         ]);
+
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
-        CourseOffering::firstOrCreate($request->only('subject_id', 'semester_id'));
+
+        foreach ($request->subject_ids as $subjectId) {
+            CourseOffering::firstOrCreate([
+                'subject_id' => $subjectId,
+                'semester_id' => $request->semester_id,
+            ]);
+        }
+
         return redirect()->route('course-offerings.index')->with('success', 'Đã lưu thông tin.');
     }
 
