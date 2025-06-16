@@ -13,6 +13,41 @@
                 </div>
                 <div class="card-body">
                     @include('partials.alerts')
+
+                    <div class="mb-3">
+                        <form action="{{ route('class-sections.create') }}" method="GET" class="row g-3">
+                            <input type="hidden" name="auto" value="{{ request('auto') }}">
+                            <div class="col-md-3">
+                                <select name="faculty_id" class="form-select">
+                                    <option value="">{{ __('-- Khoa --') }}</option>
+                                    @foreach($faculties as $faculty)
+                                        <option value="{{ $faculty->id }}" {{ request('faculty_id') == $faculty->id ? 'selected' : '' }}>{{ $faculty->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select name="academic_year_id" class="form-select">
+                                    <option value="">{{ __('-- Năm học --') }}</option>
+                                    @foreach($academicYears as $year)
+                                        <option value="{{ $year->id }}" {{ request('academic_year_id') == $year->id ? 'selected' : '' }}>{{ $year->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select name="semester_id" class="form-select">
+                                    <option value="">{{ __('-- Học kỳ --') }}</option>
+                                    @foreach($semesters as $s)
+                                        <option value="{{ $s->id }}" {{ request('semester_id') == $s->id ? 'selected' : '' }}>{{ $s->name }} ({{ $s->academicYear->name }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-1">
+                                <button type="submit" class="btn btn-outline-primary w-100">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                     @if(request('auto'))
                         <form method="POST" action="{{ route('class-sections.generate') }}">
                             @csrf
