@@ -15,6 +15,7 @@ use App\Http\Controllers\TeachingRateController;
 use App\Http\Controllers\ClassSizeCoefficientController;
 use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\SemesterController;
+use App\Http\Controllers\PayrollController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -88,9 +89,13 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 Route::middleware(['auth', 'role:admin,teacher'])->group(function () {
     // Quản lý sinh viên
     Route::resource('students', StudentController::class);
-    
+
     // Quản lý điểm số
     Route::resource('grades', GradeController::class);
+
+    // Bảng lương giáo viên
+    Route::get('payrolls', [PayrollController::class, 'index'])->name('payrolls.index');
+    Route::get('payrolls/{teacher}', [PayrollController::class, 'show'])->name('payrolls.show');
 });
 
 // Route xem bảng điểm sinh viên (cho admin, giáo viên và sinh viên đó)
