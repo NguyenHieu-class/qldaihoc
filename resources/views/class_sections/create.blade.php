@@ -26,6 +26,7 @@
                                 </select>
                             </div>
                             <div class="col-md-4">
+                            <div class="col-md-5">
                                 <select name="academic_year_id" class="form-select">
                                     <option value="">{{ __('-- Năm học --') }}</option>
                                     @foreach($academicYears as $year)
@@ -34,6 +35,7 @@
                                 </select>
                             </div>
                             <div class="col-md-4">
+                            <div class="col-md-5">
                                 <select name="semester_id" class="form-select">
                                     <option value="">{{ __('-- Học kỳ --') }}</option>
                                     @foreach($semesters as $s)
@@ -42,6 +44,7 @@
                                 </select>
                             </div>
                             <div class="col-md-1">
+                            <div class="col-md-2">
                                 <button type="submit" class="btn btn-outline-primary w-100">
                                     <i class="fas fa-search"></i>
                                 </button>

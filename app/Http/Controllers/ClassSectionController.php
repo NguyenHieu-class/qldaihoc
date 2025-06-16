@@ -21,7 +21,7 @@ class ClassSectionController extends Controller
     public function create(Request $request)
     {
         $courseOfferingsQuery = CourseOffering::with(['subject', 'semester.academicYear']);
-
+      
         if ($request->filled('faculty_id')) {
             $courseOfferingsQuery->whereHas('subject', function ($q) use ($request) {
                 $q->where('faculty_id', $request->faculty_id);
@@ -57,6 +57,8 @@ class ClassSectionController extends Controller
         $semesters = $semestersQuery->get();
 
         return view('class_sections.create', compact('courseOfferings', 'teachers', 'academicYears', 'semesters', 'faculties'));
+
+        return view('class_sections.create', compact('courseOfferings', 'teachers', 'academicYears', 'semesters'));
     }
 
     public function store(Request $request)
