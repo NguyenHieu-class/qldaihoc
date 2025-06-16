@@ -108,6 +108,8 @@ class ClassSectionController extends Controller
             'course_offering_id' => 'required|exists:course_offerings,id',
             'teacher_id' => 'required|exists:teachers,id',
             'number_of_sections' => 'required|integer|min:1',
+            'period_count' => 'required|integer|min:0',
+            'student_count' => 'required|integer|min:0',
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
@@ -133,8 +135,8 @@ class ClassSectionController extends Controller
                 'subject_id' => $offering->subject_id,
                 'teacher_id' => $request->teacher_id,
                 'room' => $request->room,
-                'period_count' => $request->period_count ?? 0,
-                'student_count' => $request->student_count ?? 0,
+                'period_count' => $request->period_count,
+                'student_count' => $request->student_count,
             ]);
 
             $createdCodes[] = $code;
