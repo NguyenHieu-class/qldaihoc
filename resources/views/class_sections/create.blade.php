@@ -34,9 +34,19 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="mb-3">
-                                <label class="form-label">{{ __('Phòng') }}</label>
-                                <input type="text" class="form-control" name="room" value="{{ old('room') }}">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ __('Phòng') }}</label>
+                                    <input type="text" class="form-control" name="room" value="{{ old('room') }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">{{ __('Số tiết') }}</label>
+                                    <input type="number" class="form-control" name="period_count" value="{{ old('period_count', 0) }}">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">{{ __('Số SV') }}</label>
+                                    <input type="number" class="form-control" name="student_count" value="{{ old('student_count', 0) }}">
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label class="form-label">{{ __('Số lớp cần tạo') }} <span class="text-danger">*</span></label>
