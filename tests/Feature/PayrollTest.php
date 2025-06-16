@@ -27,7 +27,7 @@ class PayrollTest extends TestCase
         $subject = Subject::factory()->create(['coefficient' => 1.5]);
         $teacher = Teacher::factory()->create(['degree_id' => $degree->id]);
 
-        $service = new TeachingPaymentService();
+        $service = new TeachingPaymentService($rate->amount, ClassSizeCoefficient::all());
         $salary = $service->calculate($teacher, $subject, 30, 10);
 
         $expected = 100 * 1.2 * 1.1 * 1.5 * 10;

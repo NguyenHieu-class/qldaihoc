@@ -12,12 +12,9 @@ use Illuminate\Support\Facades\Auth;
 
 class PayrollController extends Controller
 {
-    protected TeachingPaymentService $paymentService;
-
-    public function __construct(TeachingPaymentService $paymentService)
+    public function __construct()
     {
         $this->middleware(['auth', 'role:admin,teacher']);
-        $this->paymentService = $paymentService;
     }
 
     public function index()
@@ -26,11 +23,14 @@ class PayrollController extends Controller
 
         if ($user->role === 'admin') {
             $teachers = Teacher::with(['degree', 'classSections.subject'])->get();
+            $base = TeachingRate::orderByDesc('id')->value('amount') ?? 0;
+            $coefficients = ClassSizeCoefficient::all();
+            $paymentService = new TeachingPaymentService($base, $coefficients);
 
             foreach ($teachers as $teacher) {
                 $total = 0;
                 foreach ($teacher->classSections as $section) {
-                    $total += $this->paymentService->calculate(
+                    $total += $paymentService->calculate(
                         $teacher,
                         $section->subject,
                         $section->student_count,
@@ -51,9 +51,13 @@ class PayrollController extends Controller
                 ->with('error', 'Không tìm thấy thông tin giáo viên.');
         }
 
+        $base = TeachingRate::orderByDesc('id')->value('amount') ?? 0;
+        $coefficients = ClassSizeCoefficient::all();
+        $paymentService = new TeachingPaymentService($base, $coefficients);
+
         $sections = $teacher->classSections()->with('subject')->get();
         foreach ($sections as $section) {
-            $section->salary = $this->paymentService->calculate(
+            $section->salary = $paymentService->calculate(
                 $teacher,
                 $section->subject,
                 $section->student_count,
@@ -75,16 +79,21 @@ class PayrollController extends Controller
                 ->with('error', 'Bạn không có quyền xem bảng lương này.');
         }
 
+        $base = TeachingRate::orderByDesc('id')->value('amount') ?? 0;
+        $coefficients = ClassSizeCoefficient::all();
+        $paymentService = new TeachingPaymentService($base, $coefficients);
+
         $sections = $teacher->classSections()->with('subject')->get();
         $details = [];
         foreach ($sections as $section) {
             $degree = $teacher->degree->coefficient ?? 1;
-            $classCoef = ClassSizeCoefficient::where('min_students', '<=', $section->student_count)
-                ->where('max_students', '>=', $section->student_count)
-                ->value('coefficient') ?? 1;
+            $classCoef = optional(
+                $coefficients->first(function ($coef) use ($section) {
+                    return $coef->min_students <= $section->student_count && $coef->max_students >= $section->student_count;
+                })
+            )->coefficient ?? 1;
             $subjectCoef = $section->subject->coefficient ?? 1;
-            $base = TeachingRate::orderByDesc('id')->value('amount') ?? 0;
-            $salary = $this->paymentService->calculate(
+            $salary = $paymentService->calculate(
                 $teacher,
                 $section->subject,
                 $section->student_count,
@@ -118,10 +127,14 @@ class PayrollController extends Controller
         }
 
         $teachers = Teacher::with(['degree', 'classSections.subject'])->get();
+        $base = TeachingRate::orderByDesc('id')->value('amount') ?? 0;
+        $coefficients = ClassSizeCoefficient::all();
+        $paymentService = new TeachingPaymentService($base, $coefficients);
+
         foreach ($teachers as $teacher) {
             $total = 0;
             foreach ($teacher->classSections as $section) {
-                $total += $this->paymentService->calculate(
+                $total += $paymentService->calculate(
                     $teacher,
                     $section->subject,
                     $section->student_count,
@@ -143,16 +156,21 @@ class PayrollController extends Controller
                 ->with('error', 'Bạn không có quyền.');
         }
 
+        $base = TeachingRate::orderByDesc('id')->value('amount') ?? 0;
+        $coefficients = ClassSizeCoefficient::all();
+        $paymentService = new TeachingPaymentService($base, $coefficients);
+
         $sections = $teacher->classSections()->with('subject')->get();
         $details = [];
         foreach ($sections as $section) {
             $degree = $teacher->degree->coefficient ?? 1;
-            $classCoef = ClassSizeCoefficient::where('min_students', '<=', $section->student_count)
-                ->where('max_students', '>=', $section->student_count)
-                ->value('coefficient') ?? 1;
+            $classCoef = optional(
+                $coefficients->first(function ($coef) use ($section) {
+                    return $coef->min_students <= $section->student_count && $coef->max_students >= $section->student_count;
+                })
+            )->coefficient ?? 1;
             $subjectCoef = $section->subject->coefficient ?? 1;
-            $base = TeachingRate::orderByDesc('id')->value('amount') ?? 0;
-            $salary = $this->paymentService->calculate(
+            $salary = $paymentService->calculate(
                 $teacher,
                 $section->subject,
                 $section->student_count,

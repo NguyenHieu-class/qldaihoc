@@ -2,25 +2,37 @@
 
 namespace App\Services;
 
-use App\Models\TeachingRate;
-use App\Models\ClassSizeCoefficient;
 use App\Models\Teacher;
 use App\Models\Subject;
+use Illuminate\Support\Collection;
 
 class TeachingPaymentService
 {
+    protected float $baseRate;
+
+    /**
+     * Collection of class size coefficient models.
+     */
+    protected Collection $classCoefficients;
+
+    public function __construct(float $baseRate, Collection $classCoefficients)
+    {
+        $this->baseRate = $baseRate;
+        $this->classCoefficients = $classCoefficients;
+    }
+
     public function calculate(Teacher $teacher, Subject $subject, int $studentCount, int $periods): float
     {
-        $base = TeachingRate::orderByDesc('id')->value('amount') ?? 0;
-
         $degreeCoefficient = $teacher->degree->coefficient ?? 1;
 
-        $classCoefficient = ClassSizeCoefficient::where('min_students', '<=', $studentCount)
-            ->where('max_students', '>=', $studentCount)
-            ->value('coefficient') ?? 1;
+        $classCoefficient = optional(
+            $this->classCoefficients->first(function ($coef) use ($studentCount) {
+                return $coef->min_students <= $studentCount && $coef->max_students >= $studentCount;
+            })
+        )->coefficient ?? 1;
 
-        $coefficient = $subject->coefficient ?? 1;
+        $subjectCoefficient = $subject->coefficient ?? 1;
 
-        return $base * $degreeCoefficient * $classCoefficient * $coefficient * $periods;
+        return $this->baseRate * $degreeCoefficient * $classCoefficient * $subjectCoefficient * $periods;
     }
 }
