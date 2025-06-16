@@ -5,7 +5,6 @@ namespace Tests\Unit;
 use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\TeachingRate;
-use App\Models\DegreeCoefficient;
 use App\Models\ClassSizeCoefficient;
 use App\Models\Degree;
 use App\Services\TeachingPaymentService;
@@ -23,9 +22,6 @@ class TeachingPaymentServiceTest extends TestCase
 
         TeachingRate::unguard();
         TeachingRate::create(['id' => 1, 'amount' => 100]);
-
-        DegreeCoefficient::unguard();
-        DegreeCoefficient::create(['degree_id' => 1, 'coefficient' => 1.5]);
 
         ClassSizeCoefficient::unguard();
         ClassSizeCoefficient::create(['min_students' => 1, 'max_students' => 50, 'coefficient' => 1.1]);

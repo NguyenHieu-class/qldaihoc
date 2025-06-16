@@ -284,7 +284,6 @@
                                         'academic-years.*',
                                         'semesters.*',
                                         'degrees.*',
-                                        'degree-coefficients.*',
                                         'class-size-coefficients.*',
                                         'teaching-rates.*'
                                     );
@@ -308,11 +307,6 @@
                                             <li class="nav-item">
                                                 <a class="nav-link {{ request()->routeIs('degrees.*') ? 'active' : '' }}" href="{{ route('degrees.index') }}">
                                                     <i class="fas fa-award"></i> Quản lý học vị
-                                                </a>
-                                            </li>
-                                            <li class="nav-item">
-                                                <a class="nav-link {{ request()->routeIs('degree-coefficients.*') ? 'active' : '' }}" href="{{ route('degree-coefficients.index') }}">
-                                                    <i class="fas fa-percentage"></i> Hệ số học vị
                                                 </a>
                                             </li>
                                             <li class="nav-item">
