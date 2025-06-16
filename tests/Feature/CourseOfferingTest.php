@@ -46,4 +46,23 @@ class CourseOfferingTest extends TestCase
         $this->assertCount(1, $filtered);
         $this->assertTrue($filtered->first()->is($offering1));
     }
+
+    public function test_store_creates_offering_for_each_subject(): void
+    {
+        $year = AcademicYear::factory()->create();
+        $semester = Semester::factory()->create(['academic_year_id' => $year->id]);
+
+        $faculty = Faculty::factory()->create();
+        $subjects = Subject::factory()->count(2)->create(['faculty_id' => $faculty->id]);
+
+        $admin = \App\Models\User::factory()->create(['role' => 'admin']);
+
+        $response = $this->actingAs($admin)->post(route('course-offerings.store'), [
+            'semester_id' => $semester->id,
+            'subject_ids' => $subjects->pluck('id')->toArray(),
+        ]);
+
+        $response->assertRedirect();
+        $this->assertEquals(2, CourseOffering::count());
+    }
 }
