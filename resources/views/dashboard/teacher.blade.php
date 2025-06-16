@@ -45,6 +45,10 @@
                                     <p>{{ $faculty->name }}</p>
                                 </div>
                                 <div class="col-md-6 mb-3">
+                                    <p class="mb-1"><strong>Học vị:</strong></p>
+                                    <p>{{ $teacher->degree->name }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
                                     <p class="mb-1"><strong>Ngày sinh:</strong></p>
                                     <p>{{ $teacher->date_of_birth->format('d/m/Y') }}</p>
                                 </div>

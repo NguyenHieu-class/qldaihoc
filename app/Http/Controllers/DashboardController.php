@@ -78,15 +78,16 @@ class DashboardController extends Controller
                 ->with('error', 'Bạn không có quyền truy cập trang này.');
         }
 
-        // Lấy thông tin giáo viên
-        $teacher = Auth::user()->teacher;
+        // Lấy thông tin giáo viên và load học vị
+        $teacher = Auth::user()->teacher()->with('degree')->first();
         
         if (!$teacher) {
             return redirect()->route('dashboard.index')
                 ->with('error', 'Không tìm thấy thông tin giáo viên.');
         }
 
-        // Lấy thông tin khoa của giáo viên
+        // Lấy thông tin học vị và khoa của giáo viên
+        $degree = $teacher->degree;
         $faculty = $teacher->faculty;
         
         // Đếm số lượng sinh viên trong khoa
@@ -104,6 +105,7 @@ class DashboardController extends Controller
 
         return view('dashboard.teacher', compact(
             'teacher',
+            'degree',
             'faculty',
             'studentCount',
             'classCount',
