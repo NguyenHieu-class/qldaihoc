@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\TeachingRate;
-use App\Models\DegreeCoefficient;
 use App\Models\ClassSizeCoefficient;
 use App\Models\Teacher;
 use App\Models\Subject;
@@ -14,8 +13,7 @@ class TeachingPaymentService
     {
         $base = TeachingRate::orderByDesc('id')->value('amount') ?? 0;
 
-        $degreeCoefficient = DegreeCoefficient::where('degree_id', $teacher->degree_id)
-            ->value('coefficient') ?? 1;
+        $degreeCoefficient = $teacher->degree->coefficient ?? 1;
 
         $classCoefficient = ClassSizeCoefficient::where('min_students', '<=', $studentCount)
             ->where('max_students', '>=', $studentCount)

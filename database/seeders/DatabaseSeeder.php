@@ -24,7 +24,6 @@ class DatabaseSeeder extends Seeder
             AcademicYearSeeder::class, // Tạo năm học
             SemesterSeeder::class,     // Tạo học kỳ (phụ thuộc năm học)
             TeachingRateSeeder::class, // Tạo mức lương giảng dạy
-            DegreeCoefficientSeeder::class, // Tạo hệ số học vị
             ClassSizeCoefficientSeeder::class, // Tạo hệ số sĩ số lớp
             CourseOfferingSeeder::class, // Tạo các học phần và lớp học phần
             EnrollmentSeeder::class,  // Đăng ký lớp học phần
