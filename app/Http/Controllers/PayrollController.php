@@ -144,7 +144,8 @@ class PayrollController extends Controller
             $teacher->total_salary = $total;
         }
 
-        $pdf = Pdf::loadView('payrolls.list_pdf', ['teachers' => $teachers]);
+        $pdf = Pdf::loadView('payrolls.list_pdf', ['teachers' => $teachers])
+            ->set_option('defaultFont', 'DejaVu Sans');
         return $pdf->stream('payrolls.pdf');
     }
 
@@ -192,7 +193,7 @@ class PayrollController extends Controller
             'teacher' => $teacher,
             'details' => $details,
             'total' => $total,
-        ]);
+        ])->set_option('defaultFont', 'DejaVu Sans');
 
         return $pdf->stream('payroll_' . $teacher->id . '.pdf');
     }
