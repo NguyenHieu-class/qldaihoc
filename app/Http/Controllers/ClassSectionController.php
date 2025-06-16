@@ -6,6 +6,7 @@ use App\Models\ClassSection;
 use App\Models\Subject;
 use App\Models\CourseOffering;
 use App\Models\Teacher;
+use App\Models\Faculty;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -20,6 +21,12 @@ class ClassSectionController extends Controller
     public function create(Request $request)
     {
         $courseOfferingsQuery = CourseOffering::with(['subject', 'semester.academicYear']);
+      
+        if ($request->filled('faculty_id')) {
+            $courseOfferingsQuery->whereHas('subject', function ($q) use ($request) {
+                $q->where('faculty_id', $request->faculty_id);
+            });
+        }
 
         if ($request->filled('academic_year_id')) {
             $courseOfferingsQuery->whereHas('semester', function ($q) use ($request) {
@@ -39,6 +46,8 @@ class ClassSectionController extends Controller
             })
             ->get();
 
+        $faculties = Faculty::all();
+
         $academicYears = \App\Models\AcademicYear::with('semesters')->get();
 
         $semestersQuery = \App\Models\Semester::with('academicYear');
@@ -46,6 +55,8 @@ class ClassSectionController extends Controller
             $semestersQuery->where('academic_year_id', $request->academic_year_id);
         }
         $semesters = $semestersQuery->get();
+
+        return view('class_sections.create', compact('courseOfferings', 'teachers', 'academicYears', 'semesters', 'faculties'));
 
         return view('class_sections.create', compact('courseOfferings', 'teachers', 'academicYears', 'semesters'));
     }

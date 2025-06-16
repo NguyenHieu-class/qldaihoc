@@ -17,6 +17,15 @@
                     <div class="mb-3">
                         <form action="{{ route('class-sections.create') }}" method="GET" class="row g-3">
                             <input type="hidden" name="auto" value="{{ request('auto') }}">
+                            <div class="col-md-3">
+                                <select name="faculty_id" class="form-select">
+                                    <option value="">{{ __('-- Khoa --') }}</option>
+                                    @foreach($faculties as $faculty)
+                                        <option value="{{ $faculty->id }}" {{ request('faculty_id') == $faculty->id ? 'selected' : '' }}>{{ $faculty->name }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-4">
                             <div class="col-md-5">
                                 <select name="academic_year_id" class="form-select">
                                     <option value="">{{ __('-- Năm học --') }}</option>
@@ -25,6 +34,7 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <div class="col-md-4">
                             <div class="col-md-5">
                                 <select name="semester_id" class="form-select">
                                     <option value="">{{ __('-- Học kỳ --') }}</option>
@@ -33,6 +43,7 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <div class="col-md-1">
                             <div class="col-md-2">
                                 <button type="submit" class="btn btn-outline-primary w-100">
                                     <i class="fas fa-search"></i>
