@@ -5,7 +5,14 @@
     <div class="row justify-content-center">
         <div class="col-md-10">
             <div class="card">
-                <div class="card-header">Bảng lương</div>
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Bảng lương</span>
+                    @if(isset($teachers))
+                        <a href="{{ route('payrolls.export') }}" class="btn btn-sm btn-primary">Xuất PDF</a>
+                    @elseif(isset($teacher))
+                        <a href="{{ route('payrolls.export_detail', $teacher) }}" class="btn btn-sm btn-primary">Xuất PDF</a>
+                    @endif
+                </div>
                 <div class="card-body">
                     @include('partials.alerts')
 
