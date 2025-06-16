@@ -26,7 +26,7 @@ class TeachingPaymentServiceTest extends TestCase
         ClassSizeCoefficient::unguard();
         ClassSizeCoefficient::create(['min_students' => 1, 'max_students' => 50, 'coefficient' => 1.1]);
 
-        $service = new TeachingPaymentService();
+        $service = new TeachingPaymentService(100, ClassSizeCoefficient::all());
         $payment = $service->calculate($teacher, $subject, 30, 10);
 
         $this->assertEquals(100 * 1.5 * 1.1 * 1.2 * 10, $payment);
