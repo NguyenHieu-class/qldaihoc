@@ -19,17 +19,35 @@ class ClassSectionController extends Controller
 
     public function create(Request $request)
     {
-        $courseOfferings = CourseOffering::with(['subject', 'semester.academicYear'])
-            ->when($request->semester_id, function ($q) use ($request) {
-                $q->where('semester_id', $request->semester_id);
-            })
-            ->get();
+        $courseOfferingsQuery = CourseOffering::with(['subject', 'semester.academicYear']);
+
+        if ($request->filled('academic_year_id')) {
+            $courseOfferingsQuery->whereHas('semester', function ($q) use ($request) {
+                $q->where('academic_year_id', $request->academic_year_id);
+            });
+        }
+
+        if ($request->filled('semester_id')) {
+            $courseOfferingsQuery->where('semester_id', $request->semester_id);
+        }
+
+        $courseOfferings = $courseOfferingsQuery->get();
+
         $teachers = Teacher::with('faculty')
             ->when($request->faculty_id, function ($q) use ($request) {
                 $q->where('faculty_id', $request->faculty_id);
             })
             ->get();
-        return view('class_sections.create', compact('courseOfferings', 'teachers'));
+
+        $academicYears = \App\Models\AcademicYear::with('semesters')->get();
+
+        $semestersQuery = \App\Models\Semester::with('academicYear');
+        if ($request->filled('academic_year_id')) {
+            $semestersQuery->where('academic_year_id', $request->academic_year_id);
+        }
+        $semesters = $semestersQuery->get();
+
+        return view('class_sections.create', compact('courseOfferings', 'teachers', 'academicYears', 'semesters'));
     }
 
     public function store(Request $request)
