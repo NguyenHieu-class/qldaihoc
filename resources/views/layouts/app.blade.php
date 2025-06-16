@@ -356,6 +356,12 @@
                                 </div>
                             @endif
 
+                            @if(Auth::user()->role == 'admin' || Auth::user()->role == 'teacher')
+                                <a class="nav-link {{ request()->routeIs('payrolls.*') ? 'active' : '' }}" href="{{ route('payrolls.index') }}">
+                                    <i class="fas fa-money-check-alt"></i> Bảng lương
+                                </a>
+                            @endif
+
                             @if(Auth::user()->role == 'student' && Auth::user()->student)
                                 <a class="nav-link {{ request()->routeIs('students.transcript') ? 'active' : '' }}" href="{{ route('students.transcript', Auth::user()->student->id) }}">
                                     <i class="fas fa-chart-line"></i> Bảng điểm
