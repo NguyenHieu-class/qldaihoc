@@ -16,6 +16,31 @@
                 <div class="card-body">
                     @include('partials.alerts')
 
+                    <div class="mb-3">
+                        <form action="{{ route('payrolls.index') }}" method="GET" class="row g-3">
+                            <div class="col-md-4">
+                                <select name="academic_year_id" class="form-select">
+                                    <option value="">{{ __('-- Năm học --') }}</option>
+                                    @foreach($academicYears as $year)
+                                        <option value="{{ $year->id }}" {{ request('academic_year_id') == $year->id ? 'selected' : '' }}>
+                                            {{ $year->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-outline-primary w-100">
+                                    <i class="fas fa-filter"></i>
+                                </button>
+                            </div>
+                            <div class="col-md-2">
+                                <a href="{{ route('payrolls.index') }}" class="btn btn-outline-secondary w-100">
+                                    <i class="fas fa-redo"></i>
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+
                     @if(isset($teachers))
                         <div class="table-responsive">
                             <table class="table table-bordered table-hover">
