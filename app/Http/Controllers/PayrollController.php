@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Teacher;
 use App\Models\ClassSection;
+use App\Models\AcademicYear;
 use App\Models\TeachingRate;
 use App\Models\ClassSizeCoefficient;
 use App\Services\TeachingPaymentService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class PayrollController extends Controller
 {
@@ -17,19 +19,30 @@ class PayrollController extends Controller
         $this->middleware(['auth', 'role:admin,teacher']);
     }
 
-    public function index()
+    public function index(Request $request)
     {
         $user = Auth::user();
+        $yearId = $request->academic_year_id;
+        $academicYears = AcademicYear::all();
 
         if ($user->role === 'admin') {
-            $teachers = Teacher::with(['degree', 'classSections.subject'])->get();
+            $teachers = Teacher::with('degree')->get();
             $base = TeachingRate::orderByDesc('id')->value('amount') ?? 0;
             $coefficients = ClassSizeCoefficient::all();
             $paymentService = new TeachingPaymentService($base, $coefficients);
 
             foreach ($teachers as $teacher) {
                 $total = 0;
-                foreach ($teacher->classSections as $section) {
+                $sections = $teacher->classSections()
+                    ->with(['subject', 'courseOffering.semester'])
+                    ->when($yearId, function ($q) use ($yearId) {
+                        $q->whereHas('courseOffering.semester', function ($q) use ($yearId) {
+                            $q->where('academic_year_id', $yearId);
+                        });
+                    })
+                    ->get();
+
+                foreach ($sections as $section) {
                     $total += $paymentService->calculate(
                         $teacher,
                         $section->subject,
@@ -42,6 +55,7 @@ class PayrollController extends Controller
 
             return view('payrolls.index', [
                 'teachers' => $teachers,
+                'academicYears' => $academicYears,
             ]);
         }
 
@@ -55,7 +69,14 @@ class PayrollController extends Controller
         $coefficients = ClassSizeCoefficient::all();
         $paymentService = new TeachingPaymentService($base, $coefficients);
 
-        $sections = $teacher->classSections()->with('subject')->get();
+        $sections = $teacher->classSections()
+            ->with(['subject', 'courseOffering.semester'])
+            ->when($yearId, function ($q) use ($yearId) {
+                $q->whereHas('courseOffering.semester', function ($q) use ($yearId) {
+                    $q->where('academic_year_id', $yearId);
+                });
+            })
+            ->get();
         foreach ($sections as $section) {
             $section->salary = $paymentService->calculate(
                 $teacher,
@@ -68,10 +89,11 @@ class PayrollController extends Controller
         return view('payrolls.index', [
             'sections' => $sections,
             'teacher' => $teacher,
+            'academicYears' => $academicYears,
         ]);
     }
 
-    public function show(Teacher $teacher)
+    public function show(Teacher $teacher, Request $request)
     {
         $user = Auth::user();
         if ($user->role === 'teacher' && $user->teacher?->id !== $teacher->id) {
@@ -79,11 +101,21 @@ class PayrollController extends Controller
                 ->with('error', 'Bạn không có quyền xem bảng lương này.');
         }
 
+        $yearId = $request->academic_year_id;
+        $academicYears = AcademicYear::all();
+
         $base = TeachingRate::orderByDesc('id')->value('amount') ?? 0;
         $coefficients = ClassSizeCoefficient::all();
         $paymentService = new TeachingPaymentService($base, $coefficients);
 
-        $sections = $teacher->classSections()->with('subject')->get();
+        $sections = $teacher->classSections()
+            ->with(['subject', 'courseOffering.semester'])
+            ->when($yearId, function ($q) use ($yearId) {
+                $q->whereHas('courseOffering.semester', function ($q) use ($yearId) {
+                    $q->where('academic_year_id', $yearId);
+                });
+            })
+            ->get();
         $details = [];
         foreach ($sections as $section) {
             $degree = $teacher->degree->coefficient ?? 1;
@@ -115,6 +147,7 @@ class PayrollController extends Controller
             'teacher' => $teacher,
             'details' => $details,
             'total' => $total,
+            'academicYears' => $academicYears,
         ]);
     }
 
