@@ -35,4 +35,29 @@ class TeachingPaymentService
 
         return $this->baseRate * $degreeCoefficient * $classCoefficient * $subjectCoefficient * $periods;
     }
+
+    /**
+     * Calculate total salary for a teacher in a given semester.
+     */
+    public function calculateForSemester(Teacher $teacher, int $semesterId): float
+    {
+        $sections = $teacher->classSections()
+            ->with(['subject', 'courseOffering'])
+            ->whereHas('courseOffering', function ($q) use ($semesterId) {
+                $q->where('semester_id', $semesterId);
+            })
+            ->get();
+
+        $total = 0;
+        foreach ($sections as $section) {
+            $total += $this->calculate(
+                $teacher,
+                $section->subject,
+                $section->student_count,
+                $section->period_count
+            );
+        }
+
+        return $total;
+    }
 }
