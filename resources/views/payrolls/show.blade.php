@@ -8,7 +8,7 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>Bảng lương {{ $teacher->full_name }}</span>
                     <div>
-                        <a href="{{ route('payrolls.export_detail', $teacher) }}" class="btn btn-primary btn-sm me-2">Xuất PDF</a>
+                        <a href="{{ route('payrolls.export_detail', array_merge(['teacher' => $teacher->id], request()->query())) }}" class="btn btn-primary btn-sm me-2">Xuất PDF</a>
                         <a href="{{ route('payrolls.index') }}" class="btn btn-secondary btn-sm">
                             <i class="fas fa-arrow-left"></i> Quay lại
                         </a>

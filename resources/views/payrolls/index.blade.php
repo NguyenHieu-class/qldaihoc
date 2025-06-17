@@ -8,9 +8,9 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>Bảng lương</span>
                     @if(Auth::user()->role === 'admin')
-                        <a href="{{ route('payrolls.export') }}" class="btn btn-sm btn-primary">Xuất PDF</a>
+                        <a href="{{ route('payrolls.export', request()->query()) }}" class="btn btn-sm btn-primary">Xuất PDF</a>
                     @else
-                        <a href="{{ route('payrolls.export_detail', $teacher) }}" class="btn btn-sm btn-primary">Xuất PDF</a>
+                        <a href="{{ route('payrolls.export_detail', array_merge(['teacher' => $teacher->id], request()->query())) }}" class="btn btn-sm btn-primary">Xuất PDF</a>
                     @endif
                 </div>
                 <div class="card-body">

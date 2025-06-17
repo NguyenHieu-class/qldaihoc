@@ -172,7 +172,7 @@ class PayrollController extends Controller
         ]);
     }
 
-    public function exportAll()
+    public function exportAll(Request $request)
     {
         $user = Auth::user();
         if ($user->role !== 'admin') {
@@ -180,14 +180,31 @@ class PayrollController extends Controller
                 ->with('error', 'Bạn không có quyền.');
         }
 
-        $teachers = Teacher::with(['degree', 'classSections.subject'])->get();
+        $yearId = $request->academic_year_id;
+        $semesterId = $request->semester_id;
+
+        $teachers = Teacher::with(['degree', 'classSections.subject', 'classSections.courseOffering.semester'])
+            ->get();
         $base = TeachingRate::orderByDesc('id')->value('amount') ?? 0;
         $coefficients = ClassSizeCoefficient::all();
         $paymentService = new TeachingPaymentService($base, $coefficients);
 
+        $overallTotal = 0;
         foreach ($teachers as $teacher) {
             $total = 0;
-            foreach ($teacher->classSections as $section) {
+            $sections = $teacher->classSections()
+                ->when($yearId, function ($q) use ($yearId) {
+                    $q->whereHas('courseOffering.semester', function ($q) use ($yearId) {
+                        $q->where('academic_year_id', $yearId);
+                    });
+                })
+                ->when($semesterId, function ($q) use ($semesterId) {
+                    $q->whereHas('courseOffering', function ($q) use ($semesterId) {
+                        $q->where('semester_id', $semesterId);
+                    });
+                })
+                ->get();
+            foreach ($sections as $section) {
                 $total += $paymentService->calculate(
                     $teacher,
                     $section->subject,
@@ -196,14 +213,18 @@ class PayrollController extends Controller
                 );
             }
             $teacher->total_salary = $total;
+            $overallTotal += $total;
         }
 
-        $pdf = Pdf::loadView('payrolls.list_pdf', ['teachers' => $teachers])
+        $pdf = Pdf::loadView('payrolls.list_pdf', [
+            'teachers' => $teachers,
+            'total' => $overallTotal,
+        ])
             ->set_option('defaultFont', 'DejaVu Sans');
         return $pdf->stream('payrolls.pdf');
     }
 
-    public function exportDetail(Teacher $teacher)
+    public function exportDetail(Teacher $teacher, Request $request)
     {
         $user = Auth::user();
         if ($user->role === 'teacher' && $user->teacher?->id !== $teacher->id) {
@@ -211,11 +232,26 @@ class PayrollController extends Controller
                 ->with('error', 'Bạn không có quyền.');
         }
 
+        $yearId = $request->academic_year_id;
+        $semesterId = $request->semester_id;
+
         $base = TeachingRate::orderByDesc('id')->value('amount') ?? 0;
         $coefficients = ClassSizeCoefficient::all();
         $paymentService = new TeachingPaymentService($base, $coefficients);
 
-        $sections = $teacher->classSections()->with('subject')->get();
+        $sections = $teacher->classSections()
+            ->with(['subject', 'courseOffering.semester'])
+            ->when($yearId, function ($q) use ($yearId) {
+                $q->whereHas('courseOffering.semester', function ($q) use ($yearId) {
+                    $q->where('academic_year_id', $yearId);
+                });
+            })
+            ->when($semesterId, function ($q) use ($semesterId) {
+                $q->whereHas('courseOffering', function ($q) use ($semesterId) {
+                    $q->where('semester_id', $semesterId);
+                });
+            })
+            ->get();
         $details = [];
         foreach ($sections as $section) {
             $degree = $teacher->degree->coefficient ?? 1;
