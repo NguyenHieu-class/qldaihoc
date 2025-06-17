@@ -77,7 +77,12 @@
                                         <td>{{ $row['degree'] }}</td>
                                         <td>{{ $row['class'] }}</td>
                                         <td>{{ $row['subject'] }}</td>
-                                        <td>{{ number_format($row['salary'], 2) }}</td>
+                                        <td>
+                                            {{ number_format($row['salary'], 2) }}
+                                            <a href="{{ route('payrolls.section', $row['section']) }}" class="ms-2">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>
