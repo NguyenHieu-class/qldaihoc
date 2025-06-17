@@ -63,6 +63,7 @@ class TeachingPaymentServiceTest extends TestCase
             'course_offering_id' => $off1->id,
             'teacher_id' => $teacher->id,
             'subject_id' => $subject->id,
+            'teaching_rate_id' => $rate->id,
             'period_count' => 10,
             'student_count' => 30,
         ]);
@@ -71,6 +72,7 @@ class TeachingPaymentServiceTest extends TestCase
             'course_offering_id' => $off2->id,
             'teacher_id' => $teacher->id,
             'subject_id' => $subject->id,
+            'teaching_rate_id' => $rate->id,
             'period_count' => 10,
             'student_count' => 30,
         ]);

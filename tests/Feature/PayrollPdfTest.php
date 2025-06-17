@@ -18,7 +18,7 @@ class PayrollPdfTest extends TestCase
 
     private function setUpData(): Teacher
     {
-        TeachingRate::factory()->create(['amount' => 100]);
+        $rate = TeachingRate::factory()->create(['amount' => 100]);
         ClassSizeCoefficient::factory()->create([
             'min_students' => 0,
             'max_students' => 50,
@@ -30,6 +30,7 @@ class PayrollPdfTest extends TestCase
         ClassSection::factory()->create([
             'teacher_id' => $teacher->id,
             'subject_id' => $subject->id,
+            'teaching_rate_id' => $rate->id,
             'period_count' => 10,
             'student_count' => 30,
         ]);

@@ -8,6 +8,7 @@ use App\Models\ClassSection;
 use App\Models\Semester;
 use App\Models\Subject;
 use App\Models\Teacher;
+use App\Models\TeachingRate;
 
 class CourseOfferingSeeder extends Seeder
 {
@@ -16,6 +17,7 @@ class CourseOfferingSeeder extends Seeder
         $semesters = Semester::all();
         $subjects = Subject::all();
         $teachers = Teacher::all();
+        $rates = TeachingRate::all();
 
         foreach ($semesters as $semester) {
             $offeredSubjects = $subjects->random(min(5, $subjects->count()));
@@ -31,6 +33,7 @@ class CourseOfferingSeeder extends Seeder
                         'course_offering_id' => $offering->id,
                         'subject_id' => $subject->id,
                         'teacher_id' => $teachers->random()->id,
+                        'teaching_rate_id' => $rates->random()->id,
                         'room' => 'R' . rand(1, 10),
                         'period_count' => 0,
                         'student_count' => 0,

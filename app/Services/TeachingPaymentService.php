@@ -21,7 +21,7 @@ class TeachingPaymentService
         $this->classCoefficients = $classCoefficients;
     }
 
-    public function calculate(Teacher $teacher, Subject $subject, int $studentCount, int $periods): float
+    public function calculate(Teacher $teacher, Subject $subject, int $studentCount, int $periods, ?float $rate = null): float
     {
         $degreeCoefficient = $teacher->degree->coefficient ?? 1;
 
@@ -33,7 +33,9 @@ class TeachingPaymentService
 
         $subjectCoefficient = $subject->coefficient ?? 1;
 
-        return $this->baseRate * $degreeCoefficient * $classCoefficient * $subjectCoefficient * $periods;
+        $base = $rate ?? $this->baseRate;
+
+        return $base * $degreeCoefficient * $classCoefficient * $subjectCoefficient * $periods;
     }
 
     /**
@@ -54,7 +56,8 @@ class TeachingPaymentService
                 $teacher,
                 $section->subject,
                 $section->student_count,
-                $section->period_count
+                $section->period_count,
+                optional($section->teachingRate)->amount
             );
         }
 

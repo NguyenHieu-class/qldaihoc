@@ -36,6 +36,14 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">{{ __('Định mức lương') }} <span class="text-danger">*</span></label>
+                            <select class="form-select" name="teaching_rate_id" required>
+                                @foreach($teachingRates as $rate)
+                                    <option value="{{ $rate->id }}" {{ $classSection->teaching_rate_id == $rate->id ? 'selected' : '' }}>{{ number_format($rate->amount, 0, ',', '.') }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">{{ __('Phòng') }}</label>

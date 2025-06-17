@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Student;
 use App\Models\Enrollment;
+use App\Models\TeachingRate;
 
 class ClassSection extends Model
 {
@@ -19,6 +20,7 @@ class ClassSection extends Model
         'course_offering_id',
         'subject_id',
         'teacher_id',
+        'teaching_rate_id',
         'room',
         'period_count',
         'student_count',
@@ -32,6 +34,11 @@ class ClassSection extends Model
     public function teacher(): BelongsTo
     {
         return $this->belongsTo(Teacher::class);
+    }
+
+    public function teachingRate(): BelongsTo
+    {
+        return $this->belongsTo(TeachingRate::class);
     }
 
     public function courseOffering(): BelongsTo

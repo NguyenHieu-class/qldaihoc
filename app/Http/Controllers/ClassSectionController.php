@@ -7,6 +7,7 @@ use App\Models\Subject;
 use App\Models\CourseOffering;
 use App\Models\Teacher;
 use App\Models\Faculty;
+use App\Models\TeachingRate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -56,7 +57,9 @@ class ClassSectionController extends Controller
         }
         $semesters = $semestersQuery->get();
 
-        return view('class_sections.create', compact('courseOfferings', 'teachers', 'academicYears', 'semesters', 'faculties'));
+        $teachingRates = TeachingRate::all();
+
+        return view('class_sections.create', compact('courseOfferings', 'teachers', 'academicYears', 'semesters', 'faculties', 'teachingRates'));
     }
 
     public function store(Request $request)
@@ -65,6 +68,7 @@ class ClassSectionController extends Controller
             'code' => 'required|unique:class_sections,code',
             'course_offering_id' => 'required|exists:course_offerings,id',
             'teacher_id' => 'required|exists:teachers,id',
+            'teaching_rate_id' => 'required|exists:teaching_rates,id',
             'room' => 'nullable|string',
             'period_count' => 'required|integer|min:0',
             'student_count' => 'required|integer|min:0',
@@ -79,6 +83,7 @@ class ClassSectionController extends Controller
             'course_offering_id' => $offering->id,
             'subject_id' => $offering->subject_id,
             'teacher_id' => $request->teacher_id,
+            'teaching_rate_id' => $request->teaching_rate_id,
             'room' => $request->room,
             'period_count' => $request->period_count,
             'student_count' => $request->student_count,
@@ -90,7 +95,8 @@ class ClassSectionController extends Controller
     {
         $courseOfferings = CourseOffering::with(['subject', 'semester.academicYear'])->get();
         $teachers = Teacher::with('faculty')->get();
-        return view('class_sections.edit', compact('classSection', 'courseOfferings', 'teachers'));
+        $teachingRates = TeachingRate::all();
+        return view('class_sections.edit', compact('classSection', 'courseOfferings', 'teachers', 'teachingRates'));
     }
 
     public function update(Request $request, ClassSection $classSection)
@@ -99,6 +105,7 @@ class ClassSectionController extends Controller
             'code' => 'required|unique:class_sections,code,' . $classSection->id,
             'course_offering_id' => 'required|exists:course_offerings,id',
             'teacher_id' => 'required|exists:teachers,id',
+            'teaching_rate_id' => 'required|exists:teaching_rates,id',
             'room' => 'nullable|string',
             'period_count' => 'required|integer|min:0',
             'student_count' => 'required|integer|min:0',
@@ -113,6 +120,7 @@ class ClassSectionController extends Controller
             'course_offering_id' => $offering->id,
             'subject_id' => $offering->subject_id,
             'teacher_id' => $request->teacher_id,
+            'teaching_rate_id' => $request->teaching_rate_id,
             'room' => $request->room,
             'period_count' => $request->period_count,
             'student_count' => $request->student_count,
@@ -134,6 +142,7 @@ class ClassSectionController extends Controller
         $validator = Validator::make($request->all(), [
             'course_offering_id' => 'required|exists:course_offerings,id',
             'teacher_id' => 'required|exists:teachers,id',
+            'teaching_rate_id' => 'required|exists:teaching_rates,id',
             'number_of_sections' => 'required|integer|min:1',
             'period_count' => 'required|integer|min:0',
             'student_count' => 'required|integer|min:0',
@@ -161,6 +170,7 @@ class ClassSectionController extends Controller
                 'course_offering_id' => $offering->id,
                 'subject_id' => $offering->subject_id,
                 'teacher_id' => $request->teacher_id,
+                'teaching_rate_id' => $request->teaching_rate_id,
                 'room' => $request->room,
                 'period_count' => $request->period_count,
                 'student_count' => $request->student_count,
