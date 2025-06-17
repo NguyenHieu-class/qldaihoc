@@ -25,7 +25,7 @@ class PayrollTotalsTest extends TestCase
         $semester = Semester::factory()->create(['academic_year_id' => $year->id]);
         $otherSemester = Semester::factory()->create(['academic_year_id' => $year->id]);
 
-        TeachingRate::factory()->create(['amount' => 100]);
+        $rate = TeachingRate::factory()->create(['amount' => 100]);
         ClassSizeCoefficient::factory()->create(['min_students' => 0, 'max_students' => 50, 'coefficient' => 1]);
         $degree = Degree::factory()->create(['coefficient' => 1]);
         $subject = Subject::factory()->create(['coefficient' => 1]);
@@ -38,6 +38,7 @@ class PayrollTotalsTest extends TestCase
             'teacher_id' => $teacher->id,
             'subject_id' => $subject->id,
             'course_offering_id' => $offering1->id,
+            'teaching_rate_id' => $rate->id,
             'period_count' => 10,
             'student_count' => 20,
         ]);
@@ -46,6 +47,7 @@ class PayrollTotalsTest extends TestCase
             'teacher_id' => $teacher->id,
             'subject_id' => $subject->id,
             'course_offering_id' => $offering2->id,
+            'teaching_rate_id' => $rate->id,
             'period_count' => 5,
             'student_count' => 20,
         ]);

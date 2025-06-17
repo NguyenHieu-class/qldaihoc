@@ -33,7 +33,7 @@ class PayrollController extends Controller
             $coefficients = ClassSizeCoefficient::all();
             $paymentService = new TeachingPaymentService($base, $coefficients);
 
-            $sections = ClassSection::with(['subject', 'teacher', 'courseOffering.semester'])
+            $sections = ClassSection::with(['subject', 'teacher', 'courseOffering.semester', 'teachingRate'])
                 ->when($yearId, function ($q) use ($yearId) {
                     $q->whereHas('courseOffering.semester', function ($q) use ($yearId) {
                         $q->where('academic_year_id', $yearId);
@@ -51,7 +51,8 @@ class PayrollController extends Controller
                     $section->teacher,
                     $section->subject,
                     $section->student_count,
-                    $section->period_count
+                    $section->period_count,
+                    optional($section->teachingRate)->amount
                 );
             }
 
@@ -74,7 +75,7 @@ class PayrollController extends Controller
         $paymentService = new TeachingPaymentService($base, $coefficients);
 
         $sections = $teacher->classSections()
-            ->with(['subject', 'courseOffering.semester'])
+            ->with(['subject', 'courseOffering.semester', 'teachingRate'])
             ->when($yearId, function ($q) use ($yearId) {
                 $q->whereHas('courseOffering.semester', function ($q) use ($yearId) {
                     $q->where('academic_year_id', $yearId);
@@ -91,7 +92,8 @@ class PayrollController extends Controller
                 $teacher,
                 $section->subject,
                 $section->student_count,
-                $section->period_count
+                $section->period_count,
+                optional($section->teachingRate)->amount
             );
         }
 
@@ -122,7 +124,7 @@ class PayrollController extends Controller
         $paymentService = new TeachingPaymentService($base, $coefficients);
 
         $sections = $teacher->classSections()
-            ->with(['subject', 'courseOffering.semester'])
+            ->with(['subject', 'courseOffering.semester', 'teachingRate'])
             ->when($yearId, function ($q) use ($yearId) {
                 $q->whereHas('courseOffering.semester', function ($q) use ($yearId) {
                     $q->where('academic_year_id', $yearId);
@@ -147,7 +149,8 @@ class PayrollController extends Controller
                 $teacher,
                 $section->subject,
                 $section->student_count,
-                $section->period_count
+                $section->period_count,
+                optional($section->teachingRate)->amount
             );
             $details[] = [
                 'section' => $section,
@@ -183,7 +186,7 @@ class PayrollController extends Controller
         $yearId = $request->academic_year_id;
         $semesterId = $request->semester_id;
 
-        $teachers = Teacher::with(['degree', 'classSections.subject', 'classSections.courseOffering.semester'])
+        $teachers = Teacher::with(['degree', 'classSections.subject', 'classSections.courseOffering.semester', 'classSections.teachingRate'])
             ->get();
         $base = TeachingRate::orderByDesc('id')->value('amount') ?? 0;
         $coefficients = ClassSizeCoefficient::all();
@@ -209,7 +212,8 @@ class PayrollController extends Controller
                     $teacher,
                     $section->subject,
                     $section->student_count,
-                    $section->period_count
+                    $section->period_count,
+                    optional($section->teachingRate)->amount
                 );
             }
             $teacher->total_salary = $total;
@@ -240,7 +244,7 @@ class PayrollController extends Controller
         $paymentService = new TeachingPaymentService($base, $coefficients);
 
         $sections = $teacher->classSections()
-            ->with(['subject', 'courseOffering.semester'])
+            ->with(['subject', 'courseOffering.semester', 'teachingRate'])
             ->when($yearId, function ($q) use ($yearId) {
                 $q->whereHas('courseOffering.semester', function ($q) use ($yearId) {
                     $q->where('academic_year_id', $yearId);
@@ -265,7 +269,8 @@ class PayrollController extends Controller
                 $teacher,
                 $section->subject,
                 $section->student_count,
-                $section->period_count
+                $section->period_count,
+                optional($section->teachingRate)->amount
             );
             $details[] = [
                 'section' => $section,
@@ -313,7 +318,8 @@ class PayrollController extends Controller
             $teacher,
             $classSection->subject,
             $classSection->student_count,
-            $classSection->period_count
+            $classSection->period_count,
+            optional($classSection->teachingRate)->amount
         );
 
         return view('payrolls.section', [
