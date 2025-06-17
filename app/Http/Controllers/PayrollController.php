@@ -29,42 +29,37 @@ class PayrollController extends Controller
         $semesters = Semester::all();
 
         if ($user->role === 'admin') {
-            $teachers = Teacher::with('degree')->get();
             $base = TeachingRate::orderByDesc('id')->value('amount') ?? 0;
             $coefficients = ClassSizeCoefficient::all();
             $paymentService = new TeachingPaymentService($base, $coefficients);
 
-            foreach ($teachers as $teacher) {
-                if ($semesterId) {
-                    $teacher->total_salary = $paymentService->calculateForSemester($teacher, $semesterId);
-                    continue;
-                }
+            $sections = ClassSection::with(['subject', 'teacher', 'courseOffering.semester'])
+                ->when($yearId, function ($q) use ($yearId) {
+                    $q->whereHas('courseOffering.semester', function ($q) use ($yearId) {
+                        $q->where('academic_year_id', $yearId);
+                    });
+                })
+                ->when($semesterId, function ($q) use ($semesterId) {
+                    $q->whereHas('courseOffering', function ($q) use ($semesterId) {
+                        $q->where('semester_id', $semesterId);
+                    });
+                })
+                ->get();
 
-                $total = 0;
-                $sections = $teacher->classSections()
-                    ->with(['subject', 'courseOffering.semester'])
-                    ->when($yearId, function ($q) use ($yearId) {
-                        $q->whereHas('courseOffering.semester', function ($q) use ($yearId) {
-                            $q->where('academic_year_id', $yearId);
-                        });
-                    })
-                    ->get();
-
-                foreach ($sections as $section) {
-                    $total += $paymentService->calculate(
-                        $teacher,
-                        $section->subject,
-                        $section->student_count,
-                        $section->period_count
-                    );
-                }
-                $teacher->total_salary = $total;
+            foreach ($sections as $section) {
+                $section->salary = $paymentService->calculate(
+                    $section->teacher,
+                    $section->subject,
+                    $section->student_count,
+                    $section->period_count
+                );
             }
 
             return view('payrolls.index', [
-                'teachers' => $teachers,
+                'sections' => $sections,
                 'academicYears' => $academicYears,
                 'semesters' => $semesters,
+                'total' => $sections->sum('salary'),
             ]);
         }
 
@@ -105,6 +100,7 @@ class PayrollController extends Controller
             'teacher' => $teacher,
             'academicYears' => $academicYears,
             'semesters' => $semesters,
+            'total' => $sections->sum('salary'),
         ]);
     }
 
@@ -254,5 +250,46 @@ class PayrollController extends Controller
         ])->set_option('defaultFont', 'DejaVu Sans');
 
         return $pdf->stream('payroll_' . $teacher->id . '.pdf');
+    }
+
+    public function sectionDetail(ClassSection $classSection)
+    {
+        $user = Auth::user();
+        if ($user->role === 'teacher' && $user->teacher?->id !== $classSection->teacher_id) {
+            return redirect()->route('payrolls.index')
+                ->with('error', 'Bạn không có quyền xem bảng lương này.');
+        }
+
+        $base = TeachingRate::orderByDesc('id')->value('amount') ?? 0;
+        $coefficients = ClassSizeCoefficient::all();
+        $paymentService = new TeachingPaymentService($base, $coefficients);
+
+        $teacher = $classSection->teacher;
+        $degree = $teacher->degree->coefficient ?? 1;
+        $classCoef = optional(
+            $coefficients->first(function ($coef) use ($classSection) {
+                return $coef->min_students <= $classSection->student_count && $coef->max_students >= $classSection->student_count;
+            })
+        )->coefficient ?? 1;
+        $subjectCoef = $classSection->subject->coefficient ?? 1;
+
+        $salary = $paymentService->calculate(
+            $teacher,
+            $classSection->subject,
+            $classSection->student_count,
+            $classSection->period_count
+        );
+
+        return view('payrolls.section', [
+            'teacher' => $teacher,
+            'section' => $classSection,
+            'detail' => [
+                'base' => $base,
+                'degree' => $degree,
+                'class' => $classCoef,
+                'subject' => $subjectCoef,
+                'salary' => $salary,
+            ],
+        ]);
     }
 }

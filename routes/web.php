@@ -98,6 +98,7 @@ Route::middleware(['auth', 'role:admin,teacher'])->group(function () {
     Route::get('payrolls/{teacher}/export', [PayrollController::class, 'exportDetail'])->name('payrolls.export_detail');
     Route::get('payrolls', [PayrollController::class, 'index'])->name('payrolls.index');
     Route::get('payrolls/{teacher}', [PayrollController::class, 'show'])->name('payrolls.show');
+    Route::get('payrolls/sections/{classSection}', [PayrollController::class, 'sectionDetail'])->name('payrolls.section');
 });
 
 // Route xem bảng điểm sinh viên (cho admin, giáo viên và sinh viên đó)
