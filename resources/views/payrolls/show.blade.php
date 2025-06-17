@@ -29,6 +29,16 @@
                                     @endforeach
                                 </select>
                             </div>
+                            <div class="col-md-4">
+                                <select name="semester_id" class="form-select">
+                                    <option value="">{{ __('-- Học kỳ --') }}</option>
+                                    @foreach($semesters as $s)
+                                        <option value="{{ $s->id }}" {{ request('semester_id') == $s->id ? 'selected' : '' }}>
+                                            {{ $s->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <div class="col-md-2">
                                 <button type="submit" class="btn btn-outline-primary w-100">
                                     <i class="fas fa-filter"></i>
