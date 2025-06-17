@@ -28,6 +28,14 @@
                 </tr>
             @endforeach
         </tbody>
+        @isset($total)
+            <tfoot>
+                <tr>
+                    <td colspan="3" style="text-align: right; font-weight: bold;">Tổng cộng</td>
+                    <td>{{ number_format($total, 2) }}</td>
+                </tr>
+            </tfoot>
+        @endisset
     </table>
 </body>
 </html>
