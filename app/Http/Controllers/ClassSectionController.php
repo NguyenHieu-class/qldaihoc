@@ -57,8 +57,6 @@ class ClassSectionController extends Controller
         $semesters = $semestersQuery->get();
 
         return view('class_sections.create', compact('courseOfferings', 'teachers', 'academicYears', 'semesters', 'faculties'));
-
-        return view('class_sections.create', compact('courseOfferings', 'teachers', 'academicYears', 'semesters'));
     }
 
     public function store(Request $request)
