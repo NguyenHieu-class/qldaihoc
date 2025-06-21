@@ -1,6 +1,6 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
-from helpers import login_user, wait_for_url_contains, wait_for_visibility
+from helpers import login_user, wait_for_url_contains, wait_for_visibility, click_when_clickable
 
 
 def create_class(driver, base_url, code="CLTEST"):
@@ -11,7 +11,7 @@ def create_class(driver, base_url, code="CLTEST"):
     year_field = driver.find_element(By.ID, "year")
     year_field.clear()
     year_field.send_keys("2024")
-    driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+    click_when_clickable(driver, By.CSS_SELECTOR, "button[type='submit']")
     wait_for_visibility(driver, By.XPATH, f"//td[text()='{code}']")
 
 
@@ -21,13 +21,13 @@ def edit_class(driver, code, new_name="Updated Class"):
     name_field = driver.find_element(By.ID, "name")
     name_field.clear()
     name_field.send_keys(new_name)
-    driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+    click_when_clickable(driver, By.CSS_SELECTOR, "button[type='submit']")
     wait_for_url_contains(driver, "classes")
 
 
 def delete_class(driver, code):
     row = driver.find_element(By.XPATH, f"//td[text()='{code}']/..")
-    row.find_element(By.CSS_SELECTOR, "form button[type='submit']").click()
+    click_when_clickable(driver, By.CSS_SELECTOR, "form button[type='submit']")
     wait_for_url_contains(driver, "classes")
 
 

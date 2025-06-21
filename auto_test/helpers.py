@@ -23,11 +23,11 @@ def login_user(role, driver, base_url, timeout=10):
     credentials_password = getattr(config, f"{role.upper()}_PASSWORD")
 
     driver.get(f"{base_url}/login")
-    driver.find_element(By.ID, "email").send_keys(credentials_email)
-    driver.find_element(By.ID, "password").send_keys(credentials_password)
+    wait_for_visibility(driver, By.ID, "email", timeout).send_keys(credentials_email)
+    wait_for_visibility(driver, By.ID, "password", timeout).send_keys(credentials_password)
 
     previous_url = driver.current_url
-    driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+    click_when_clickable(driver, By.CSS_SELECTOR, "button[type='submit']", timeout)
 
     try:
         WebDriverWait(driver, timeout).until(EC.url_changes(previous_url))
@@ -64,6 +64,11 @@ def wait_for_clickable(driver, by, locator, timeout=10):
     return WebDriverWait(driver, timeout).until(
         EC.element_to_be_clickable((by, locator))
     )
+
+
+def click_when_clickable(driver, by, locator, timeout=10):
+    """Click element once it becomes clickable."""
+    wait_for_clickable(driver, by, locator, timeout).click()
 
 
 def wait_for_url_contains(driver, text, timeout=10):
