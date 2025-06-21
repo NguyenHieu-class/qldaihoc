@@ -26,6 +26,7 @@
                                 @error('teacher_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                                <div class="form-text">Mã giáo viên phải là duy nhất...</div>
                             </div>
                             <div class="col-md-4">
                                 <label for="faculty_id" class="form-label">{{ __('Khoa') }} <span class="text-danger">*</span></label>
