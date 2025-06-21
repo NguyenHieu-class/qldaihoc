@@ -26,17 +26,20 @@ def delete_year(driver, name):
     time.sleep(1)
 
 
-def test_academic_year_crud(driver, base_url):
+def test_academic_year_crud(driver, base_url, unique_suffix):
     login_admin(driver, base_url)
-    name = "2025-2026"
-    create_year(driver, base_url, name)
-    assert "academic-years" in driver.current_url
-    assert name in driver.page_source
+    name = f"2025-2026-{unique_suffix}"
 
-    edit_year(driver, name, new_name="2026-2027")
-    assert "academic-years" in driver.current_url
-    assert "2026-2027" in driver.page_source
+    try:
+        create_year(driver, base_url, name)
+        assert "academic-years" in driver.current_url
+        assert name in driver.page_source
 
-    delete_year(driver, "2026-2027")
+        edit_year(driver, name, new_name="2026-2027")
+        assert "academic-years" in driver.current_url
+        assert "2026-2027" in driver.page_source
+    finally:
+        delete_year(driver, "2026-2027")
+
     assert "academic-years" in driver.current_url
     assert "2026-2027" not in driver.page_source

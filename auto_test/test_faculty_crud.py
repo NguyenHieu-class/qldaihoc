@@ -24,19 +24,21 @@ def delete_faculty(driver):
     time.sleep(1)
 
 
-def test_faculty_crud(driver, base_url):
+def test_faculty_crud(driver, base_url, unique_suffix):
     login_admin(driver, base_url)
-    faculty_name = "Test Faculty"
-    updated_name = "Updated Faculty"
+    faculty_name = f"Test Faculty {unique_suffix}"
+    updated_name = f"Updated Faculty {unique_suffix}"
 
-    create_faculty(driver, base_url, name=faculty_name)
-    assert "faculties" in driver.current_url
-    assert faculty_name in driver.page_source
+    try:
+        create_faculty(driver, base_url, name=faculty_name)
+        assert "faculties" in driver.current_url
+        assert faculty_name in driver.page_source
 
-    edit_faculty(driver, base_url, new_name=updated_name)
-    assert "faculties" in driver.current_url
-    assert updated_name in driver.page_source
+        edit_faculty(driver, base_url, new_name=updated_name)
+        assert "faculties" in driver.current_url
+        assert updated_name in driver.page_source
+    finally:
+        delete_faculty(driver)
 
-    delete_faculty(driver)
     assert "faculties" in driver.current_url
     assert updated_name not in driver.page_source

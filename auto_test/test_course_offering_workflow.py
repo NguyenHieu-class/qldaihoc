@@ -24,10 +24,31 @@ def generate_class_section(driver, base_url):
     time.sleep(1)
 
 
+def delete_first_course_offering(driver, base_url):
+    driver.get(f"{base_url}/course-offerings")
+    buttons = driver.find_elements(By.CSS_SELECTOR, "form button[type='submit']")
+    if buttons:
+        buttons[0].click()
+        time.sleep(1)
+
+
+def delete_first_class_section(driver, base_url):
+    driver.get(f"{base_url}/class-sections")
+    buttons = driver.find_elements(By.CSS_SELECTOR, "form button[type='submit']")
+    if buttons:
+        buttons[0].click()
+        time.sleep(1)
+
+
 def test_course_offering_and_class_section(driver, base_url):
     login_admin(driver, base_url)
-    create_course_offering(driver, base_url)
-    assert "course-offerings" in driver.current_url
 
-    generate_class_section(driver, base_url)
-    assert "class-sections" in driver.current_url
+    try:
+        create_course_offering(driver, base_url)
+        assert "course-offerings" in driver.current_url
+
+        generate_class_section(driver, base_url)
+        assert "class-sections" in driver.current_url
+    finally:
+        delete_first_class_section(driver, base_url)
+        delete_first_course_offering(driver, base_url)

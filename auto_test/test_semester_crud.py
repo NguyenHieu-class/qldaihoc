@@ -28,17 +28,20 @@ def delete_semester(driver, name):
     time.sleep(1)
 
 
-def test_semester_crud(driver, base_url):
+def test_semester_crud(driver, base_url, unique_suffix):
     login_admin(driver, base_url)
-    name = "HKTEST"
-    create_semester(driver, base_url, name)
-    assert "semesters" in driver.current_url
-    assert name in driver.page_source
+    name = f"HKTEST{unique_suffix}"
 
-    edit_semester(driver, name, new_name="HKUP")
-    assert "semesters" in driver.current_url
-    assert "HKUP" in driver.page_source
+    try:
+        create_semester(driver, base_url, name)
+        assert "semesters" in driver.current_url
+        assert name in driver.page_source
 
-    delete_semester(driver, "HKUP")
+        edit_semester(driver, name, new_name="HKUP")
+        assert "semesters" in driver.current_url
+        assert "HKUP" in driver.page_source
+    finally:
+        delete_semester(driver, "HKUP")
+
     assert "semesters" in driver.current_url
     assert "HKUP" not in driver.page_source
