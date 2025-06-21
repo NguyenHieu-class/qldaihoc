@@ -1,6 +1,6 @@
 import time
 from selenium.webdriver.common.by import By
-from helpers import login_admin
+from helpers import login_user
 
 
 def create_year(driver, base_url, name="2025-2026"):
@@ -27,7 +27,7 @@ def delete_year(driver, name):
 
 
 def test_academic_year_crud(driver, base_url, unique_suffix):
-    login_admin(driver, base_url)
+    login_user("admin", driver, base_url)
     name = f"2025-2026-{unique_suffix}"
 
     try:

@@ -1,7 +1,7 @@
 import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
-from helpers import login_admin
+from helpers import login_user
 
 
 def create_teacher(driver, base_url, teacher_id="GVTEST", email="teacher_test@example.com"):
@@ -35,7 +35,7 @@ def delete_teacher(driver, teacher_id):
 
 
 def test_teacher_crud(driver, base_url, unique_suffix):
-    login_admin(driver, base_url)
+    login_user("admin", driver, base_url)
     teacher_id = f"GVTEST{unique_suffix}"
     email = f"teacher_test_{unique_suffix}@example.com"
 

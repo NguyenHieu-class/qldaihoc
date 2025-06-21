@@ -1,23 +1,17 @@
 import config
-
-
-def login(driver, base_url, email, password):
-    driver.get(f"{base_url}/login")
-    driver.find_element("id", "email").send_keys(email)
-    driver.find_element("id", "password").send_keys(password)
-    driver.find_element("css selector", "button[type='submit']").click()
+from helpers import login_user
 
 
 def test_admin_login(driver, base_url):
-    login(driver, base_url, config.ADMIN_EMAIL, config.ADMIN_PASSWORD)
+    login_user("admin", driver, base_url)
     assert "/dashboard" in driver.current_url
 
 
 def test_teacher_login(driver, base_url):
-    login(driver, base_url, config.TEACHER_EMAIL, config.TEACHER_PASSWORD)
+    login_user("teacher", driver, base_url)
     assert "/dashboard" in driver.current_url
 
 
 def test_student_login(driver, base_url):
-    login(driver, base_url, config.STUDENT_EMAIL, config.STUDENT_PASSWORD)
+    login_user("student", driver, base_url)
     assert "/dashboard" in driver.current_url

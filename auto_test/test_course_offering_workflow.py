@@ -1,7 +1,7 @@
 import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
-from helpers import login_admin
+from helpers import login_user
 
 
 def create_course_offering(driver, base_url):
@@ -41,7 +41,7 @@ def delete_first_class_section(driver, base_url):
 
 
 def test_course_offering_and_class_section(driver, base_url):
-    login_admin(driver, base_url)
+    login_user("admin", driver, base_url)
 
     try:
         create_course_offering(driver, base_url)

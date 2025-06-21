@@ -2,7 +2,7 @@ import config
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 import time
-from helpers import login_admin
+from helpers import login_user
 
 
 def create_student(driver, base_url, name="Test Student", email="student_test@example.com"):
@@ -30,7 +30,7 @@ def delete_student(driver):
 
 
 def test_student_crud(driver, base_url, unique_suffix):
-    login_admin(driver, base_url)
+    login_user("admin", driver, base_url)
     student_name = f"Test Student {unique_suffix}"
     updated_name = f"Updated Student {unique_suffix}"
     email = f"student_test_{unique_suffix}@example.com"
