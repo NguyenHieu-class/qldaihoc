@@ -64,7 +64,7 @@
         options: {responsive: true, scales: {x: {stacked: true}, y: {stacked: true}}}
     });
 
-    const openLabels = @json(array_map(fn($d) => $d['faculty']+' - '+$d['semester'], $openRateData));
+    const openLabels = @json(array_map(fn($d) => $d['faculty'].' - '.$d['semester'], $openRateData));
     const openData = @json(array_column($openRateData, 'percent'));
     new Chart(document.getElementById('openRateChart').getContext('2d'), {
         type: 'bar',
