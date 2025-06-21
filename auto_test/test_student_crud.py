@@ -2,13 +2,7 @@ import config
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 import time
-
-
-def login_admin(driver, base_url):
-    driver.get(f"{base_url}/login")
-    driver.find_element(By.ID, "email").send_keys(config.ADMIN_EMAIL)
-    driver.find_element(By.ID, "password").send_keys(config.ADMIN_PASSWORD)
-    driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+from helpers import login_admin
 
 
 def create_student(driver, base_url, name="Test Student", email="student_test@example.com"):

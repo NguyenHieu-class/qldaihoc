@@ -1,12 +1,6 @@
 import config
 from selenium.webdriver.common.by import By
-
-
-def login_teacher(driver, base_url):
-    driver.get(f"{base_url}/login")
-    driver.find_element(By.ID, "email").send_keys(config.TEACHER_EMAIL)
-    driver.find_element(By.ID, "password").send_keys(config.TEACHER_PASSWORD)
-    driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+from helpers import login_teacher
 
 
 def test_grade_entry(driver, base_url):
