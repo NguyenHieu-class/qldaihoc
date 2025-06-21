@@ -79,6 +79,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 
     // Lớp học phần
     Route::post('class-sections/generate', [ClassSectionController::class, 'generate'])->name('class-sections.generate');
+    Route::get('reports', [\App\Http\Controllers\ReportController::class, 'index'])->name('reports.index');
     Route::get("reports/sections", [\App\Http\Controllers\ReportController::class, "sectionsBySemester"])->name("reports.sections");
     Route::get("reports/workload", [\App\Http\Controllers\ReportController::class, "teacherWorkload"])->name("reports.workload");
     Route::get("reports/open-rate", [\App\Http\Controllers\ReportController::class, "subjectOpenRate"])->name("reports.open_rate");
