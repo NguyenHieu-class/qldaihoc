@@ -1,6 +1,6 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
-from helpers import login_user, wait_for_url_contains, wait_for_visibility
+from helpers import login_user, wait_for_url_contains, wait_for_visibility, click_when_clickable
 
 
 def create_major(driver, base_url, code="TMJ"):
@@ -8,7 +8,7 @@ def create_major(driver, base_url, code="TMJ"):
     Select(driver.find_element(By.ID, "faculty_id")).select_by_index(1)
     driver.find_element(By.ID, "name").send_keys("Test Major")
     driver.find_element(By.ID, "code").send_keys(code)
-    driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+    click_when_clickable(driver, By.CSS_SELECTOR, "button[type='submit']")
     wait_for_visibility(driver, By.XPATH, f"//td[text()='{code}']")
 
 
@@ -18,13 +18,13 @@ def edit_major(driver, code, new_name="Updated Major"):
     name_field = driver.find_element(By.ID, "name")
     name_field.clear()
     name_field.send_keys(new_name)
-    driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+    click_when_clickable(driver, By.CSS_SELECTOR, "button[type='submit']")
     wait_for_url_contains(driver, "majors")
 
 
 def delete_major(driver, code):
     row = driver.find_element(By.XPATH, f"//td[text()='{code}']/..")
-    row.find_element(By.CSS_SELECTOR, "form button[type='submit']").click()
+    click_when_clickable(driver, By.CSS_SELECTOR, "form button[type='submit']")
     wait_for_url_contains(driver, "majors")
 
 
