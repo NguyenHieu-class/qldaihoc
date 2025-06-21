@@ -49,5 +49,10 @@ class PayrollPdfTest extends TestCase
         $res = $this->actingAs($admin)->get(route('payrolls.export_detail', $teacher));
         $res->assertOk();
         $this->assertStringContainsString('application/pdf', $res->headers->get('content-type'));
+
+        $section = ClassSection::first();
+        $res = $this->actingAs($admin)->get(route('payrolls.section_export', $section));
+        $res->assertOk();
+        $this->assertStringContainsString('application/pdf', $res->headers->get('content-type'));
     }
 }

@@ -7,9 +7,12 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>Bảng lương lớp {{ $section->code }}</span>
-                    <a href="{{ route('payrolls.index') }}" class="btn btn-secondary btn-sm">
-                        <i class="fas fa-arrow-left"></i> Quay lại
-                    </a>
+                    <div>
+                        <a href="{{ route('payrolls.section_export', $section) }}" class="btn btn-primary btn-sm me-2">Xuất PDF</a>
+                        <a href="{{ route('payrolls.index') }}" class="btn btn-secondary btn-sm">
+                            <i class="fas fa-arrow-left"></i> Quay lại
+                        </a>
+                    </div>
                 </div>
                 <div class="card-body">
                     <table class="table table-bordered">

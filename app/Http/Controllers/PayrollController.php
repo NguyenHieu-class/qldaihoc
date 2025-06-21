@@ -348,4 +348,48 @@ class PayrollController extends Controller
             ],
         ]);
     }
+
+    public function exportSection(ClassSection $classSection)
+    {
+        $user = Auth::user();
+        if ($user->role === 'teacher' && $user->teacher?->id !== $classSection->teacher_id) {
+            return redirect()->route('payrolls.index')
+                ->with('error', 'Bạn không có quyền.');
+        }
+
+        $base = TeachingRate::orderByDesc('id')->value('amount') ?? 0;
+        $coefficients = ClassSizeCoefficient::all();
+        $paymentService = new TeachingPaymentService($base, $coefficients);
+
+        $teacher = $classSection->teacher;
+        $degree = $teacher->degree->coefficient ?? 1;
+        $classCoef = optional(
+            $coefficients->first(function ($coef) use ($classSection) {
+                return $coef->min_students <= $classSection->student_count && $coef->max_students >= $classSection->student_count;
+            })
+        )->coefficient ?? 1;
+        $subjectCoef = $classSection->subject->coefficient ?? 1;
+
+        $salary = $paymentService->calculate(
+            $teacher,
+            $classSection->subject,
+            $classSection->student_count,
+            $classSection->period_count,
+            optional($classSection->teachingRate)->amount
+        );
+
+        $pdf = Pdf::loadView('payrolls.section_pdf', [
+            'teacher' => $teacher,
+            'section' => $classSection,
+            'detail' => [
+                'base' => $base,
+                'degree' => $degree,
+                'class' => $classCoef,
+                'subject' => $subjectCoef,
+                'salary' => $salary,
+            ],
+        ])->set_option('defaultFont', 'DejaVu Sans');
+
+        return $pdf->stream('section_' . $classSection->id . '.pdf');
+    }
 }
