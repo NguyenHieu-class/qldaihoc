@@ -1,6 +1,6 @@
 import config
 from selenium.webdriver.common.by import By
-from helpers import login_admin
+from helpers import login_user
 
 
 def create_faculty(driver, base_url, name="Test Faculty"):
@@ -25,7 +25,7 @@ def delete_faculty(driver):
 
 
 def test_faculty_crud(driver, base_url, unique_suffix):
-    login_admin(driver, base_url)
+    login_user("admin", driver, base_url)
     faculty_name = f"Test Faculty {unique_suffix}"
     updated_name = f"Updated Faculty {unique_suffix}"
 

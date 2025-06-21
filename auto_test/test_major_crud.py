@@ -1,7 +1,7 @@
 import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
-from helpers import login_admin
+from helpers import login_user
 
 
 def create_major(driver, base_url, code="TMJ"):
@@ -30,7 +30,7 @@ def delete_major(driver, code):
 
 
 def test_major_crud(driver, base_url, unique_suffix):
-    login_admin(driver, base_url)
+    login_user("admin", driver, base_url)
     code = f"TMJ{unique_suffix}"
 
     try:

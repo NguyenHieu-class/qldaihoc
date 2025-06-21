@@ -1,7 +1,7 @@
 import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
-from helpers import login_admin
+from helpers import login_user
 
 
 def create_semester(driver, base_url, name="HKTEST"):
@@ -29,7 +29,7 @@ def delete_semester(driver, name):
 
 
 def test_semester_crud(driver, base_url, unique_suffix):
-    login_admin(driver, base_url)
+    login_user("admin", driver, base_url)
     name = f"HKTEST{unique_suffix}"
 
     try:

@@ -1,11 +1,11 @@
 import config
 import time
 from selenium.webdriver.common.by import By
-from helpers import login_admin
+from helpers import login_user
 
 
 def test_subject_crud(driver, base_url, unique_suffix):
-    login_admin(driver, base_url)
+    login_user("admin", driver, base_url)
     name = f"Test Subject {unique_suffix}"
     updated = f"Updated Subject {unique_suffix}"
 

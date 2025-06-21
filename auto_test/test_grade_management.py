@@ -1,10 +1,10 @@
 import config
 from selenium.webdriver.common.by import By
-from helpers import login_teacher
+from helpers import login_user
 
 
 def test_grade_entry(driver, base_url):
-    login_teacher(driver, base_url)
+    login_user("teacher", driver, base_url)
     driver.get(f"{base_url}/grades")
     driver.find_element(By.LINK_TEXT, "Edit").click()
     score_input = driver.find_element(By.NAME, "score")

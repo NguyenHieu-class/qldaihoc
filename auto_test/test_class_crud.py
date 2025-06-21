@@ -1,7 +1,7 @@
 import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
-from helpers import login_admin
+from helpers import login_user
 
 
 def create_class(driver, base_url, code="CLTEST"):
@@ -33,7 +33,7 @@ def delete_class(driver, code):
 
 
 def test_class_crud(driver, base_url, unique_suffix):
-    login_admin(driver, base_url)
+    login_user("admin", driver, base_url)
     code = f"CLTEST{unique_suffix}"
 
     try:
