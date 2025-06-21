@@ -13,6 +13,7 @@
                 </div>
                 <div class="card-body">
                     @include('partials.alerts')
+                    @include('partials.instructions', ['guideline' => 'Nhập đầy đủ thông tin và nhấn Lưu để tạo mới.'])
                     <form method="POST" action="{{ route('teaching-rates.store') }}">
                         @csrf
                         <div class="mb-3">

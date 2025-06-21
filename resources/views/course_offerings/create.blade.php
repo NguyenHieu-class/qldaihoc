@@ -13,6 +13,7 @@
                 </div>
                 <div class="card-body">
                     @include('partials.alerts')
+                    @include('partials.instructions', ['guideline' => 'Nhập đầy đủ thông tin và nhấn Lưu để tạo mới.'])
 
                     <div class="mb-3">
                         <form action="{{ route('course-offerings.create') }}" method="GET" class="row g-3">
