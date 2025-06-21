@@ -2,7 +2,8 @@ import config
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
+from selenium.common.exceptions import TimeoutException, ElementClickInterceptedException
+import time
 
 
 def login_user(role, driver, base_url, timeout=10):
@@ -52,23 +53,38 @@ def login_student(driver, base_url):
     login_user("student", driver, base_url)
 
 
-def wait_for_visibility(driver, by, locator, timeout=10):
+def wait_for_visibility(driver, by, locator, timeout=20):
     """Return element once visible."""
     return WebDriverWait(driver, timeout).until(
         EC.visibility_of_element_located((by, locator))
     )
 
 
-def wait_for_clickable(driver, by, locator, timeout=10):
+def wait_for_clickable(driver, by, locator, timeout=20):
     """Return element once clickable."""
     return WebDriverWait(driver, timeout).until(
         EC.element_to_be_clickable((by, locator))
     )
 
 
-def click_when_clickable(driver, by, locator, timeout=10):
-    """Click element once it becomes clickable."""
-    wait_for_clickable(driver, by, locator, timeout).click()
+def click_when_clickable(driver, by, locator, timeout=20):
+    """Click element once it becomes clickable with retry on interception."""
+    for attempt in range(3):
+        try:
+            wait_for_clickable(driver, by, locator, timeout).click()
+            return
+        except ElementClickInterceptedException:
+            time.sleep(1)
+    raise ElementClickInterceptedException(
+        f"Element {locator} could not be clicked after retries"
+    )
+
+
+def wait_until_element_disappear(driver, by, locator, timeout=20):
+    """Wait until the specified element is no longer present."""
+    WebDriverWait(driver, timeout).until_not(
+        EC.presence_of_element_located((by, locator))
+    )
 
 
 def wait_for_url_contains(driver, text, timeout=10):
