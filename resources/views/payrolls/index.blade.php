@@ -19,7 +19,7 @@
 
                     <div class="mb-3">
                         <form action="{{ route('payrolls.index') }}" method="GET" class="row g-3">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <select name="academic_year_id" class="form-select">
                                     <option value="">{{ __('-- Năm học --') }}</option>
                                     @foreach($academicYears as $year)
@@ -29,7 +29,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <select name="semester_id" class="form-select">
                                     <option value="">{{ __('-- Học kỳ --') }}</option>
                                     @foreach($semesters as $s)
@@ -39,7 +39,12 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-2">
+                            @if(Auth::user()->role === 'admin')
+                                <div class="col-md-3">
+                                    <input type="text" name="search" class="form-control" placeholder="{{ __('Tìm kiếm theo mã hoặc tên giáo viên...') }}" value="{{ request('search') }}">
+                                </div>
+                            @endif
+                            <div class="col-md-1">
                                 <button type="submit" class="btn btn-outline-primary w-100">
                                     <i class="fas fa-filter"></i>
                                 </button>
