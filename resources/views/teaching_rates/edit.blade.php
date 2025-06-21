@@ -13,6 +13,7 @@
                 </div>
                 <div class="card-body">
                     @include('partials.alerts')
+                    @include('partials.instructions', ['guideline' => 'Chỉnh sửa thông tin và nhấn Cập nhật để lưu thay đổi.'])
                     <form method="POST" action="{{ route('teaching-rates.update', $teachingRate->id) }}">
                         @csrf
                         @method('PUT')

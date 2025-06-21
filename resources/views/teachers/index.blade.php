@@ -16,6 +16,7 @@
 
                 <div class="card-body">
                     @include('partials.alerts')
+                    @include('partials.instructions', ['guideline' => 'Sử dụng bộ lọc và ô tìm kiếm để lọc danh sách. Bạn có thể thêm, chỉnh sửa hoặc xoá bản ghi.'])
 
                     <div class="mb-3">
                         <form action="{{ route('teachers.index') }}" method="GET" class="row g-3">
