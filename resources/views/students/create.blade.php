@@ -25,6 +25,7 @@
                                 @error('student_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
+                                <div class="form-text">Mã sinh viên phải là duy nhất...</div>
                             </div>
                             <div class="col-md-6">
                                 <label for="class_id" class="form-label">{{ __('Lớp') }} <span class="text-danger">*</span></label>
