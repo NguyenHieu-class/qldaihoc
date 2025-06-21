@@ -50,3 +50,22 @@ def login_teacher(driver, base_url):
 
 def login_student(driver, base_url):
     login_user("student", driver, base_url)
+
+
+def wait_for_visibility(driver, by, locator, timeout=10):
+    """Return element once visible."""
+    return WebDriverWait(driver, timeout).until(
+        EC.visibility_of_element_located((by, locator))
+    )
+
+
+def wait_for_clickable(driver, by, locator, timeout=10):
+    """Return element once clickable."""
+    return WebDriverWait(driver, timeout).until(
+        EC.element_to_be_clickable((by, locator))
+    )
+
+
+def wait_for_url_contains(driver, text, timeout=10):
+    """Wait until current URL contains given text."""
+    return WebDriverWait(driver, timeout).until(EC.url_contains(text))

@@ -1,13 +1,12 @@
-import time
 from selenium.webdriver.common.by import By
-from helpers import login_user
+from helpers import login_user, wait_for_url_contains, wait_for_visibility
 
 
 def create_year(driver, base_url, name="2025-2026"):
     driver.get(f"{base_url}/academic-years/create")
     driver.find_element(By.ID, "name").send_keys(name)
     driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
-    time.sleep(1)
+    wait_for_visibility(driver, By.XPATH, f"//td[text()='{name}']")
 
 
 def edit_year(driver, name, new_name="2026-2027"):
@@ -17,13 +16,13 @@ def edit_year(driver, name, new_name="2026-2027"):
     field.clear()
     field.send_keys(new_name)
     driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
-    time.sleep(1)
+    wait_for_url_contains(driver, "academic-years")
 
 
 def delete_year(driver, name):
     row = driver.find_element(By.XPATH, f"//td[text()='{name}']/..")
     row.find_element(By.CSS_SELECTOR, "form button[type='submit']").click()
-    time.sleep(1)
+    wait_for_url_contains(driver, "academic-years")
 
 
 def test_academic_year_crud(driver, base_url, unique_suffix):
