@@ -25,6 +25,7 @@ class PayrollController extends Controller
         $user = Auth::user();
         $yearId = $request->academic_year_id;
         $semesterId = $request->semester_id;
+        $search = $request->search;
         $academicYears = AcademicYear::all();
         $semesters = Semester::all();
 
@@ -42,6 +43,13 @@ class PayrollController extends Controller
                 ->when($semesterId, function ($q) use ($semesterId) {
                     $q->whereHas('courseOffering', function ($q) use ($semesterId) {
                         $q->where('semester_id', $semesterId);
+                    });
+                })
+                ->when($search, function ($q) use ($search) {
+                    $q->whereHas('teacher', function ($q) use ($search) {
+                        $q->where('teacher_id', 'like', "%$search%")
+                            ->orWhere('first_name', 'like', "%$search%")
+                            ->orWhere('last_name', 'like', "%$search%");
                     });
                 })
                 ->get();
@@ -185,8 +193,14 @@ class PayrollController extends Controller
 
         $yearId = $request->academic_year_id;
         $semesterId = $request->semester_id;
+        $search = $request->search;
 
         $teachers = Teacher::with(['degree', 'classSections.subject', 'classSections.courseOffering.semester', 'classSections.teachingRate'])
+            ->when($search, function ($q) use ($search) {
+                $q->where('teacher_id', 'like', "%$search%")
+                    ->orWhere('first_name', 'like', "%$search%")
+                    ->orWhere('last_name', 'like', "%$search%");
+            })
             ->get();
         $base = TeachingRate::orderByDesc('id')->value('amount') ?? 0;
         $coefficients = ClassSizeCoefficient::all();
