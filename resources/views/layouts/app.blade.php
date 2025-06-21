@@ -347,7 +347,7 @@
                                                 </a>
                                             </li>
                                             <li class="nav-item">
-                                                <a class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" href="{{ route('reports.sections') }}">
+                                                <a class="nav-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" href="{{ route('reports.index') }}">
                                                     <i class="fas fa-chart-pie"></i> Báo cáo
                                                 </a>
                                             </li>

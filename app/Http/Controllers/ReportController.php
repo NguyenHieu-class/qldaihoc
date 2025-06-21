@@ -19,6 +19,86 @@ class ReportController extends Controller
     }
 
     /**
+     * Dashboard showing multiple report charts.
+     */
+    public function index()
+    {
+        $semesters = Semester::with('academicYear')->get();
+
+        // Sections by semester data
+        $sectionsData = [];
+        foreach ($semesters as $semester) {
+            $count = CourseOffering::where('semester_id', $semester->id)
+                ->withCount('subject.classSections')
+                ->get()
+                ->sum('subject_class_sections_count');
+            $sectionsData[] = [
+                'name' => $semester->name . ' ' . $semester->academicYear->name,
+                'count' => $count,
+            ];
+        }
+
+        // Teacher workload data
+        $teachers = Teacher::all();
+        $workloadData = [];
+        foreach ($teachers as $teacher) {
+            $rows = [];
+            foreach ($semesters as $semester) {
+                $periods = ClassSection::where('teacher_id', $teacher->id)
+                    ->whereHas('subject.courseOfferings', function ($q) use ($semester) {
+                        $q->where('semester_id', $semester->id);
+                    })
+                    ->sum('period_count');
+                $payment = ClassSection::where('teacher_id', $teacher->id)
+                    ->whereHas('subject.courseOfferings', function ($q) use ($semester) {
+                        $q->where('semester_id', $semester->id);
+                    })
+                    ->join('subjects', 'class_sections.subject_id', '=', 'subjects.id')
+                    ->sum(DB::raw('class_sections.period_count * subjects.coefficient'));
+                $rows[] = [
+                    'semester' => $semester->name . ' ' . $semester->academicYear->name,
+                    'periods' => $periods,
+                    'payment' => $payment,
+                ];
+            }
+            $workloadData[] = [
+                'teacher' => $teacher->full_name,
+                'rows' => $rows,
+            ];
+        }
+
+        // Subject open rate data
+        $faculties = Faculty::all();
+        $totalSubjects = Subject::count();
+        $openRateData = [];
+        foreach ($faculties as $faculty) {
+            foreach ($semesters as $semester) {
+                $opened = Subject::whereHas('courseOfferings', function ($q) use ($semester) {
+                        $q->where('semester_id', $semester->id);
+                    })
+                    ->whereHas('classSections.teacher', function ($q) use ($faculty) {
+                        $q->where('faculty_id', $faculty->id);
+                    })
+                    ->distinct('subjects.id')
+                    ->count('subjects.id');
+                $percent = $totalSubjects > 0 ? ($opened / $totalSubjects) * 100 : 0;
+                $openRateData[] = [
+                    'faculty' => $faculty->name,
+                    'semester' => $semester->name . ' ' . $semester->academicYear->name,
+                    'percent' => round($percent, 2),
+                ];
+            }
+        }
+
+        return view('reports.index', [
+            'sectionsData' => $sectionsData,
+            'workloadData' => $workloadData,
+            'openRateData' => $openRateData,
+            'semesters' => $semesters,
+        ]);
+    }
+
+    /**
      * Number of class sections by semester.
      */
     public function sectionsBySemester()
