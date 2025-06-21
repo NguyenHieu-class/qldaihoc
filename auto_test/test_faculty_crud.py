@@ -7,6 +7,7 @@ def create_faculty(driver, base_url, name="Test Faculty"):
     driver.get(f"{base_url}/faculties/create")
     driver.find_element(By.ID, "name").send_keys(name)
     driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+    time.sleep(1)
 
 
 def edit_faculty(driver, base_url, new_name="Updated Faculty"):
@@ -15,19 +16,27 @@ def edit_faculty(driver, base_url, new_name="Updated Faculty"):
     name_field.clear()
     name_field.send_keys(new_name)
     driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+    time.sleep(1)
 
 
 def delete_faculty(driver):
     driver.find_element(By.CSS_SELECTOR, "form button[type='submit']").click()
+    time.sleep(1)
 
 
 def test_faculty_crud(driver, base_url):
     login_admin(driver, base_url)
-    create_faculty(driver, base_url)
-    assert "faculties" in driver.current_url
+    faculty_name = "Test Faculty"
+    updated_name = "Updated Faculty"
 
-    edit_faculty(driver, base_url)
+    create_faculty(driver, base_url, name=faculty_name)
     assert "faculties" in driver.current_url
+    assert faculty_name in driver.page_source
+
+    edit_faculty(driver, base_url, new_name=updated_name)
+    assert "faculties" in driver.current_url
+    assert updated_name in driver.page_source
 
     delete_faculty(driver)
     assert "faculties" in driver.current_url
+    assert updated_name not in driver.page_source

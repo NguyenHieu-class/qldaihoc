@@ -12,6 +12,7 @@ def create_student(driver, base_url, name="Test Student", email="student_test@ex
     driver.find_element(By.ID, "password").send_keys("password")
     Select(driver.find_element(By.ID, "class_id")).select_by_index(1)
     driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+    time.sleep(1)
 
 
 def edit_student(driver, base_url, new_name="Updated Student"):
@@ -20,19 +21,27 @@ def edit_student(driver, base_url, new_name="Updated Student"):
     name_field.clear()
     name_field.send_keys(new_name)
     driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
+    time.sleep(1)
 
 
 def delete_student(driver):
     driver.find_element(By.CSS_SELECTOR, "form button[type='submit']").click()
+    time.sleep(1)
 
 
 def test_student_crud(driver, base_url):
     login_admin(driver, base_url)
-    create_student(driver, base_url)
-    assert "students" in driver.current_url
+    student_name = "Test Student"
+    updated_name = "Updated Student"
 
-    edit_student(driver, base_url)
+    create_student(driver, base_url, name=student_name)
     assert "students" in driver.current_url
+    assert student_name in driver.page_source
+
+    edit_student(driver, base_url, new_name=updated_name)
+    assert "students" in driver.current_url
+    assert updated_name in driver.page_source
 
     delete_student(driver)
     assert "students" in driver.current_url
+    assert updated_name not in driver.page_source
