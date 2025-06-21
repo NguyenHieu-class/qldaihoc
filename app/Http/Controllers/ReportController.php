@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\ClassSection;
-use App\Models\CourseOffering;
 use App\Models\Faculty;
 use App\Models\Semester;
 use App\Models\Subject;
@@ -28,10 +27,10 @@ class ReportController extends Controller
         // Sections by semester data
         $sectionsData = [];
         foreach ($semesters as $semester) {
-            $count = CourseOffering::where('semester_id', $semester->id)
-                ->withCount('subject.classSections')
-                ->get()
-                ->sum('subject_class_sections_count');
+            $count = ClassSection::whereHas('courseOffering', function ($q) use ($semester) {
+                    $q->where('semester_id', $semester->id);
+                })
+                ->count();
             $sectionsData[] = [
                 'name' => $semester->name . ' ' . $semester->academicYear->name,
                 'count' => $count,
@@ -106,10 +105,10 @@ class ReportController extends Controller
         $semesters = Semester::with('academicYear')->get();
         $data = [];
         foreach ($semesters as $semester) {
-            $count = CourseOffering::where('semester_id', $semester->id)
-                ->withCount('subject.classSections')
-                ->get()
-                ->sum('subject_class_sections_count');
+            $count = ClassSection::whereHas('courseOffering', function ($q) use ($semester) {
+                    $q->where('semester_id', $semester->id);
+                })
+                ->count();
             $data[] = [
                 'name' => $semester->name . ' ' . $semester->academicYear->name,
                 'count' => $count,
