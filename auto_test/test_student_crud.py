@@ -1,8 +1,7 @@
 import config
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
-import time
-from helpers import login_user
+from helpers import login_user, wait_for_url_contains, wait_for_visibility
 
 
 def create_student(driver, base_url, name="Test Student", email="student_test@example.com"):
@@ -12,7 +11,7 @@ def create_student(driver, base_url, name="Test Student", email="student_test@ex
     driver.find_element(By.ID, "password").send_keys("password")
     Select(driver.find_element(By.ID, "class_id")).select_by_index(1)
     driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
-    time.sleep(1)
+    wait_for_visibility(driver, By.XPATH, f"//td[text()='{name}']")
 
 
 def edit_student(driver, base_url, new_name="Updated Student"):
@@ -21,12 +20,12 @@ def edit_student(driver, base_url, new_name="Updated Student"):
     name_field.clear()
     name_field.send_keys(new_name)
     driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
-    time.sleep(1)
+    wait_for_url_contains(driver, "students")
 
 
 def delete_student(driver):
     driver.find_element(By.CSS_SELECTOR, "form button[type='submit']").click()
-    time.sleep(1)
+    wait_for_url_contains(driver, "students")
 
 
 def test_student_crud(driver, base_url, unique_suffix):

@@ -1,7 +1,6 @@
-import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
-from helpers import login_user
+from helpers import login_user, wait_for_url_contains, wait_for_visibility
 
 
 def create_major(driver, base_url, code="TMJ"):
@@ -10,7 +9,7 @@ def create_major(driver, base_url, code="TMJ"):
     driver.find_element(By.ID, "name").send_keys("Test Major")
     driver.find_element(By.ID, "code").send_keys(code)
     driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
-    time.sleep(1)
+    wait_for_visibility(driver, By.XPATH, f"//td[text()='{code}']")
 
 
 def edit_major(driver, code, new_name="Updated Major"):
@@ -20,13 +19,13 @@ def edit_major(driver, code, new_name="Updated Major"):
     name_field.clear()
     name_field.send_keys(new_name)
     driver.find_element(By.CSS_SELECTOR, "button[type='submit']").click()
-    time.sleep(1)
+    wait_for_url_contains(driver, "majors")
 
 
 def delete_major(driver, code):
     row = driver.find_element(By.XPATH, f"//td[text()='{code}']/..")
     row.find_element(By.CSS_SELECTOR, "form button[type='submit']").click()
-    time.sleep(1)
+    wait_for_url_contains(driver, "majors")
 
 
 def test_major_crud(driver, base_url, unique_suffix):
