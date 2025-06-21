@@ -32,17 +32,20 @@ def delete_class(driver, code):
     time.sleep(1)
 
 
-def test_class_crud(driver, base_url):
+def test_class_crud(driver, base_url, unique_suffix):
     login_admin(driver, base_url)
-    code = "CLTEST"
-    create_class(driver, base_url, code)
-    assert "classes" in driver.current_url
-    assert code in driver.page_source
+    code = f"CLTEST{unique_suffix}"
 
-    edit_class(driver, code, new_name="Class Updated")
-    assert "classes" in driver.current_url
-    assert "Class Updated" in driver.page_source
+    try:
+        create_class(driver, base_url, code)
+        assert "classes" in driver.current_url
+        assert code in driver.page_source
 
-    delete_class(driver, code)
+        edit_class(driver, code, new_name="Class Updated")
+        assert "classes" in driver.current_url
+        assert "Class Updated" in driver.page_source
+    finally:
+        delete_class(driver, code)
+
     assert "classes" in driver.current_url
     assert code not in driver.page_source

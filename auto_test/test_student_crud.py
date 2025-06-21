@@ -29,19 +29,22 @@ def delete_student(driver):
     time.sleep(1)
 
 
-def test_student_crud(driver, base_url):
+def test_student_crud(driver, base_url, unique_suffix):
     login_admin(driver, base_url)
-    student_name = "Test Student"
-    updated_name = "Updated Student"
+    student_name = f"Test Student {unique_suffix}"
+    updated_name = f"Updated Student {unique_suffix}"
+    email = f"student_test_{unique_suffix}@example.com"
 
-    create_student(driver, base_url, name=student_name)
-    assert "students" in driver.current_url
-    assert student_name in driver.page_source
+    try:
+        create_student(driver, base_url, name=student_name, email=email)
+        assert "students" in driver.current_url
+        assert student_name in driver.page_source
 
-    edit_student(driver, base_url, new_name=updated_name)
-    assert "students" in driver.current_url
-    assert updated_name in driver.page_source
+        edit_student(driver, base_url, new_name=updated_name)
+        assert "students" in driver.current_url
+        assert updated_name in driver.page_source
+    finally:
+        delete_student(driver)
 
-    delete_student(driver)
     assert "students" in driver.current_url
     assert updated_name not in driver.page_source

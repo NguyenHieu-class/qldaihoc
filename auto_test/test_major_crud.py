@@ -29,17 +29,20 @@ def delete_major(driver, code):
     time.sleep(1)
 
 
-def test_major_crud(driver, base_url):
+def test_major_crud(driver, base_url, unique_suffix):
     login_admin(driver, base_url)
-    code = "TMJ"
-    create_major(driver, base_url, code)
-    assert "majors" in driver.current_url
-    assert code in driver.page_source
+    code = f"TMJ{unique_suffix}"
 
-    edit_major(driver, code, new_name="Major Updated")
-    assert "majors" in driver.current_url
-    assert "Major Updated" in driver.page_source
+    try:
+        create_major(driver, base_url, code)
+        assert "majors" in driver.current_url
+        assert code in driver.page_source
 
-    delete_major(driver, code)
+        edit_major(driver, code, new_name="Major Updated")
+        assert "majors" in driver.current_url
+        assert "Major Updated" in driver.page_source
+    finally:
+        delete_major(driver, code)
+
     assert "majors" in driver.current_url
     assert code not in driver.page_source

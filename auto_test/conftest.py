@@ -1,5 +1,6 @@
 import os
 import shutil
+import time
 
 import pytest
 from selenium import webdriver
@@ -34,3 +35,9 @@ def driver():
 @pytest.fixture
 def base_url():
     return config.BASE_URL
+
+
+@pytest.fixture
+def unique_suffix():
+    """Return a unique string based on the current timestamp."""
+    return str(int(time.time() * 1000))
