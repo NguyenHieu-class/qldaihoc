@@ -35,3 +35,20 @@ pytest --html=report.html
 ```
 
 Ensure the Laravel server is running before executing the tests.
+
+## Environment Variables
+
+The tests read several settings from environment variables. Defaults are used
+when variables are unset:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `BASE_URL` | `http://127.0.0.1:8000` | Base URL where the Laravel application is served |
+| `ADMIN_EMAIL` | `admin@example.com` | Seeded admin account email |
+| `ADMIN_PASSWORD` | `password` | Password for the admin account |
+| `TEACHER_EMAIL` | `teacher1@example.com` | Seeded teacher account email |
+| `TEACHER_PASSWORD` | `password` | Password for the teacher account |
+| `STUDENT_EMAIL` | `student1@example.com` | Seeded student account email |
+| `STUDENT_PASSWORD` | `password` | Password for the student account |
+
+`CHROME_DRIVER_PATH` may also be set to specify a custom Chrome driver path.
