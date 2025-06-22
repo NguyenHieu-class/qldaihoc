@@ -50,5 +50,10 @@ when variables are unset:
 | `TEACHER_PASSWORD` | `password` | Password for the teacher account |
 | `STUDENT_EMAIL` | `student1@example.com` | Seeded student account email |
 | `STUDENT_PASSWORD` | `password` | Password for the student account |
+| `ACTION_DELAY` | `0` | Seconds to pause after each Selenium action |
 
 `CHROME_DRIVER_PATH` may also be set to specify a custom Chrome driver path.
+
+To slow down the tests for debugging, export an `ACTION_DELAY` value. For
+example, running `export ACTION_DELAY=1` will wait one second after each
+Selenium step.

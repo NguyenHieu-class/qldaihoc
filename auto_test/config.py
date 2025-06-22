@@ -13,3 +13,7 @@ TEACHER_PASSWORD = os.getenv("TEACHER_PASSWORD", "password")
 
 STUDENT_EMAIL = os.getenv("STUDENT_EMAIL", "student1@example.com")
 STUDENT_PASSWORD = os.getenv("STUDENT_PASSWORD", "password")
+
+# Optional delay (in seconds) inserted after each Selenium action. This can be
+# useful for visually observing test execution or for debugging timing issues.
+ACTION_DELAY = float(os.getenv("ACTION_DELAY", 0))
