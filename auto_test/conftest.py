@@ -14,7 +14,7 @@ import config
 @pytest.fixture(scope="session")
 def driver():
     options = Options()
-    options.add_argument("--headless=new")
+    # options.add_argument("--headless=new")
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
 
@@ -27,7 +27,7 @@ def driver():
         service = Service(ChromeDriverManager().install())
 
     driver = webdriver.Chrome(service=service, options=options)
-    driver.implicitly_wait(5)
+    driver.implicitly_wait(30)
     yield driver
     driver.quit()
 
@@ -40,4 +40,4 @@ def base_url():
 @pytest.fixture
 def unique_suffix():
     """Return a unique string based on the current timestamp."""
-    return str(int(time.time() * 1000))
+    return str(int(time.time() * 10000))
