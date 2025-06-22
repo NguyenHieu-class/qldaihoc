@@ -6,6 +6,12 @@ from selenium.common.exceptions import TimeoutException, ElementClickIntercepted
 import time
 
 
+def delay():
+    """Pause execution for ``config.ACTION_DELAY`` seconds if configured."""
+    if config.ACTION_DELAY > 0:
+        time.sleep(config.ACTION_DELAY)
+
+
 def login_user(role, driver, base_url, timeout=10):
     """Log in as the specified role and wait for dashboard redirect.
 
@@ -24,11 +30,15 @@ def login_user(role, driver, base_url, timeout=10):
     credentials_password = getattr(config, f"{role.upper()}_PASSWORD")
 
     driver.get(f"{base_url}/login")
+    delay()
     wait_for_visibility(driver, By.ID, "email", timeout).send_keys(credentials_email)
+    delay()
     wait_for_visibility(driver, By.ID, "password", timeout).send_keys(credentials_password)
+    delay()
 
     previous_url = driver.current_url
     click_when_clickable(driver, By.CSS_SELECTOR, "button[type='submit']", timeout)
+    delay()
 
     try:
         WebDriverWait(driver, timeout).until(EC.url_changes(previous_url))
@@ -55,16 +65,20 @@ def login_student(driver, base_url):
 
 def wait_for_visibility(driver, by, locator, timeout=20):
     """Return element once visible."""
-    return WebDriverWait(driver, timeout).until(
+    element = WebDriverWait(driver, timeout).until(
         EC.visibility_of_element_located((by, locator))
     )
+    delay()
+    return element
 
 
 def wait_for_clickable(driver, by, locator, timeout=20):
     """Return element once clickable."""
-    return WebDriverWait(driver, timeout).until(
+    element = WebDriverWait(driver, timeout).until(
         EC.element_to_be_clickable((by, locator))
     )
+    delay()
+    return element
 
 
 def click_when_clickable(driver, by, locator, timeout=20):
@@ -72,6 +86,7 @@ def click_when_clickable(driver, by, locator, timeout=20):
     for attempt in range(3):
         try:
             wait_for_clickable(driver, by, locator, timeout).click()
+            delay()
             return
         except ElementClickInterceptedException:
             time.sleep(1)
@@ -85,8 +100,11 @@ def wait_until_element_disappear(driver, by, locator, timeout=20):
     WebDriverWait(driver, timeout).until_not(
         EC.presence_of_element_located((by, locator))
     )
+    delay()
 
 
 def wait_for_url_contains(driver, text, timeout=10):
     """Wait until current URL contains given text."""
-    return WebDriverWait(driver, timeout).until(EC.url_contains(text))
+    result = WebDriverWait(driver, timeout).until(EC.url_contains(text))
+    delay()
+    return result
