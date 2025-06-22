@@ -11,7 +11,7 @@ This directory contains automated end-to-end tests written with Selenium and Pyt
    python3 -m venv venv
    source venv/bin/activate
    ```
-4. Install dependencies:
+4. Install dependencies with the pinned versions:
    ```bash
    pip install -r requirements.txt
    ```
