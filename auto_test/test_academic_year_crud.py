@@ -18,12 +18,11 @@ def edit_year(driver, name, new_name="2026-2027"):
     click_when_clickable(driver, By.CSS_SELECTOR, "button[type='submit']")
     wait_for_url_contains(driver, "academic-years")
 
-
 def delete_year(driver, name):
     row = driver.find_element(By.XPATH, f"//td[text()='{name}']/..")
     click_when_clickable(driver, By.CSS_SELECTOR, "form button[type='submit']")
+    driver.switch_to.alert.accept()
     wait_for_url_contains(driver, "academic-years")
-
 
 def test_academic_year_crud(driver, base_url, unique_suffix):
     login_user("admin", driver, base_url)

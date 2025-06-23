@@ -32,7 +32,8 @@ def delete_class(driver, code):
 
 
 def test_class_crud(driver, base_url, unique_suffix):
-    login_user("admin", driver, base_url)
+    # login_user("admin", driver, base_url)
+    driver.get(f"{base_url}/classes")
     code = f"CLTEST{unique_suffix}"
 
     try:

@@ -62,6 +62,30 @@ def login_teacher(driver, base_url):
 def login_student(driver, base_url):
     login_user("student", driver, base_url)
 
+def logout(driver, base_url, timeout=10):
+    """
+    Logout current user session.
+    """
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+    
+    # Mở dropdown menu
+    dropdown_button = WebDriverWait(driver, timeout).until(
+        EC.element_to_be_clickable((By.ID, "navbarDropdown"))
+    )
+    dropdown_button.click()
+    delay()
+
+    # Click vào link Đăng xuất
+    logout_link = WebDriverWait(driver, timeout).until(
+        EC.element_to_be_clickable((By.LINK_TEXT, "Đăng xuất"))
+    )
+    logout_link.click()
+    delay()
+
+    # Đợi trang chuyển về trang login (có thể thay đổi tùy app)
+    WebDriverWait(driver, timeout).until(EC.url_contains("/login"))
 
 def wait_for_visibility(driver, by, locator, timeout=20):
     """Return element once visible."""
