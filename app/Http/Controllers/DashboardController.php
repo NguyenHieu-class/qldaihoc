@@ -114,6 +114,61 @@ class DashboardController extends Controller
     }
 
     /**
+     * Hiển thị dashboard cho trưởng khoa
+     */
+    public function departmentHead()
+    {
+        if (!Auth::user()->isDepartmentHead()) {
+            return redirect()->route('dashboard.index')
+                ->with('error', 'Bạn không có quyền truy cập trang này.');
+        }
+
+        $teacher = Auth::user()->teacher()->with('faculty')->first();
+
+        if (!$teacher || !$teacher->faculty) {
+            return redirect()->route('dashboard.index')
+                ->with('error', 'Không tìm thấy thông tin khoa.');
+        }
+
+        $faculty = $teacher->faculty;
+
+        $majorCount = Major::where('faculty_id', $faculty->id)->count();
+        $classCount = Classes::whereHas('major', function ($query) use ($faculty) {
+            $query->where('faculty_id', $faculty->id);
+        })->count();
+        $studentCount = Student::whereHas('class.major', function ($query) use ($faculty) {
+            $query->where('faculty_id', $faculty->id);
+        })->count();
+        $teacherCount = Teacher::where('faculty_id', $faculty->id)->count();
+        $subjectCount = Subject::where('faculty_id', $faculty->id)->count();
+
+        $recentStudents = Student::with('class.major')
+            ->whereHas('class.major', function ($query) use ($faculty) {
+                $query->where('faculty_id', $faculty->id);
+            })
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        $recentTeachers = Teacher::with('faculty')
+            ->where('faculty_id', $faculty->id)
+            ->orderBy('created_at', 'desc')
+            ->take(5)
+            ->get();
+
+        return view('dashboard.head', compact(
+            'faculty',
+            'majorCount',
+            'classCount',
+            'studentCount',
+            'teacherCount',
+            'subjectCount',
+            'recentStudents',
+            'recentTeachers'
+        ));
+    }
+
+    /**
      * Hiển thị dashboard cho sinh viên
      */
     public function student()
@@ -170,6 +225,8 @@ class DashboardController extends Controller
     {
         if (Auth::user()->isAdmin()) {
             return redirect()->route('dashboard.admin');
+        } elseif (Auth::user()->isDepartmentHead()) {
+            return redirect()->route('dashboard.head');
         } elseif (Auth::user()->isTeacher()) {
             return redirect()->route('dashboard.teacher');
         } else {
