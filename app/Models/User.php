@@ -70,6 +70,14 @@ class User extends Authenticatable
     }
 
     /**
+     * Kiểm tra xem người dùng có phải là trưởng khoa không
+     */
+    public function isDepartmentHead(): bool
+    {
+        return $this->role === 'department_head';
+    }
+
+    /**
      * Lấy thông tin sinh viên liên kết với người dùng này
      */
     public function student(): HasOne
