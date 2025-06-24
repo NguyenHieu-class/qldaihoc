@@ -42,6 +42,7 @@ Auth::routes();
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
 Route::get('/dashboard/admin', [DashboardController::class, 'admin'])->name('dashboard.admin');
 Route::get('/dashboard/teacher', [DashboardController::class, 'teacher'])->name('dashboard.teacher');
+Route::get('/dashboard/head', [DashboardController::class, 'departmentHead'])->name('dashboard.head');
 Route::get('/dashboard/student', [DashboardController::class, 'student'])->name('dashboard.student');
 
 // Nhóm route yêu cầu xác thực và quyền admin

@@ -50,6 +50,8 @@ class LoginController extends Controller
     {
         if ($user->isAdmin()) {
             return redirect()->route('dashboard.admin');
+        } elseif ($user->isDepartmentHead()) {
+            return redirect()->route('dashboard.head');
         } elseif ($user->isTeacher()) {
             return redirect()->route('dashboard.teacher');
         } else {
