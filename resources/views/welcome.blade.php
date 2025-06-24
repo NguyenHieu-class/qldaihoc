@@ -1,13 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Trang chủ - Hệ thống quản lý sinh viên')
+@section('title', 'Trang chủ - Hệ thống quản lý Giáo Viên và Sinh Viên')
 
 @section('content')
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-md-10">
             <div class="text-center my-5">
-                <h1 class="display-4 fw-bold text-primary">Hệ thống quản lý sinh viên</h1>
+                <h1 class="display-4 fw-bold text-primary">Hệ thống quản lý Đại Học</h1>
                 <p class="lead">Giải pháp toàn diện cho việc quản lý thông tin sinh viên, điểm số và hoạt động học tập</p>
             </div>
             
@@ -30,8 +30,8 @@
                             <div class="rounded-circle bg-success text-white d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px;">
                                 <i class="fas fa-chart-line fa-2x"></i>
                             </div>
-                            <h4 class="card-title">Quản lý điểm số</h4>
-                            <p class="card-text">Nhập và theo dõi điểm số của sinh viên theo từng môn học, học kỳ và năm học.</p>
+                            <h4 class="card-title">Quản lý tiền lương</h4>
+                            <p class="card-text">Tính toán xuất dữ liệu lương của giáo viên.</p>
                         </div>
                     </div>
                 </div>

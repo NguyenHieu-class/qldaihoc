@@ -141,7 +141,7 @@
         <nav class="navbar navbar-expand-md navbar-dark bg-primary">
             <div class="container-fluid">
                 <a class="navbar-brand" href="{{ url('/') }}">
-                    <i class="fas fa-graduation-cap me-2"></i>Quản lý sinh viên
+                    <i class="fas fa-graduation-cap me-2"></i>Quản lý trường đại học
                 </a>
                 <button id="sidebarToggle" class="btn btn-outline-light d-md-none me-2" type="button">
                     <i class="fas fa-bars"></i>
