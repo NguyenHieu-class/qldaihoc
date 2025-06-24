@@ -27,6 +27,16 @@ class UserFactory extends Factory
     }
 
     /**
+     * Trạng thái tạo tài khoản trưởng khoa
+     */
+    public function departmentHead(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'department_head',
+        ]);
+    }
+
+    /**
      * Indicate that the model's email address should be unverified.
      *
      * @return $this

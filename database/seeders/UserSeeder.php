@@ -22,6 +22,14 @@ class UserSeeder extends Seeder
             'role' => 'admin',
         ]);
 
+        // Tạo tài khoản trưởng khoa mặc định
+        User::create([
+            'name' => 'Trưởng khoa',
+            'email' => 'head@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'department_head',
+        ]);
+
         // Tạo tài khoản giáo viên
         for ($i = 1; $i <= 5; $i++) {
             User::create([
