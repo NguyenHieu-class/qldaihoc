@@ -12,6 +12,7 @@ use App\Http\Controllers\CourseOfferingController;
 use App\Http\Controllers\ClassSectionController;
 use App\Http\Controllers\DegreeController;
 use App\Http\Controllers\TeachingRateController;
+use App\Http\Controllers\TuitionSettingController;
 use App\Http\Controllers\ClassSizeCoefficientController;
 use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\SemesterController;
@@ -74,6 +75,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Quản lý hệ số và mức lương giảng dạy
     Route::resource('teaching-rates', TeachingRateController::class);
     Route::resource('class-size-coefficients', ClassSizeCoefficientController::class);
+    Route::get('tuition-settings', [TuitionSettingController::class, 'index'])->name('tuition-settings.index');
+    Route::put('tuition-settings', [TuitionSettingController::class, 'update'])->name('tuition-settings.update');
 
     // Mở môn học
     Route::resource('course-offerings', CourseOfferingController::class);
