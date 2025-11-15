@@ -52,21 +52,28 @@
                         </div>
 
                         <div class="row mb-3">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label for="midterm_score" class="form-label">{{ __('Điểm giữa kỳ') }} <span class="text-danger">*</span></label>
                                 <input type="number" step="0.1" min="0" max="10" class="form-control @error('midterm_score') is-invalid @enderror" id="midterm_score" name="midterm_score" value="{{ old('midterm_score', $grade->midterm_score) }}" required>
                                 @error('midterm_score')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label for="final_score" class="form-label">{{ __('Điểm cuối kỳ') }} <span class="text-danger">*</span></label>
                                 <input type="number" step="0.1" min="0" max="10" class="form-control @error('final_score') is-invalid @enderror" id="final_score" name="final_score" value="{{ old('final_score', $grade->final_score) }}" required>
                                 @error('final_score')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-3">
+                                <label for="assignment_score" class="form-label">{{ __('Điểm bài tập') }}</label>
+                                <input type="number" step="0.1" min="0" max="10" class="form-control @error('assignment_score') is-invalid @enderror" id="assignment_score" name="assignment_score" value="{{ old('assignment_score', $grade->assignment_score) }}">
+                                @error('assignment_score')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-3">
                                 <label for="semester_id" class="form-label">{{ __('Học kỳ') }} <span class="text-danger">*</span></label>
                                 <select class="form-select @error('semester_id') is-invalid @enderror" id="semester_id" name="semester_id" required>
                                     <option value="">{{ __('-- Chọn học kỳ --') }}</option>
