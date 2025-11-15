@@ -91,6 +91,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get("reports/open-rate", [\App\Http\Controllers\ReportController::class, "subjectOpenRate"])->name("reports.open_rate");
     Route::resource('class-sections', ClassSectionController::class)->except(['show']);
     Route::resource('tuitions', TuitionController::class);
+
+    // Nhập sinh viên từ file CSV
+    Route::get('students/template', [StudentController::class, 'downloadTemplate'])->name('students.template');
+    Route::post('students/import', [StudentController::class, 'import'])->name('students.import');
 });
 
 // Nhóm route yêu cầu xác thực và quyền admin hoặc giáo viên

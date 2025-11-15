@@ -5,10 +5,12 @@ namespace App\Http\Controllers;
 use App\Models\Classes;
 use App\Models\Student;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class StudentController extends Controller
 {
@@ -195,12 +197,12 @@ class StudentController extends Controller
             if ($student->user_id) {
                 $student->user->delete();
             }
-            
+
             // Xóa sinh viên
             $student->delete();
-            
+
             DB::commit();
-            
+
             return redirect()->route('students.index')
                 ->with('success', 'Sinh viên đã được xóa thành công.');
         } catch (\Exception $e) {
@@ -209,4 +211,225 @@ class StudentController extends Controller
                 ->with('error', 'Đã xảy ra lỗi khi xóa sinh viên: ' . $e->getMessage());
         }
     }
-} 
+
+    /**
+     * Tải về file CSV mẫu để nhập sinh viên hàng loạt.
+     */
+    public function downloadTemplate()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="student_import_template.csv"',
+        ];
+
+        $columns = [
+            'student_id',
+            'first_name',
+            'last_name',
+            'date_of_birth (YYYY-MM-DD)',
+            'gender (Nam/Nữ/Khác)',
+            'email',
+            'phone',
+            'address',
+            'class_code',
+        ];
+
+        $callback = function () use ($columns) {
+            $handle = fopen('php://output', 'w');
+            fputcsv($handle, $columns);
+            fputcsv($handle, [
+                'SV001',
+                'Nguyen',
+                'An',
+                '2000-01-15',
+                'Nam',
+                'an.nguyen@example.com',
+                '0987654321',
+                '123 Đường ABC, Quận 1',
+                'CTK42A',
+            ]);
+            fclose($handle);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
+
+    /**
+     * Nhập sinh viên từ file CSV.
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'csv_file' => 'required|file|mimes:csv,txt|max:5120',
+        ]);
+
+        $path = $request->file('csv_file')->getRealPath();
+        $handle = fopen($path, 'r');
+
+        if ($handle === false) {
+            return redirect()->back()->with('error', 'Không thể đọc file CSV đã tải lên.');
+        }
+
+        $header = fgetcsv($handle);
+
+        if (!$header) {
+            fclose($handle);
+            return redirect()->back()->with('error', 'File CSV không chứa dữ liệu.');
+        }
+
+        $normalizedHeader = array_map(function ($value) {
+            return Str::snake(strtolower(trim($value)));
+        }, $header);
+
+        $expectedHeaders = [
+            'student_id',
+            'first_name',
+            'last_name',
+            'date_of_birth',
+            'gender',
+            'email',
+            'phone',
+            'address',
+            'class_code',
+        ];
+
+        if ($normalizedHeader !== $expectedHeaders) {
+            fclose($handle);
+            return redirect()->back()->with('error', 'Cấu trúc file CSV không hợp lệ. Vui lòng sử dụng file mẫu được cung cấp.');
+        }
+
+        $lineNumber = 1;
+        $created = 0;
+        $errors = [];
+
+        while (($row = fgetcsv($handle)) !== false) {
+            $lineNumber++;
+
+            if (count(array_filter($row, fn ($value) => trim((string) $value) !== '')) === 0) {
+                continue;
+            }
+
+            $data = array_combine($expectedHeaders, array_map('trim', $row));
+
+            if ($data === false) {
+                $errors[] = "Dòng {$lineNumber}: Không thể đọc dữ liệu.";
+                continue;
+            }
+
+            $studentId = $data['student_id'];
+            $firstName = $data['first_name'];
+            $lastName = $data['last_name'];
+            $gender = $data['gender'];
+            $email = $data['email'];
+            $phone = $data['phone'] ?? null;
+            $address = $data['address'] ?? null;
+            $classCode = $data['class_code'];
+
+            if (!$studentId || !$firstName || !$lastName || !$email || !$classCode || !$data['date_of_birth'] || !$gender) {
+                $errors[] = "Dòng {$lineNumber}: Thiếu thông tin bắt buộc.";
+                continue;
+            }
+
+            $dateOfBirth = $this->parseDateFromCsv($data['date_of_birth']);
+            if (!$dateOfBirth) {
+                $errors[] = "Dòng {$lineNumber}: Ngày sinh không hợp lệ.";
+                continue;
+            }
+
+            if (!in_array($gender, ['Nam', 'Nữ', 'Khác'])) {
+                $errors[] = "Dòng {$lineNumber}: Giá trị giới tính phải là Nam, Nữ hoặc Khác.";
+                continue;
+            }
+
+            $class = Classes::where('code', $classCode)->first();
+            if (!$class) {
+                $errors[] = "Dòng {$lineNumber}: Không tìm thấy lớp với mã '{$classCode}'.";
+                continue;
+            }
+
+            if (Student::where('student_id', $studentId)->orWhere('email', $email)->exists()) {
+                $errors[] = "Dòng {$lineNumber}: Mã sinh viên hoặc email đã tồn tại.";
+                continue;
+            }
+
+            if (User::where('email', $email)->exists()) {
+                $errors[] = "Dòng {$lineNumber}: Email đã được sử dụng cho tài khoản khác.";
+                continue;
+            }
+
+            try {
+                DB::transaction(function () use (
+                    $studentId,
+                    $firstName,
+                    $lastName,
+                    $dateOfBirth,
+                    $gender,
+                    $email,
+                    $phone,
+                    $address,
+                    $class
+                ) {
+                    $user = User::create([
+                        'name' => $firstName . ' ' . $lastName,
+                        'email' => $email,
+                        'password' => Hash::make($dateOfBirth->format('dmY')),
+                        'role' => 'student',
+                    ]);
+
+                    Student::create([
+                        'student_id' => $studentId,
+                        'first_name' => $firstName,
+                        'last_name' => $lastName,
+                        'date_of_birth' => $dateOfBirth->format('Y-m-d'),
+                        'gender' => $gender,
+                        'email' => $email,
+                        'phone' => $phone,
+                        'address' => $address,
+                        'class_id' => $class->id,
+                        'user_id' => $user->id,
+                    ]);
+                });
+
+                $created++;
+            } catch (\Exception $exception) {
+                $errors[] = "Dòng {$lineNumber}: " . $exception->getMessage();
+            }
+        }
+
+        fclose($handle);
+
+        $message = "Đã nhập thành công {$created} sinh viên.";
+
+        return redirect()->route('students.index')
+            ->with('success', $message)
+            ->with('import_errors', $errors);
+    }
+
+    /**
+     * Chuyển đổi giá trị ngày tháng trong CSV thành đối tượng Carbon.
+     */
+    protected function parseDateFromCsv(string $value): ?Carbon
+    {
+        $value = trim($value);
+
+        if ($value === '') {
+            return null;
+        }
+
+        $formats = ['Y-m-d', 'd/m/Y', 'd-m-Y', 'd.m.Y', 'm/d/Y'];
+
+        foreach ($formats as $format) {
+            try {
+                return Carbon::createFromFormat($format, $value);
+            } catch (\Exception $e) {
+                // Tiếp tục thử các định dạng khác
+            }
+        }
+
+        try {
+            return Carbon::parse($value);
+        } catch (\Exception $e) {
+            return null;
+        }
+    }
+}
