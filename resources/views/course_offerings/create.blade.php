@@ -75,6 +75,14 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="mb-3">
+                            <label for="status" class="form-label">{{ __('Trạng thái') }} <span class="text-danger">*</span></label>
+                            <select class="form-select" id="status" name="status" required>
+                                @foreach($statusOptions as $value => $label)
+                                    <option value="{{ $value }}" {{ old('status', \App\Models\CourseOffering::STATUS_OPEN) == $value ? 'selected' : '' }}>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> {{ __('Lưu') }}

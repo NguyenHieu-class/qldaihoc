@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\ClassSection;
-use App\Models\Subject;
 use App\Models\CourseOffering;
 use App\Models\Teacher;
 use App\Models\Faculty;
@@ -59,7 +58,9 @@ class ClassSectionController extends Controller
 
         $teachingRates = TeachingRate::all();
 
-        return view('class_sections.create', compact('courseOfferings', 'teachers', 'academicYears', 'semesters', 'faculties', 'teachingRates'));
+        $statusOptions = ClassSection::STATUS_LABELS;
+
+        return view('class_sections.create', compact('courseOfferings', 'teachers', 'academicYears', 'semesters', 'faculties', 'teachingRates', 'statusOptions'));
     }
 
     public function store(Request $request)
@@ -72,11 +73,14 @@ class ClassSectionController extends Controller
             'room' => 'nullable|string',
             'period_count' => 'required|integer|min:0',
             'student_count' => 'required|integer|min:0',
+            'status' => 'nullable|in:' . implode(',', array_keys(ClassSection::STATUS_LABELS)),
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
         $offering = CourseOffering::find($request->course_offering_id);
+
+        $status = $request->input('status', ClassSection::STATUS_OPEN);
 
         ClassSection::create([
             'code' => $request->code,
@@ -87,6 +91,7 @@ class ClassSectionController extends Controller
             'room' => $request->room,
             'period_count' => $request->period_count,
             'student_count' => $request->student_count,
+            'status' => $status,
         ]);
         return redirect()->route('class-sections.index')->with('success', 'Đã lưu lớp học phần.');
     }
@@ -96,7 +101,8 @@ class ClassSectionController extends Controller
         $courseOfferings = CourseOffering::with(['subject', 'semester.academicYear'])->get();
         $teachers = Teacher::with('faculty')->get();
         $teachingRates = TeachingRate::all();
-        return view('class_sections.edit', compact('classSection', 'courseOfferings', 'teachers', 'teachingRates'));
+        $statusOptions = ClassSection::STATUS_LABELS;
+        return view('class_sections.edit', compact('classSection', 'courseOfferings', 'teachers', 'teachingRates', 'statusOptions'));
     }
 
     public function update(Request $request, ClassSection $classSection)
@@ -109,11 +115,14 @@ class ClassSectionController extends Controller
             'room' => 'nullable|string',
             'period_count' => 'required|integer|min:0',
             'student_count' => 'required|integer|min:0',
+            'status' => 'nullable|in:' . implode(',', array_keys(ClassSection::STATUS_LABELS)),
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
         $offering = CourseOffering::find($request->course_offering_id);
+
+        $status = $request->input('status', $classSection->status ?? ClassSection::STATUS_OPEN);
 
         $classSection->update([
             'code' => $request->code,
@@ -124,6 +133,7 @@ class ClassSectionController extends Controller
             'room' => $request->room,
             'period_count' => $request->period_count,
             'student_count' => $request->student_count,
+            'status' => $status,
         ]);
         return redirect()->route('class-sections.index')->with('success', 'Đã cập nhật lớp học phần.');
     }
@@ -146,6 +156,7 @@ class ClassSectionController extends Controller
             'number_of_sections' => 'required|integer|min:1',
             'period_count' => 'required|integer|min:0',
             'student_count' => 'required|integer|min:0',
+            'status' => 'nullable|in:' . implode(',', array_keys(ClassSection::STATUS_LABELS)),
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
@@ -162,6 +173,8 @@ class ClassSectionController extends Controller
             $num = intval(substr($last->code, strlen($prefix))) + 1;
         }
         $createdCodes = [];
+        $status = $request->input('status', ClassSection::STATUS_OPEN);
+
         for ($i = 0; $i < $request->number_of_sections; $i++) {
             $code = $prefix . str_pad($num + $i, 2, '0', STR_PAD_LEFT);
 
@@ -174,6 +187,7 @@ class ClassSectionController extends Controller
                 'room' => $request->room,
                 'period_count' => $request->period_count,
                 'student_count' => $request->student_count,
+                'status' => $status,
             ]);
 
             $createdCodes[] = $code;

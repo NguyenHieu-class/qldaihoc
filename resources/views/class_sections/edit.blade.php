@@ -59,6 +59,14 @@
                                 <input type="number" class="form-control" name="student_count" value="{{ old('student_count', $classSection->student_count) }}">
                             </div>
                         </div>
+                        <div class="mb-3">
+                            <label class="form-label">{{ __('Trạng thái') }} <span class="text-danger">*</span></label>
+                            <select class="form-select" name="status" required>
+                                @foreach($statusOptions as $value => $label)
+                                    <option value="{{ $value }}" {{ old('status', $classSection->status) == $value ? 'selected' : '' }}>{{ $label }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> {{ __('Lưu') }}

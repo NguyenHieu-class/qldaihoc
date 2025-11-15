@@ -24,6 +24,17 @@ class ClassSection extends Model
         'room',
         'period_count',
         'student_count',
+        'status',
+    ];
+
+    public const STATUS_OPEN = 'open';
+    public const STATUS_ACTIVE = 'active';
+    public const STATUS_CLOSED = 'closed';
+
+    public const STATUS_LABELS = [
+        self::STATUS_OPEN => 'Đã mở',
+        self::STATUS_ACTIVE => 'Đang hoạt động',
+        self::STATUS_CLOSED => 'Đã đóng',
     ];
 
     public function subject(): BelongsTo
@@ -60,5 +71,10 @@ class ClassSection extends Model
     public function enrollments(): HasMany
     {
         return $this->hasMany(Enrollment::class);
+    }
+
+    public function getStatusLabelAttribute(): string
+    {
+        return self::STATUS_LABELS[$this->status] ?? $this->status;
     }
 }
