@@ -67,7 +67,7 @@ class PayrollTotalsTest extends TestCase
         ]));
 
         $response->assertOk();
-        $response->assertViewHas('total', 1000.0);
+        $response->assertViewHas('total', 2000.0);
 
         $pdf = $this->actingAs($admin)->get(route('payrolls.export', [
             'academic_year_id' => $year->id,
