@@ -21,6 +21,7 @@
                 <th>Hs sĩ số</th>
                 <th>Hs môn</th>
                 <th>Trạng thái</th>
+                <th>Tiền mỗi tiết</th>
                 <th>Lương</th>
             </tr>
         </thead>
@@ -36,6 +37,7 @@
                     <td>{{ $row['class'] }}</td>
                     <td>{{ $row['subject'] }}</td>
                     <td>{{ $row['section']->payment_status_label }}</td>
+                    <td>{{ number_format($row['rate'], 2) }}</td>
                     <td>{{ number_format($row['salary'], 2) }}</td>
                 </tr>
             @endforeach

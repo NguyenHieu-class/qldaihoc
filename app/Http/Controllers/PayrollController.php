@@ -169,6 +169,7 @@ class PayrollController extends Controller
             ->get();
         $details = [];
         foreach ($sections as $section) {
+            $rate = optional($section->teachingRate)->amount ?? $base;
             $degree = $teacher->degree->coefficient ?? 1;
             $classCoef = optional(
                 $coefficients->first(function ($coef) use ($section) {
@@ -185,7 +186,8 @@ class PayrollController extends Controller
             );
             $details[] = [
                 'section' => $section,
-                'base' => $base,
+                'base' => $rate,
+                'rate' => $rate,
                 'degree' => $degree,
                 'class' => $classCoef,
                 'subject' => $subjectCoef,
@@ -322,6 +324,7 @@ class PayrollController extends Controller
 
         $details = $sections->map(function ($section) use ($paymentService, $coefficients, $base) {
             $teacher = $section->teacher;
+            $rate = optional($section->teachingRate)->amount ?? $base;
             $degree = optional($teacher->degree)->coefficient ?? 1;
             $classCoef = optional(
                 $coefficients->first(function ($coef) use ($section) {
@@ -340,7 +343,8 @@ class PayrollController extends Controller
             return [
                 'section' => $section,
                 'teacher' => $teacher,
-                'base' => $base,
+                'base' => $rate,
+                'rate' => $rate,
                 'degree' => $degree,
                 'class' => $classCoef,
                 'subject' => $subjectCoef,
@@ -388,6 +392,7 @@ class PayrollController extends Controller
             ->get();
         $details = [];
         foreach ($sections as $section) {
+            $rate = optional($section->teachingRate)->amount ?? $base;
             $degree = $teacher->degree->coefficient ?? 1;
             $classCoef = optional(
                 $coefficients->first(function ($coef) use ($section) {
@@ -404,7 +409,8 @@ class PayrollController extends Controller
             );
             $details[] = [
                 'section' => $section,
-                'base' => $base,
+                'base' => $rate,
+                'rate' => $rate,
                 'degree' => $degree,
                 'class' => $classCoef,
                 'subject' => $subjectCoef,
@@ -436,6 +442,7 @@ class PayrollController extends Controller
         $paymentService = new TeachingPaymentService($base, $coefficients);
 
         $teacher = $classSection->teacher;
+        $rate = optional($classSection->teachingRate)->amount ?? $base;
         $degree = $teacher->degree->coefficient ?? 1;
         $classCoef = optional(
             $coefficients->first(function ($coef) use ($classSection) {
@@ -456,7 +463,8 @@ class PayrollController extends Controller
             'teacher' => $teacher,
             'section' => $classSection,
             'detail' => [
-                'base' => $base,
+                'base' => $rate,
+                'rate' => $rate,
                 'degree' => $degree,
                 'class' => $classCoef,
                 'subject' => $subjectCoef,
@@ -479,6 +487,7 @@ class PayrollController extends Controller
         $paymentService = new TeachingPaymentService($base, $coefficients);
 
         $teacher = $classSection->teacher;
+        $rate = optional($classSection->teachingRate)->amount ?? $base;
         $degree = $teacher->degree->coefficient ?? 1;
         $classCoef = optional(
             $coefficients->first(function ($coef) use ($classSection) {
@@ -499,7 +508,8 @@ class PayrollController extends Controller
             'teacher' => $teacher,
             'section' => $classSection,
             'detail' => [
-                'base' => $base,
+                'base' => $rate,
+                'rate' => $rate,
                 'degree' => $degree,
                 'class' => $classCoef,
                 'subject' => $subjectCoef,

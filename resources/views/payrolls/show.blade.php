@@ -64,6 +64,7 @@
                                     <th>Hs sĩ số</th>
                                     <th>Hs môn</th>
                                     <th>Trạng thái</th>
+                                    <th>Tiền mỗi tiết</th>
                                     <th>Lương</th>
                                 </tr>
                             </thead>
@@ -95,6 +96,7 @@
                                                 <span class="badge bg-secondary">{{ $row['payment_status_label'] }}</span>
                                             @endif
                                         </td>
+                                        <td>{{ number_format($row['rate'], 2) }}</td>
                                         <td>
                                             {{ number_format($row['salary'], 2) }}
                                             <a href="{{ route('payrolls.section', $row['section']) }}" class="ms-2">
