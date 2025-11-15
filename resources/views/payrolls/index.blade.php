@@ -37,11 +37,19 @@
                                     @endforeach
                                 </select>
                             </div>
-                            @if(Auth::user()->role === 'admin')
-                                <div class="col-md-3">
-                                    <input type="text" name="search" class="form-control" placeholder="{{ __('Tìm kiếm mã GV, mã môn, mã lớp hoặc tên...') }}" value="{{ request('search') }}">
-                                </div>
-                            @endif
+                            <div class="col-md-3">
+                                <input type="text" name="search" class="form-control" placeholder="{{ __('Tìm kiếm mã GV, mã môn, mã lớp hoặc tên...') }}" value="{{ request('search') }}">
+                            </div>
+                            <div class="col-md-3">
+                                <select name="payment_status" class="form-select">
+                                    <option value="">{{ __('-- Trạng thái lương --') }}</option>
+                                    @foreach($paymentStatuses as $value => $label)
+                                        <option value="{{ $value }}" {{ request('payment_status') === $value ? 'selected' : '' }}>
+                                            {{ $label }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
                             <div class="col-md-1">
                                 <button type="submit" class="btn btn-outline-primary w-100">
                                     <i class="fas fa-filter"></i>
@@ -55,7 +63,7 @@
                         </form>
                     </div>
 
-                    @if(Auth::user()->role === 'admin' && $shouldPromptFilters)
+                    @if($shouldPromptFilters)
                         <div class="alert alert-info">
                             Vui lòng chọn năm học và học kỳ hoặc sử dụng ô tìm kiếm để hiển thị bảng lương.
                         </div>
@@ -128,45 +136,59 @@
                                 </button>
                             </div>
                         @else
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-hover">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Mã lớp HP</th>
-                                            <th>Môn học</th>
-                                            <th>Số tiết</th>
-                                            <th>Sĩ số</th>
-                                            <th>Lương</th>
-                                            <th>Trạng thái</th>
-                                            <th width="10%">Thao tác</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($sections as $i => $section)
+                            <form id="teacher-export-form" action="{{ route('payrolls.teacher_export_selected') }}" method="POST">
+                                @csrf
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover">
+                                        <thead class="table-light">
                                             <tr>
-                                                <td>{{ $i + 1 }}</td>
-                                                <td>{{ $section->code }}</td>
-                                                <td>{{ $section->subject->name }}</td>
-                                                <td>{{ $section->period_count }}</td>
-                                                <td>{{ $section->student_count }}</td>
-                                                <td>{{ number_format($section->salary, 2) }}</td>
-                                                <td>
-                                                    <span class="badge bg-secondary">{{ $section->payment_status_label }}</span>
-                                                </td>
-                                                <td>
-                                                    <a href="{{ route('payrolls.section', $section) }}" class="btn btn-sm btn-info">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                </td>
+                                                <th width="40">
+                                                    <input type="checkbox" id="select-all">
+                                                </th>
+                                                <th>#</th>
+                                                <th>Mã lớp HP</th>
+                                                <th>Môn học</th>
+                                                <th>Số tiết</th>
+                                                <th>Sĩ số</th>
+                                                <th>Lương</th>
+                                                <th>Trạng thái</th>
+                                                <th width="10%">Thao tác</th>
                                             </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="text-end fw-bold mt-3">
-                                Tổng lương: {{ number_format($total, 2) }}
-                            </div>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($sections as $i => $section)
+                                                <tr>
+                                                    <td>
+                                                        <input type="checkbox" name="section_ids[]" value="{{ $section->id }}" class="section-checkbox">
+                                                    </td>
+                                                    <td>{{ $i + 1 }}</td>
+                                                    <td>{{ $section->code }}</td>
+                                                    <td>{{ $section->subject->name }}</td>
+                                                    <td>{{ $section->period_count }}</td>
+                                                    <td>{{ $section->student_count }}</td>
+                                                    <td>{{ number_format($section->salary, 2) }}</td>
+                                                    <td>
+                                                        <span class="badge bg-secondary">{{ $section->payment_status_label }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <a href="{{ route('payrolls.section', $section) }}" class="btn btn-sm btn-info">
+                                                            <i class="fas fa-eye"></i>
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mt-3">
+                                    <div class="fw-bold">
+                                        Tổng lương: {{ number_format($total, 2) }}
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-print me-1"></i> In lương đã chọn
+                                    </button>
+                                </div>
+                            </form>
                         @endif
                     @endif
                 </div>
@@ -177,22 +199,20 @@
 @endsection
 
 @push('scripts')
-    @if(Auth::user()->role === 'admin')
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const selectAll = document.getElementById('select-all');
-                if (!selectAll) {
-                    return;
-                }
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const selectAll = document.getElementById('select-all');
+            if (!selectAll) {
+                return;
+            }
 
-                const checkboxes = document.querySelectorAll('.section-checkbox');
+            const checkboxes = document.querySelectorAll('.section-checkbox');
 
-                selectAll.addEventListener('change', function () {
-                    checkboxes.forEach(function (checkbox) {
-                        checkbox.checked = selectAll.checked;
-                    });
+            selectAll.addEventListener('change', function () {
+                checkboxes.forEach(function (checkbox) {
+                    checkbox.checked = selectAll.checked;
                 });
             });
-        </script>
-    @endif
+        });
+    </script>
 @endpush
