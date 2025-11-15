@@ -70,6 +70,14 @@ class Student extends Model
     }
 
     /**
+     * Các khoản học phí của sinh viên.
+     */
+    public function tuitions(): HasMany
+    {
+        return $this->hasMany(Tuition::class);
+    }
+
+    /**
      * Lấy họ tên đầy đủ của sinh viên
      */
     public function getFullNameAttribute(): string

@@ -335,7 +335,8 @@
                                         $isActive = request()->routeIs(
                                             'course-offerings.*',
                                             'class-sections.*',
-                                            'reports.*'
+                                            'reports.*',
+                                            'tuitions.*'
                                         );
                                     @endphp
                                     <a class="nav-link" data-bs-toggle="collapse" href="#operationsMenu" role="button" aria-expanded="{{ $isActive ? 'true' : 'false' }}" aria-controls="operationsMenu">
@@ -351,6 +352,11 @@
                                             <li class="nav-item">
                                                 <a class="nav-link {{ request()->routeIs('class-sections.*') ? 'active' : '' }}" href="{{ route('class-sections.index') }}">
                                                     <i class="fas fa-list"></i> Lớp học phần
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request()->routeIs('tuitions.*') ? 'active' : '' }}" href="{{ route('tuitions.index') }}">
+                                                    <i class="fas fa-wallet"></i> Quản lý học phí
                                                 </a>
                                             </li>
                                             <li class="nav-item">
@@ -372,6 +378,9 @@
                             @if(Auth::user()->role == 'student' && Auth::user()->student)
                                 <a class="nav-link {{ request()->routeIs('students.transcript') ? 'active' : '' }}" href="{{ route('students.transcript', Auth::user()->student->id) }}">
                                     <i class="fas fa-chart-line"></i> Bảng điểm
+                                </a>
+                                <a class="nav-link {{ request()->routeIs('student.tuitions.*') ? 'active' : '' }}" href="{{ route('student.tuitions.index') }}">
+                                    <i class="fas fa-wallet"></i> Học phí
                                 </a>
                                 <a class="nav-link {{ request()->routeIs('enrollments.*') ? 'active' : '' }}" href="{{ route('enrollments.index') }}">
                                     <i class="fas fa-book-open"></i> Đăng ký lớp

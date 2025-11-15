@@ -37,4 +37,12 @@ class Semester extends Model
     {
         return $this->hasMany(CourseOffering::class);
     }
+
+    /**
+     * Các khoản học phí được ghi nhận trong học kỳ.
+     */
+    public function tuitions(): HasMany
+    {
+        return $this->hasMany(Tuition::class);
+    }
 }
