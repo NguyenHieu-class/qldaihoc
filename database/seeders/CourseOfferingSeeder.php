@@ -25,6 +25,7 @@ class CourseOfferingSeeder extends Seeder
                 $offering = CourseOffering::create([
                     'subject_id' => $subject->id,
                     'semester_id' => $semester->id,
+                    'status' => CourseOffering::STATUS_OPEN,
                 ]);
 
                 for ($i = 1; $i <= 2; $i++) {
@@ -37,6 +38,7 @@ class CourseOfferingSeeder extends Seeder
                         'room' => 'R' . rand(1, 10),
                         'period_count' => 0,
                         'student_count' => 0,
+                        'status' => ClassSection::STATUS_OPEN,
                     ]);
                 }
             }

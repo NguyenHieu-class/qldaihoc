@@ -34,7 +34,9 @@ class CourseOfferingController extends Controller
         $faculties = Faculty::all();
         $academicYears = \App\Models\AcademicYear::all();
 
-        return view('course_offerings.create', compact('subjects', 'semesters', 'faculties', 'academicYears'));
+        $statusOptions = CourseOffering::STATUS_LABELS;
+
+        return view('course_offerings.create', compact('subjects', 'semesters', 'faculties', 'academicYears', 'statusOptions'));
     }
 
     public function store(Request $request)
@@ -43,16 +45,21 @@ class CourseOfferingController extends Controller
             'subject_ids' => 'required|array',
             'subject_ids.*' => 'exists:subjects,id',
             'semester_id' => 'required|exists:semesters,id',
+            'status' => 'nullable|in:' . implode(',', array_keys(CourseOffering::STATUS_LABELS)),
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
 
+        $status = $request->input('status', CourseOffering::STATUS_OPEN);
+
         foreach ($request->subject_ids as $subjectId) {
             CourseOffering::firstOrCreate([
                 'subject_id' => $subjectId,
                 'semester_id' => $request->semester_id,
+            ], [
+                'status' => $status,
             ]);
         }
 
@@ -68,7 +75,8 @@ class CourseOfferingController extends Controller
         $subjects = $subjectsQuery->get();
         $semesters = Semester::with('academicYear')->get();
         $faculties = Faculty::all();
-        return view('course_offerings.edit', compact('courseOffering', 'subjects', 'semesters', 'faculties'));
+        $statusOptions = CourseOffering::STATUS_LABELS;
+        return view('course_offerings.edit', compact('courseOffering', 'subjects', 'semesters', 'faculties', 'statusOptions'));
     }
 
     public function update(Request $request, CourseOffering $courseOffering)
@@ -76,11 +84,17 @@ class CourseOfferingController extends Controller
         $validator = Validator::make($request->all(), [
             'subject_id' => 'required|exists:subjects,id',
             'semester_id' => 'required|exists:semesters,id',
+            'status' => 'nullable|in:' . implode(',', array_keys(CourseOffering::STATUS_LABELS)),
         ]);
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
-        $courseOffering->update($request->only('subject_id', 'semester_id'));
+        $status = $request->input('status', $courseOffering->status ?? CourseOffering::STATUS_OPEN);
+        $courseOffering->update([
+            'subject_id' => $request->subject_id,
+            'semester_id' => $request->semester_id,
+            'status' => $status,
+        ]);
         return redirect()->route('course-offerings.index')->with('success', 'Đã cập nhật thông tin.');
     }
 

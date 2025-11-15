@@ -21,6 +21,7 @@
                                     <th width="5%">{{ __('STT') }}</th>
                                     <th>{{ __('Môn học') }}</th>
                                     <th>{{ __('Học kỳ') }}</th>
+                                    <th>{{ __('Trạng thái') }}</th>
                                     <th width="15%">{{ __('Thao tác') }}</th>
                                 </tr>
                             </thead>
@@ -30,6 +31,7 @@
                                     <td>{{ $courseOfferings->firstItem() + $key }}</td>
                                     <td>{{ $offering->subject->code }} - {{ $offering->subject->name }}</td>
                                     <td>{{ $offering->semester->name }} ({{ $offering->semester->academicYear->name }})</td>
+                                    <td>{{ $offering->status_label }}</td>
                                     <td>
                                         <div class="d-flex">
                                             <a href="{{ route('course-offerings.edit', $offering->id) }}" class="btn btn-sm btn-info me-1">

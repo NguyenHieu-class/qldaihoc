@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AcademicYear;
 use App\Models\ClassSection;
+use App\Models\CourseOffering;
 use App\Models\Enrollment;
 use App\Models\Semester;
 use Illuminate\Http\RedirectResponse;
@@ -32,10 +33,12 @@ class EnrollmentController extends Controller
         $registeredIds = $student->classSections()->pluck('class_sections.id');
 
         $availableSections = ClassSection::with(['subject', 'teacher', 'courseOffering.semester.academicYear'])
+            ->where('status', ClassSection::STATUS_OPEN)
             ->whereHas('courseOffering', function ($q) use ($semesterIds) {
                 if (count($semesterIds)) {
                     $q->whereIn('semester_id', $semesterIds);
                 }
+                $q->where('status', CourseOffering::STATUS_OPEN);
             })
             ->whereNotIn('id', $registeredIds)
             ->get();
@@ -56,6 +59,16 @@ class EnrollmentController extends Controller
 
         if ($classSection->students()->where('enrollments.student_id', $student->id)->exists()) {
             return back()->with('error', 'Bạn đã đăng ký lớp này.');
+        }
+
+        $classSection->loadMissing('courseOffering');
+
+        if ($classSection->status !== ClassSection::STATUS_OPEN) {
+            return back()->with('error', 'Lớp học phần hiện không mở để đăng ký.');
+        }
+
+        if ($classSection->courseOffering && $classSection->courseOffering->status !== CourseOffering::STATUS_OPEN) {
+            return back()->with('error', 'Môn học này hiện không mở để đăng ký.');
         }
 
         if ($classSection->students()->count() >= $classSection->student_count) {

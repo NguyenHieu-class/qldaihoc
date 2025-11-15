@@ -19,6 +19,7 @@
                                     <th>Phòng</th>
                                     <th>Học kỳ</th>
                                     <th>Số SV</th>
+                                    <th>Trạng thái</th>
                                     <th></th>
                                 </tr>
                             </thead>
@@ -31,6 +32,12 @@
                                         <td>{{ $section->room }}</td>
                                         <td>{{ optional($section->courseOffering->semester)->name }} ({{ optional(optional($section->courseOffering->semester)->academicYear)->name }})</td>
                                         <td>{{ $section->students()->count() }} / {{ $section->student_count }}</td>
+                                        <td>
+                                            {{ $section->status_label }}
+                                            @if($section->courseOffering)
+                                                <div class="text-muted small">{{ __('Môn học:') }} {{ $section->courseOffering->status_label }}</div>
+                                            @endif
+                                        </td>
                                         <td>
                                             <form method="POST" action="{{ route('enrollments.store', $section->id) }}">
                                                 @csrf

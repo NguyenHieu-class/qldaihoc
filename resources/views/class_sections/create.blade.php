@@ -94,6 +94,14 @@
                                 </div>
                             </div>
                             <div class="mb-3">
+                                <label class="form-label">{{ __('Trạng thái') }} <span class="text-danger">*</span></label>
+                                <select class="form-select" name="status" required>
+                                    @foreach($statusOptions as $value => $label)
+                                        <option value="{{ $value }}" {{ old('status', \App\Models\ClassSection::STATUS_OPEN) == $value ? 'selected' : '' }}>{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="mb-3">
                                 <label class="form-label">{{ __('Số lớp cần tạo') }} <span class="text-danger">*</span></label>
                                 <input type="number" class="form-control" name="number_of_sections" value="{{ old('number_of_sections', 1) }}" min="1">
                             </div>
@@ -150,6 +158,14 @@
                                     <label class="form-label">{{ __('Số SV') }}</label>
                                     <input type="number" class="form-control" name="student_count" value="{{ old('student_count', 0) }}">
                                 </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">{{ __('Trạng thái') }} <span class="text-danger">*</span></label>
+                                <select class="form-select" name="status" required>
+                                    @foreach($statusOptions as $value => $label)
+                                        <option value="{{ $value }}" {{ old('status', \App\Models\ClassSection::STATUS_OPEN) == $value ? 'selected' : '' }}>{{ $label }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             <div class="d-grid gap-2">
                                 <button type="submit" class="btn btn-primary">

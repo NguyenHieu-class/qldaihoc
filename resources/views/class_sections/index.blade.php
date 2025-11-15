@@ -30,6 +30,7 @@
                                     <th>{{ __('Phòng') }}</th>
                                     <th>{{ __('Số tiết') }}</th>
                                     <th>{{ __('Số SV') }}</th>
+                                    <th>{{ __('Trạng thái') }}</th>
                                     <th width="15%">{{ __('Thao tác') }}</th>
                                 </tr>
                             </thead>
@@ -49,6 +50,7 @@
                                     <td>{{ $section->room }}</td>
                                     <td>{{ $section->period_count }}</td>
                                     <td>{{ $section->student_count }}</td>
+                                    <td>{{ $section->status_label }}</td>
                                     <td>
                                         <div class="d-flex">
                                             <a href="{{ route('class-sections.edit', $section->id) }}" class="btn btn-sm btn-info me-1">
