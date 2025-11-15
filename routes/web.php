@@ -107,6 +107,7 @@ Route::middleware(['auth', 'role:admin,teacher'])->group(function () {
 
     // Bảng lương giáo viên
     Route::get('payrolls/export', [PayrollController::class, 'exportAll'])->name('payrolls.export');
+    Route::post('payrolls/export-selected', [PayrollController::class, 'exportSelected'])->name('payrolls.export_selected');
     Route::get('payrolls/{teacher}/export', [PayrollController::class, 'exportDetail'])->name('payrolls.export_detail');
     Route::get('payrolls', [PayrollController::class, 'index'])->name('payrolls.index');
     Route::get('payrolls/{teacher}', [PayrollController::class, 'show'])->name('payrolls.show');
