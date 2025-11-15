@@ -108,6 +108,19 @@
                             @enderror
                         </div>
 
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="create_account" name="create_account" value="1" {{ old('create_account') ? 'checked' : '' }}>
+                            <label class="form-check-label" for="create_account">{{ __('Tạo tài khoản đăng nhập') }}</label>
+                        </div>
+
+                        <div class="mb-3" id="password_field" style="{{ old('create_account') ? '' : 'display: none;' }}">
+                            <label for="password" class="form-label">{{ __('Mật khẩu') }} <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password">
+                            @error('password')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> {{ __('Lưu') }}
@@ -119,4 +132,15 @@
         </div>
     </div>
 </div>
-@endsection 
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const createAccountCheckbox = document.getElementById('create_account');
+        const passwordField = document.getElementById('password_field');
+
+        createAccountCheckbox.addEventListener('change', function() {
+            passwordField.style.display = this.checked ? 'block' : 'none';
+        });
+    });
+</script>
+@endsection
