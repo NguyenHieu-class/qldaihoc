@@ -126,9 +126,6 @@
                                 <button type="submit" class="btn btn-primary" form="export-form">
                                     <i class="fas fa-print me-1"></i> In lương đã chọn
                                 </button>
-                                <div class="fw-bold">
-                                    Tổng lương: {{ number_format($total, 2) }}
-                                </div>
                             </div>
                         @else
                             <div class="table-responsive">
