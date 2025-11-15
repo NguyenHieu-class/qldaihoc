@@ -54,7 +54,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::resource('majors', MajorController::class);
     
     // Quản lý lớp học
-    Route::resource('classes', ClassController::class);
+    Route::resource('classes', ClassController::class)->except(['show']);
     
     // Quản lý môn học
     Route::resource('subjects', SubjectController::class);
@@ -102,6 +102,11 @@ Route::middleware(['auth', 'role:admin,teacher'])->group(function () {
     Route::get('payrolls/{teacher}', [PayrollController::class, 'show'])->name('payrolls.show');
     Route::get('payrolls/sections/{classSection}/export', [PayrollController::class, 'exportSection'])->name('payrolls.section_export');
     Route::get('payrolls/sections/{classSection}', [PayrollController::class, 'sectionDetail'])->name('payrolls.section');
+});
+
+// Trang thông tin lớp học cho tất cả vai trò có thể truy cập hệ thống
+Route::middleware(['auth', 'role:admin,teacher,student'])->group(function () {
+    Route::get('classes/{class}', [ClassController::class, 'show'])->name('classes.show');
 });
 
 // Nhóm route dành riêng cho giáo viên

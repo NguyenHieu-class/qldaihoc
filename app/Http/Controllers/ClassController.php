@@ -56,7 +56,8 @@ class ClassController extends Controller
     public function create()
     {
         $majors = Major::with('faculty')->get();
-        return view('classes.create', compact('majors'));
+        $statusOptions = Classes::STATUS_LABELS;
+        return view('classes.create', compact('majors', 'statusOptions'));
     }
 
     /**
@@ -69,6 +70,7 @@ class ClassController extends Controller
             'code' => 'required|string|max:50|unique:classes',
             'major_id' => 'required|exists:majors,id',
             'year' => 'required|integer|min:2000|max:' . (date('Y') + 10),
+            'status' => 'required|in:' . implode(',', array_keys(Classes::STATUS_LABELS)),
         ]);
 
         if ($validator->fails()) {
@@ -88,7 +90,12 @@ class ClassController extends Controller
      */
     public function show(Classes $class)
     {
-        $class->load('major.faculty', 'students');
+        $class->load([ 
+            'major.faculty',
+            'students' => function ($query) {
+                $query->orderBy('student_id');
+            },
+        ]);
         return view('classes.show', compact('class'));
     }
 
@@ -98,7 +105,8 @@ class ClassController extends Controller
     public function edit(Classes $class)
     {
         $majors = Major::with('faculty')->get();
-        return view('classes.edit', compact('class', 'majors'));
+        $statusOptions = Classes::STATUS_LABELS;
+        return view('classes.edit', compact('class', 'majors', 'statusOptions'));
     }
 
     /**
@@ -111,6 +119,7 @@ class ClassController extends Controller
             'code' => 'required|string|max:50|unique:classes,code,' . $class->id,
             'major_id' => 'required|exists:majors,id',
             'year' => 'required|integer|min:2000|max:' . (date('Y') + 10),
+            'status' => 'required|in:' . implode(',', array_keys(Classes::STATUS_LABELS)),
         ]);
 
         if ($validator->fails()) {

@@ -29,6 +29,7 @@ class ClassSeeder extends Seeder
                     'code' => $major->code . $year . $i,
                     'major_id' => $major->id,
                     'year' => $year,
+                    'status' => Classes::STATUS_ACTIVE,
                 ]);
             }
         }
