@@ -21,7 +21,7 @@
 
                     <form method="GET" action="{{ route('teacher.classes.index') }}" class="mb-4">
                         <div class="row g-3 align-items-end">
-                            <div class="col-md-4">
+                            <div class="col-md-3">
                                 <label for="search" class="form-label">{{ __('Tìm kiếm lớp học') }}</label>
                                 <input type="text" name="search" id="search" class="form-control"
                                     placeholder="{{ __('Nhập mã lớp hoặc tên môn học...') }}" value="{{ request('search') }}">
@@ -38,7 +38,7 @@
                                     @endforeach
                                 </select>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-2">
                                 <label for="semester_id" class="form-label">{{ __('Học kỳ') }}</label>
                                 <select name="semester_id" id="semester_id" class="form-select">
                                     <option value="">{{ __('Tất cả học kỳ') }}</option>
@@ -46,6 +46,17 @@
                                         <option value="{{ $semester->id }}"
                                             @selected(request('semester_id') == $semester->id)>
                                             {{ $semester->name }} - {{ optional($semester->academicYear)->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label for="status" class="form-label">{{ __('Trạng thái lớp') }}</label>
+                                <select name="status" id="status" class="form-select">
+                                    <option value="">{{ __('Tất cả trạng thái') }}</option>
+                                    @foreach ($statuses as $key => $label)
+                                        <option value="{{ $key }}" @selected(request('status') == $key)>
+                                            {{ $label }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -70,6 +81,7 @@
                                     <th scope="col">{{ __('Số tiết') }}</th>
                                     <th scope="col">{{ __('Số sinh viên') }}</th>
                                     <th scope="col">{{ __('Phòng học') }}</th>
+                                    <th scope="col">{{ __('Trạng thái') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -94,10 +106,15 @@
                                         <td>{{ $section->period_count }}</td>
                                         <td>{{ $section->student_count }}</td>
                                         <td>{{ $section->room ?? __('Chưa sắp xếp') }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ $section->status === 'active' ? 'success' : ($section->status === 'closed' ? 'secondary' : 'info') }}">
+                                                {{ $section->status_label }}
+                                            </span>
+                                        </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="8" class="text-center text-muted py-4">
+                                        <td colspan="9" class="text-center text-muted py-4">
                                             <i class="fas fa-info-circle me-2"></i>{{ __('Bạn chưa được phân công lớp học nào.') }}
                                         </td>
                                     </tr>

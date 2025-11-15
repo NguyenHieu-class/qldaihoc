@@ -52,11 +52,16 @@ class TeacherClassController extends Controller
             });
         }
 
+        if ($request->filled('status')) {
+            $sectionsQuery->where('status', $request->input('status'));
+        }
+
         $sections = $sectionsQuery->orderBy('code')->paginate(10)->withQueryString();
 
         $academicYears = AcademicYear::with('semesters')->orderBy('name')->get();
         $semesters = Semester::with('academicYear')->orderBy('name')->get();
+        $statuses = ClassSection::STATUS_LABELS;
 
-        return view('teacher.classes.index', compact('sections', 'academicYears', 'semesters', 'teacher'));
+        return view('teacher.classes.index', compact('sections', 'academicYears', 'semesters', 'teacher', 'statuses'));
     }
 }
