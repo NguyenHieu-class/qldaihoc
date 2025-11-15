@@ -40,6 +40,10 @@
                 <td>{{ $detail['subject'] }}</td>
             </tr>
             <tr>
+                <th>Trạng thái thanh toán</th>
+                <td>{{ $section->payment_status_label }}</td>
+            </tr>
+            <tr>
                 <th>Lương</th>
                 <td>{{ number_format($detail['salary'], 2) }}</td>
             </tr>

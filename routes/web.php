@@ -111,6 +111,8 @@ Route::middleware(['auth', 'role:admin,teacher'])->group(function () {
     Route::get('payrolls', [PayrollController::class, 'index'])->name('payrolls.index');
     Route::get('payrolls/{teacher}', [PayrollController::class, 'show'])->name('payrolls.show');
     Route::get('payrolls/sections/{classSection}/export', [PayrollController::class, 'exportSection'])->name('payrolls.section_export');
+    Route::patch('payrolls/sections/{classSection}/payment-status', [PayrollController::class, 'updatePaymentStatus'])
+        ->name('payrolls.section_payment_status');
     Route::get('payrolls/sections/{classSection}', [PayrollController::class, 'sectionDetail'])->name('payrolls.section');
 });
 
