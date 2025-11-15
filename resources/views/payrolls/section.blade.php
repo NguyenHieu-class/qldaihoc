@@ -46,6 +46,10 @@
                                 <td>{{ $detail['subject'] }}</td>
                             </tr>
                             <tr>
+                                <th>Số tiền mỗi tiết</th>
+                                <td>{{ number_format($detail['rate'], 2) }}</td>
+                            </tr>
+                            <tr>
                                 <th>Trạng thái thanh toán</th>
                                 <td>
                                     @if(Auth::user()->role === 'admin')
