@@ -52,10 +52,7 @@
             <div class="text-center my-5">
                 @guest
                     <p class="mb-4">Đăng nhập để truy cập vào hệ thống quản lý sinh viên</p>
-                    <a href="{{ route('login') }}" class="btn btn-primary btn-lg me-2">Đăng nhập</a>
-                    @if (Route::has('register'))
-                        <a href="{{ route('register') }}" class="btn btn-outline-primary btn-lg">Đăng ký</a>
-                    @endif
+                    <a href="{{ route('login') }}" class="btn btn-primary btn-lg">Đăng nhập</a>
                 @else
                     <a href="{{ route('dashboard.index') }}" class="btn btn-primary btn-lg">Đi đến Dashboard</a>
                 @endguest
