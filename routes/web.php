@@ -84,7 +84,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get("reports/sections", [\App\Http\Controllers\ReportController::class, "sectionsBySemester"])->name("reports.sections");
     Route::get("reports/workload", [\App\Http\Controllers\ReportController::class, "teacherWorkload"])->name("reports.workload");
     Route::get("reports/open-rate", [\App\Http\Controllers\ReportController::class, "subjectOpenRate"])->name("reports.open_rate");
-    Route::resource('class-sections', ClassSectionController::class);
+    Route::resource('class-sections', ClassSectionController::class)->except(['show']);
 });
 
 // Nhóm route yêu cầu xác thực và quyền admin hoặc giáo viên
@@ -107,6 +107,7 @@ Route::middleware(['auth', 'role:admin,teacher'])->group(function () {
 // Trang thông tin lớp học cho tất cả vai trò có thể truy cập hệ thống
 Route::middleware(['auth', 'role:admin,teacher,student'])->group(function () {
     Route::get('classes/{class}', [ClassController::class, 'show'])->name('classes.show');
+    Route::get('class-sections/{classSection}', [ClassSectionController::class, 'show'])->name('class-sections.show');
 });
 
 // Nhóm route dành riêng cho giáo viên

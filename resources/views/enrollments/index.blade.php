@@ -26,7 +26,11 @@
                             <tbody>
                                 @forelse($availableSections as $section)
                                     <tr>
-                                        <td>{{ $section->code }}</td>
+                                        <td>
+                                            <a href="{{ route('class-sections.show', $section->id) }}" class="text-decoration-none">
+                                                {{ $section->code }}
+                                            </a>
+                                        </td>
                                         <td>{{ $section->subject->code }} - {{ $section->subject->name }}</td>
                                         <td>{{ $section->teacher->full_name }}</td>
                                         <td>{{ $section->room }}</td>
@@ -72,7 +76,11 @@
                             <tbody>
                                 @forelse($registrations as $enrollment)
                                     <tr>
-                                        <td>{{ $enrollment->classSection->code }}</td>
+                                        <td>
+                                            <a href="{{ route('class-sections.show', $enrollment->classSection->id) }}" class="text-decoration-none">
+                                                {{ $enrollment->classSection->code }}
+                                            </a>
+                                        </td>
                                         <td>{{ $enrollment->classSection->subject->code }} - {{ $enrollment->classSection->subject->name }}</td>
                                         <td>{{ $enrollment->classSection->teacher->full_name }}</td>
                                         <td>{{ optional($enrollment->classSection->courseOffering->semester)->name }} ({{ optional(optional($enrollment->classSection->courseOffering->semester)->academicYear)->name }})</td>

@@ -38,7 +38,11 @@
                                 @foreach($sections as $key => $section)
                                 <tr>
                                     <td>{{ $sections->firstItem() + $key }}</td>
-                                    <td>{{ $section->code }}</td>
+                                    <td>
+                                        <a href="{{ route('class-sections.show', $section->id) }}" class="text-decoration-none">
+                                            {{ $section->code }}
+                                        </a>
+                                    </td>
                                     <td>
                                         @if($section->courseOffering)
                                             {{ $section->courseOffering->subject->code }} - {{ $section->courseOffering->subject->name }}
@@ -53,6 +57,9 @@
                                     <td>{{ $section->status_label }}</td>
                                     <td>
                                         <div class="d-flex">
+                                            <a href="{{ route('class-sections.show', $section->id) }}" class="btn btn-sm btn-outline-primary me-1">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
                                             <a href="{{ route('class-sections.edit', $section->id) }}" class="btn btn-sm btn-info me-1">
                                                 <i class="fas fa-edit"></i>
                                             </a>
