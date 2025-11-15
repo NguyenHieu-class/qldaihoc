@@ -81,7 +81,11 @@
                                     @endphp
                                     <tr>
                                         <td>{{ $sections->firstItem() + $index }}</td>
-                                        <td>{{ $section->code }}</td>
+                                        <td>
+                                            <a href="{{ route('class-sections.show', $section->id) }}" class="text-decoration-none">
+                                                {{ $section->code }}
+                                            </a>
+                                        </td>
                                         <td>
                                             {{ $section->subject->code }} - {{ $section->subject->name }}
                                         </td>

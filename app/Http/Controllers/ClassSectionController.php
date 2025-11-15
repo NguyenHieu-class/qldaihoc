@@ -96,6 +96,25 @@ class ClassSectionController extends Controller
         return redirect()->route('class-sections.index')->with('success', 'Đã lưu lớp học phần.');
     }
 
+    public function show(ClassSection $classSection)
+    {
+        $classSection->load([
+            'subject',
+            'teacher',
+            'teachingRate',
+            'courseOffering.semester.academicYear',
+            'students' => function ($query) {
+                $query->orderBy('student_id');
+            },
+        ]);
+
+        $courseOffering = $classSection->courseOffering;
+        $semester = optional($courseOffering)->semester;
+        $academicYear = optional($semester)->academicYear;
+
+        return view('class_sections.show', compact('classSection', 'courseOffering', 'semester', 'academicYear'));
+    }
+
     public function edit(ClassSection $classSection)
     {
         $courseOfferings = CourseOffering::with(['subject', 'semester.academicYear'])->get();
