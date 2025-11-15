@@ -32,7 +32,8 @@ class TeachingPaymentServiceTest extends TestCase
         $service = new TeachingPaymentService(100, ClassSizeCoefficient::all());
         $payment = $service->calculate($teacher, $subject, 30, 10);
 
-        $this->assertEquals(100 * 1.5 * 1.1 * 1.2 * 10, $payment);
+        $expected = 10 * (1.2 + 1.1) * 1.5 * 100;
+        $this->assertEquals($expected, $payment);
     }
 
     public function test_calculate_for_semester()
@@ -81,7 +82,7 @@ class TeachingPaymentServiceTest extends TestCase
 
         $total = $service->calculateForSemester($teacher, $semester1->id);
 
-        $expected = 100 * 1.2 * 1.1 * 1.5 * 10;
+        $expected = 10 * (1.5 + 1.1) * 1.2 * 100;
         $this->assertEquals($expected, $total);
     }
 }

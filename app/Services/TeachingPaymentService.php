@@ -29,13 +29,15 @@ class TeachingPaymentService
             $this->classCoefficients->first(function ($coef) use ($studentCount) {
                 return $coef->min_students <= $studentCount && $coef->max_students >= $studentCount;
             })
-        )->coefficient ?? 1;
+        )->coefficient ?? 0;
 
-        $subjectCoefficient = $subject->coefficient ?? 1;
+        $subjectCoefficient = $subject->coefficient ?? 0;
 
         $base = $rate ?? $this->baseRate;
 
-        return $base * $degreeCoefficient * $classCoefficient * $subjectCoefficient * $periods;
+        $standardizedPeriods = $periods * ($subjectCoefficient + $classCoefficient);
+
+        return $standardizedPeriods * $degreeCoefficient * $base;
     }
 
     /**

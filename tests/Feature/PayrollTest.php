@@ -30,7 +30,7 @@ class PayrollTest extends TestCase
         $service = new TeachingPaymentService($rate->amount, ClassSizeCoefficient::all());
         $salary = $service->calculate($teacher, $subject, 30, 10);
 
-        $expected = 100 * 1.2 * 1.1 * 1.5 * 10;
+        $expected = 10 * (1.5 + 1.1) * 1.2 * 100;
         $this->assertEquals($expected, $salary);
     }
 }
