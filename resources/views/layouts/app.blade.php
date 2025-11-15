@@ -286,7 +286,8 @@
                                         'semesters.*',
                                         'degrees.*',
                                         'class-size-coefficients.*',
-                                        'teaching-rates.*'
+                                        'teaching-rates.*',
+                                        'tuition-settings.*'
                                     );
                                 @endphp
                                 <div class="nav-group">
@@ -318,6 +319,11 @@
                                             <li class="nav-item">
                                                 <a class="nav-link {{ request()->routeIs('teaching-rates.*') ? 'active' : '' }}" href="{{ route('teaching-rates.index') }}">
                                                     <i class="fas fa-money-bill-wave"></i> Mức lương giảng dạy
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request()->routeIs('tuition-settings.*') ? 'active' : '' }}" href="{{ route('tuition-settings.index') }}">
+                                                    <i class="fas fa-wallet"></i> Cấu hình học phí
                                                 </a>
                                             </li>
                                         </ul>
