@@ -26,7 +26,8 @@ class PayrollController extends Controller
         $user = Auth::user();
         $yearId = $request->academic_year_id;
         $semesterId = $request->semester_id;
-        $search = $request->search;
+        $search = trim($request->search ?? '');
+        $search = $search === '' ? null : $search;
         $academicYears = AcademicYear::all();
         $semesters = Semester::all();
 
@@ -35,42 +36,59 @@ class PayrollController extends Controller
             $coefficients = ClassSizeCoefficient::all();
             $paymentService = new TeachingPaymentService($base, $coefficients);
 
-            $sections = ClassSection::with(['subject', 'teacher', 'courseOffering.semester', 'teachingRate'])
-                ->when($yearId, function ($q) use ($yearId) {
-                    $q->whereHas('courseOffering.semester', function ($q) use ($yearId) {
-                        $q->where('academic_year_id', $yearId);
-                    });
-                })
-                ->when($semesterId, function ($q) use ($semesterId) {
-                    $q->whereHas('courseOffering', function ($q) use ($semesterId) {
-                        $q->where('semester_id', $semesterId);
-                    });
-                })
-                ->when($search, function ($q) use ($search) {
-                    $q->whereHas('teacher', function ($q) use ($search) {
-                        $q->where('teacher_id', 'like', "%$search%")
-                            ->orWhere('first_name', 'like', "%$search%")
-                            ->orWhere('last_name', 'like', "%$search%");
-                    });
-                })
-                ->get();
+            $shouldLoadSections = ($yearId && $semesterId) || $search;
+            $sections = collect();
+            $total = 0;
 
-            foreach ($sections as $section) {
-                $section->salary = $paymentService->calculate(
-                    $section->teacher,
-                    $section->subject,
-                    $section->student_count,
-                    $section->period_count,
-                    optional($section->teachingRate)->amount
-                );
+            if ($shouldLoadSections) {
+                $sections = ClassSection::with(['subject', 'teacher.degree', 'courseOffering.semester', 'teachingRate'])
+                    ->when($yearId, function ($q) use ($yearId) {
+                        $q->whereHas('courseOffering.semester', function ($q) use ($yearId) {
+                            $q->where('academic_year_id', $yearId);
+                        });
+                    })
+                    ->when($semesterId, function ($q) use ($semesterId) {
+                        $q->whereHas('courseOffering', function ($q) use ($semesterId) {
+                            $q->where('semester_id', $semesterId);
+                        });
+                    })
+                    ->when($search, function ($q) use ($search) {
+                        $q->where(function ($query) use ($search) {
+                            $query->whereHas('teacher', function ($teacherQuery) use ($search) {
+                                $teacherQuery->where('teacher_id', 'like', "%$search%")
+                                    ->orWhere('first_name', 'like', "%$search%")
+                                    ->orWhere('last_name', 'like', "%$search%");
+                            })
+                                ->orWhere('code', 'like', "%$search%")
+                                ->orWhereHas('subject', function ($subjectQuery) use ($search) {
+                                    $subjectQuery->where('code', 'like', "%$search%")
+                                        ->orWhere('name', 'like', "%$search%");
+                                });
+                        });
+                    })
+                    ->get();
+
+                foreach ($sections as $section) {
+                    $section->salary = $paymentService->calculate(
+                        $section->teacher,
+                        $section->subject,
+                        $section->student_count,
+                        $section->period_count,
+                        optional($section->teachingRate)->amount
+                    );
+                }
+
+                $total = $sections->sum('salary');
             }
 
             return view('payrolls.index', [
                 'sections' => $sections,
                 'academicYears' => $academicYears,
                 'semesters' => $semesters,
-                'total' => $sections->sum('salary'),
+                'total' => $total,
                 'paymentStatuses' => ClassSection::PAYMENT_STATUS_LABELS,
+                'shouldPromptFilters' => !$shouldLoadSections,
+                'filterApplied' => $shouldLoadSections,
             ]);
         }
 
@@ -114,6 +132,8 @@ class PayrollController extends Controller
             'semesters' => $semesters,
             'total' => $sections->sum('salary'),
             'paymentStatuses' => ClassSection::PAYMENT_STATUS_LABELS,
+            'shouldPromptFilters' => false,
+            'filterApplied' => true,
         ]);
     }
 
@@ -220,9 +240,18 @@ class PayrollController extends Controller
 
         $teachers = Teacher::with(['degree', 'classSections.subject', 'classSections.courseOffering.semester', 'classSections.teachingRate'])
             ->when($search, function ($q) use ($search) {
-                $q->where('teacher_id', 'like', "%$search%")
-                    ->orWhere('first_name', 'like', "%$search%")
-                    ->orWhere('last_name', 'like', "%$search%");
+                $q->where(function ($query) use ($search) {
+                    $query->where('teacher_id', 'like', "%$search%")
+                        ->orWhere('first_name', 'like', "%$search%")
+                        ->orWhere('last_name', 'like', "%$search%")
+                        ->orWhereHas('classSections', function ($sectionQuery) use ($search) {
+                            $sectionQuery->where('code', 'like', "%$search%")
+                                ->orWhereHas('subject', function ($subjectQuery) use ($search) {
+                                    $subjectQuery->where('code', 'like', "%$search%")
+                                        ->orWhere('name', 'like', "%$search%");
+                                });
+                        });
+                });
             })
             ->get();
         $base = TeachingRate::orderByDesc('id')->value('amount') ?? 0;
@@ -263,6 +292,70 @@ class PayrollController extends Controller
         ])
             ->set_option('defaultFont', 'DejaVu Sans');
         return $pdf->stream('payrolls.pdf');
+    }
+
+    public function exportSelected(Request $request)
+    {
+        $user = Auth::user();
+        if ($user->role !== 'admin') {
+            return redirect()->route('payrolls.index')
+                ->with('error', 'Bạn không có quyền.');
+        }
+
+        $validated = $request->validate([
+            'section_ids' => ['required', 'array'],
+            'section_ids.*' => ['integer', 'exists:class_sections,id'],
+        ]);
+
+        $sections = ClassSection::with(['subject', 'teacher.degree', 'teachingRate'])
+            ->whereIn('id', $validated['section_ids'])
+            ->get();
+
+        if ($sections->isEmpty()) {
+            return redirect()->route('payrolls.index')
+                ->with('error', 'Không tìm thấy lớp học phần được chọn.');
+        }
+
+        $base = TeachingRate::orderByDesc('id')->value('amount') ?? 0;
+        $coefficients = ClassSizeCoefficient::all();
+        $paymentService = new TeachingPaymentService($base, $coefficients);
+
+        $details = $sections->map(function ($section) use ($paymentService, $coefficients, $base) {
+            $teacher = $section->teacher;
+            $degree = optional($teacher->degree)->coefficient ?? 1;
+            $classCoef = optional(
+                $coefficients->first(function ($coef) use ($section) {
+                    return $coef->min_students <= $section->student_count && $coef->max_students >= $section->student_count;
+                })
+            )->coefficient ?? 1;
+            $subjectCoef = $section->subject->coefficient ?? 1;
+            $salary = $paymentService->calculate(
+                $teacher,
+                $section->subject,
+                $section->student_count,
+                $section->period_count,
+                optional($section->teachingRate)->amount
+            );
+
+            return [
+                'section' => $section,
+                'teacher' => $teacher,
+                'base' => $base,
+                'degree' => $degree,
+                'class' => $classCoef,
+                'subject' => $subjectCoef,
+                'salary' => $salary,
+            ];
+        });
+
+        $total = $details->sum('salary');
+
+        $pdf = Pdf::loadView('payrolls.selected_pdf', [
+            'details' => $details,
+            'total' => $total,
+        ])->set_option('defaultFont', 'DejaVu Sans');
+
+        return $pdf->stream('payroll_selected.pdf');
     }
 
     public function exportDetail(Teacher $teacher, Request $request)
