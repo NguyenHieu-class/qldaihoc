@@ -16,6 +16,7 @@ class Tuition extends Model
 
     protected $fillable = [
         'student_id',
+        'class_section_id',
         'semester_id',
         'amount',
         'status',
@@ -56,6 +57,14 @@ class Tuition extends Model
     public function semester(): BelongsTo
     {
         return $this->belongsTo(Semester::class);
+    }
+
+    /**
+     * Lớp học phần gắn với khoản học phí.
+     */
+    public function classSection(): BelongsTo
+    {
+        return $this->belongsTo(ClassSection::class);
     }
 
     /**
