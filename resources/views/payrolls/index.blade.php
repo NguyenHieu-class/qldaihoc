@@ -71,6 +71,7 @@
                                         <th>Số tiết</th>
                                         <th>Sĩ số</th>
                                         <th>Lương</th>
+                                        <th>Trạng thái</th>
                                         <th width="10%">Thao tác</th>
                                     </tr>
                                 </thead>
@@ -86,6 +87,23 @@
                                             <td>{{ $section->period_count }}</td>
                                             <td>{{ $section->student_count }}</td>
                                             <td>{{ number_format($section->salary, 2) }}</td>
+                                            <td>
+                                                @if(Auth::user()->role === 'admin')
+                                                    <form action="{{ route('payrolls.section_payment_status', $section) }}" method="POST">
+                                                        @csrf
+                                                        @method('PATCH')
+                                                        <select name="payment_status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                                            @foreach($paymentStatuses as $value => $label)
+                                                                <option value="{{ $value }}" {{ $section->payment_status === $value ? 'selected' : '' }}>
+                                                                    {{ $label }}
+                                                                </option>
+                                                            @endforeach
+                                                        </select>
+                                                    </form>
+                                                @else
+                                                    <span class="badge bg-secondary">{{ $section->payment_status_label }}</span>
+                                                @endif
+                                            </td>
                                             <td>
                                                 <a href="{{ route('payrolls.section', $section) }}" class="btn btn-sm btn-info">
                                                     <i class="fas fa-eye"></i>

@@ -12,6 +12,7 @@ use App\Services\TeachingPaymentService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class PayrollController extends Controller
 {
@@ -69,6 +70,7 @@ class PayrollController extends Controller
                 'academicYears' => $academicYears,
                 'semesters' => $semesters,
                 'total' => $sections->sum('salary'),
+                'paymentStatuses' => ClassSection::PAYMENT_STATUS_LABELS,
             ]);
         }
 
@@ -111,6 +113,7 @@ class PayrollController extends Controller
             'academicYears' => $academicYears,
             'semesters' => $semesters,
             'total' => $sections->sum('salary'),
+            'paymentStatuses' => ClassSection::PAYMENT_STATUS_LABELS,
         ]);
     }
 
@@ -167,6 +170,8 @@ class PayrollController extends Controller
                 'class' => $classCoef,
                 'subject' => $subjectCoef,
                 'salary' => $salary,
+                'payment_status' => $section->payment_status,
+                'payment_status_label' => $section->payment_status_label,
             ];
         }
 
@@ -180,7 +185,25 @@ class PayrollController extends Controller
             'total' => $total,
             'academicYears' => $academicYears,
             'semesters' => $semesters,
+            'paymentStatuses' => ClassSection::PAYMENT_STATUS_LABELS,
         ]);
+    }
+
+    public function updatePaymentStatus(Request $request, ClassSection $classSection)
+    {
+        $user = Auth::user();
+        if ($user->role !== 'admin') {
+            return redirect()->route('payrolls.index')
+                ->with('error', 'Bạn không có quyền cập nhật trạng thái thanh toán.');
+        }
+
+        $validated = $request->validate([
+            'payment_status' => ['required', Rule::in(array_keys(ClassSection::PAYMENT_STATUS_LABELS))],
+        ]);
+
+        $classSection->update($validated);
+
+        return redirect()->back()->with('success', 'Cập nhật trạng thái thanh toán thành công.');
     }
 
     public function exportAll(Request $request)
@@ -346,6 +369,7 @@ class PayrollController extends Controller
                 'subject' => $subjectCoef,
                 'salary' => $salary,
             ],
+            'paymentStatuses' => ClassSection::PAYMENT_STATUS_LABELS,
         ]);
     }
 

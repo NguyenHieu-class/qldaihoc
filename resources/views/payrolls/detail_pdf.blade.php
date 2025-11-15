@@ -20,6 +20,7 @@
                 <th>Hs học vị</th>
                 <th>Hs sĩ số</th>
                 <th>Hs môn</th>
+                <th>Trạng thái</th>
                 <th>Lương</th>
             </tr>
         </thead>
@@ -34,6 +35,7 @@
                     <td>{{ $row['degree'] }}</td>
                     <td>{{ $row['class'] }}</td>
                     <td>{{ $row['subject'] }}</td>
+                    <td>{{ $row['section']->payment_status_label }}</td>
                     <td>{{ number_format($row['salary'], 2) }}</td>
                 </tr>
             @endforeach

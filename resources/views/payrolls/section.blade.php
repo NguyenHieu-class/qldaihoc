@@ -46,6 +46,27 @@
                                 <td>{{ $detail['subject'] }}</td>
                             </tr>
                             <tr>
+                                <th>Trạng thái thanh toán</th>
+                                <td>
+                                    @if(Auth::user()->role === 'admin')
+                                        <form action="{{ route('payrolls.section_payment_status', $section) }}" method="POST" class="d-flex align-items-center gap-2">
+                                            @csrf
+                                            @method('PATCH')
+                                            <select name="payment_status" class="form-select">
+                                                @foreach($paymentStatuses as $value => $label)
+                                                    <option value="{{ $value }}" {{ $section->payment_status === $value ? 'selected' : '' }}>
+                                                        {{ $label }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            <button type="submit" class="btn btn-primary btn-sm">Cập nhật</button>
+                                        </form>
+                                    @else
+                                        <span class="badge bg-secondary">{{ $section->payment_status_label }}</span>
+                                    @endif
+                                </td>
+                            </tr>
+                            <tr>
                                 <th>Lương</th>
                                 <td>{{ number_format($detail['salary'], 2) }}</td>
                             </tr>

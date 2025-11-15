@@ -63,6 +63,7 @@
                                     <th>Hs học vị</th>
                                     <th>Hs sĩ số</th>
                                     <th>Hs môn</th>
+                                    <th>Trạng thái</th>
                                     <th>Lương</th>
                                 </tr>
                             </thead>
@@ -77,6 +78,23 @@
                                         <td>{{ $row['degree'] }}</td>
                                         <td>{{ $row['class'] }}</td>
                                         <td>{{ $row['subject'] }}</td>
+                                        <td>
+                                            @if(Auth::user()->role === 'admin')
+                                                <form action="{{ route('payrolls.section_payment_status', $row['section']) }}" method="POST">
+                                                    @csrf
+                                                    @method('PATCH')
+                                                    <select name="payment_status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                                        @foreach($paymentStatuses as $value => $label)
+                                                            <option value="{{ $value }}" {{ $row['payment_status'] === $value ? 'selected' : '' }}>
+                                                                {{ $label }}
+                                                            </option>
+                                                        @endforeach
+                                                    </select>
+                                                </form>
+                                            @else
+                                                <span class="badge bg-secondary">{{ $row['payment_status_label'] }}</span>
+                                            @endif
+                                        </td>
                                         <td>
                                             {{ number_format($row['salary'], 2) }}
                                             <a href="{{ route('payrolls.section', $row['section']) }}" class="ms-2">
