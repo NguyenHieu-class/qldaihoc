@@ -16,6 +16,7 @@ use App\Http\Controllers\ClassSizeCoefficientController;
 use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\SemesterController;
 use App\Http\Controllers\PayrollController;
+use App\Http\Controllers\TeacherClassController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -101,6 +102,11 @@ Route::middleware(['auth', 'role:admin,teacher'])->group(function () {
     Route::get('payrolls/{teacher}', [PayrollController::class, 'show'])->name('payrolls.show');
     Route::get('payrolls/sections/{classSection}/export', [PayrollController::class, 'exportSection'])->name('payrolls.section_export');
     Route::get('payrolls/sections/{classSection}', [PayrollController::class, 'sectionDetail'])->name('payrolls.section');
+});
+
+// Nhóm route dành riêng cho giáo viên
+Route::middleware(['auth', 'role:teacher'])->group(function () {
+    Route::get('teacher/classes', [TeacherClassController::class, 'index'])->name('teacher.classes.index');
 });
 
 // Route xem bảng điểm sinh viên (cho admin, giáo viên và sinh viên đó)

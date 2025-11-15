@@ -138,6 +138,11 @@
                                 <i class="fas fa-plus-circle mr-2"></i> Nhập điểm mới
                             </a>
                         </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ route('teacher.classes.index') }}" class="btn btn-warning btn-block py-3 text-white">
+                                <i class="fas fa-chalkboard mr-2"></i> Lớp giảng dạy của tôi
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
