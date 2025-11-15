@@ -16,7 +16,45 @@
 
                 <div class="card-body">
                     @include('partials.alerts')
+                    @if(session('import_errors') && count(session('import_errors')))
+                        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                            <h5 class="alert-heading">{{ __('Một số dòng không thể nhập') }}</h5>
+                            <ul class="mb-0">
+                                @foreach(session('import_errors') as $importError)
+                                    <li>{{ $importError }}</li>
+                                @endforeach
+                            </ul>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    @endif
                     @include('partials.instructions', ['guideline' => 'Sử dụng bộ lọc và ô tìm kiếm để lọc danh sách. Bạn có thể thêm, chỉnh sửa hoặc xoá bản ghi.'])
+
+                    @if(auth()->user()->role == 'admin')
+                    <div class="card border border-2 border-light-subtle shadow-sm mb-4">
+                        <div class="card-body">
+                            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-3">
+                                <div>
+                                    <h5 class="card-title mb-1">{{ __('Nhập sinh viên từ CSV') }}</h5>
+                                    <p class="mb-0 text-muted small">{{ __('Tải file mẫu, điền thông tin sinh viên và tải lên để tạo tài khoản với mật khẩu mặc định là ngày sinh (ddmmyyyy).') }}</p>
+                                </div>
+                                <a href="{{ route('students.template') }}" class="btn btn-outline-success">
+                                    <i class="fas fa-download"></i> {{ __('Tải file mẫu') }}
+                                </a>
+                            </div>
+                            <form action="{{ route('students.import') }}" method="POST" enctype="multipart/form-data" class="row g-2 align-items-center">
+                                @csrf
+                                <div class="col-md-8">
+                                    <input type="file" name="csv_file" class="form-control" accept=".csv" required>
+                                </div>
+                                <div class="col-md-4 d-grid d-md-flex justify-content-md-end">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-upload"></i> {{ __('Tải lên và nhập') }}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    @endif
 
                     <div class="mb-3">
                         <form action="{{ route('students.index') }}" method="GET" class="row g-3">
