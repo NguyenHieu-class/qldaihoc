@@ -13,6 +13,8 @@ use App\Http\Controllers\ClassSectionController;
 use App\Http\Controllers\DegreeController;
 use App\Http\Controllers\TeachingRateController;
 use App\Http\Controllers\TuitionSettingController;
+use App\Http\Controllers\TuitionController;
+use App\Http\Controllers\StudentTuitionController;
 use App\Http\Controllers\ClassSizeCoefficientController;
 use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\SemesterController;
@@ -88,6 +90,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get("reports/workload", [\App\Http\Controllers\ReportController::class, "teacherWorkload"])->name("reports.workload");
     Route::get("reports/open-rate", [\App\Http\Controllers\ReportController::class, "subjectOpenRate"])->name("reports.open_rate");
     Route::resource('class-sections', ClassSectionController::class)->except(['show']);
+    Route::resource('tuitions', TuitionController::class);
 });
 
 // Nhóm route yêu cầu xác thực và quyền admin hoặc giáo viên
@@ -128,4 +131,5 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('enrollments', [\App\Http\Controllers\EnrollmentController::class, 'index'])->name('enrollments.index');
     Route::post('class-sections/{classSection}/enroll', [\App\Http\Controllers\EnrollmentController::class, 'store'])->name('enrollments.store');
     Route::delete('enrollments/{enrollment}', [\App\Http\Controllers\EnrollmentController::class, 'destroy'])->name('enrollments.destroy');
+    Route::get('my-tuitions', [StudentTuitionController::class, 'index'])->name('student.tuitions.index');
 });
