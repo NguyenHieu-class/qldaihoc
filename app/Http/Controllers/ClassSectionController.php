@@ -112,7 +112,20 @@ class ClassSectionController extends Controller
         $semester = optional($courseOffering)->semester;
         $academicYear = optional($semester)->academicYear;
 
-        return view('class_sections.show', compact('classSection', 'courseOffering', 'semester', 'academicYear'));
+        $user = auth()->user();
+        $backRoute = null;
+
+        if ($user) {
+            if ($user->isAdmin()) {
+                $backRoute = route('class-sections.index');
+            } elseif ($user->isTeacher()) {
+                $backRoute = route('teacher.classes.index');
+            } elseif ($user->isStudent()) {
+                $backRoute = route('enrollments.index');
+            }
+        }
+
+        return view('class_sections.show', compact('classSection', 'courseOffering', 'semester', 'academicYear', 'backRoute'));
     }
 
     public function edit(ClassSection $classSection)

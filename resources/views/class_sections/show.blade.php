@@ -19,18 +19,6 @@
                                 <i class="fas fa-edit"></i> {{ __('Chỉnh sửa') }}
                             </a>
                         @endif
-                        @php
-                            $backRoute = null;
-                            if($user) {
-                                if($user->isAdmin()) {
-                                    $backRoute = route('class-sections.index');
-                                } elseif($user->isTeacher()) {
-                                    $backRoute = route('teacher.classes.index');
-                                } elseif($user->isStudent()) {
-                                    $backRoute = route('enrollments.index');
-                                }
-                            }
-                        @endphp
                         @if($backRoute)
                             <a href="{{ $backRoute }}" class="btn btn-sm btn-secondary">
                                 <i class="fas fa-arrow-left"></i> {{ __('Quay lại') }}
