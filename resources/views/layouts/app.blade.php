@@ -257,6 +257,13 @@
                                                     </a>
                                                 </li>
                                             @endif
+                                            @if(Auth::user()->role == 'teacher')
+                                                <li class="nav-item">
+                                                    <a class="nav-link {{ request()->routeIs('teacher.classes.*') ? 'active' : '' }}" href="{{ route('teacher.classes.index') }}">
+                                                        <i class="fas fa-chalkboard"></i> Quản lý lớp của tôi
+                                                    </a>
+                                                </li>
+                                            @endif
                                             <li class="nav-item">
                                                 <a class="nav-link {{ request()->routeIs('students.*') ? 'active' : '' }}" href="{{ route('students.index') }}">
                                                     <i class="fas fa-user-graduate"></i> Quản lý sinh viên
