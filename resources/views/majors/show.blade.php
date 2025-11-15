@@ -61,8 +61,12 @@
                                         @foreach($major->classes as $key => $class)
                                         <tr>
                                             <td>{{ $key + 1 }}</td>
-                                            <td>{{ $class->code }}</td>
-                                            <td>{{ $class->name }}</td>
+                                            <td>
+                                                <a href="{{ route('classes.show', $class->id) }}">{{ $class->code }}</a>
+                                            </td>
+                                            <td>
+                                                <a href="{{ route('classes.show', $class->id) }}">{{ $class->name }}</a>
+                                            </td>
                                             <td>{{ $class->year }}</td>
                                         </tr>
                                         @endforeach

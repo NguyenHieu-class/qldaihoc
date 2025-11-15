@@ -17,6 +17,7 @@ class ClassesFactory extends Factory
             'code' => strtoupper($this->faker->unique()->lexify('CL??')),
             'major_id' => Major::factory(),
             'year' => 2024,
+            'status' => $this->faker->randomElement(array_keys(Classes::STATUS_LABELS)),
         ];
     }
 }

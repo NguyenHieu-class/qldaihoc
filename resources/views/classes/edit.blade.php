@@ -60,6 +60,21 @@
                             @enderror
                         </div>
 
+                        <div class="mb-3">
+                            <label for="status" class="form-label">{{ __('Trạng thái lớp học') }} <span class="text-danger">*</span></label>
+                            <select class="form-select @error('status') is-invalid @enderror" id="status" name="status" required>
+                                @php($currentStatus = old('status', $class->status))
+                                @foreach($statusOptions as $value => $label)
+                                    <option value="{{ $value }}" @selected($currentStatus === $value)>
+                                        {{ $label }}
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error('status')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> {{ __('Cập nhật') }}
