@@ -109,6 +109,23 @@
                             @enderror
                         </div>
 
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="password" class="form-label">{{ __('Mật khẩu mới') }}</label>
+                                <input type="password" class="form-control @error('password') is-invalid @enderror" id="password" name="password" autocomplete="new-password" placeholder="{{ __('Để trống nếu không đổi') }}">
+                                @error('password')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label for="password_confirmation" class="form-label">{{ __('Xác nhận mật khẩu mới') }}</label>
+                                <input type="password" class="form-control" id="password_confirmation" name="password_confirmation" autocomplete="new-password" placeholder="{{ __('Nhập lại mật khẩu mới') }}">
+                            </div>
+                            <div class="col-12 mt-2 text-muted small">
+                                {{ __('Nếu sinh viên chưa có tài khoản, việc nhập mật khẩu sẽ tự động tạo tài khoản đăng nhập.') }}
+                            </div>
+                        </div>
+
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> {{ __('Cập nhật') }}

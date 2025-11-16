@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class StudentController extends Controller
 {
@@ -159,10 +160,16 @@ class StudentController extends Controller
             'last_name' => 'required|string|max:255',
             'date_of_birth' => 'required|date',
             'gender' => 'required|in:Nam,Nữ,Khác',
-            'email' => 'required|email|unique:students,email,' . $student->id,
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('students', 'email')->ignore($student->id),
+                Rule::unique('users', 'email')->ignore($student->user_id),
+            ],
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'class_id' => 'required|exists:classes,id',
+            'password' => 'nullable|min:8|confirmed',
         ]);
 
         if ($validator->fails()) {
@@ -171,13 +178,31 @@ class StudentController extends Controller
                 ->withInput();
         }
 
-        $student->update($request->all());
+        $studentData = $request->except('password', 'password_confirmation');
+        $student->update($studentData);
 
         // Cập nhật thông tin người dùng nếu có
         if ($student->user_id) {
             $student->user->update([
                 'name' => $request->first_name . ' ' . $request->last_name,
                 'email' => $request->email,
+            ]);
+
+            if ($request->filled('password')) {
+                $student->user->update([
+                    'password' => Hash::make($request->password),
+                ]);
+            }
+        } elseif ($request->filled('password')) {
+            $user = User::create([
+                'name' => $request->first_name . ' ' . $request->last_name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => 'student',
+            ]);
+
+            $student->update([
+                'user_id' => $user->id,
             ]);
         }
 
