@@ -8,9 +8,16 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>{{ __('Danh sách sinh viên') }}</span>
                     @if(auth()->user()->role == 'admin' || auth()->user()->role == 'teacher')
-                    <a href="{{ route('students.create') }}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-plus"></i> {{ __('Thêm sinh viên mới') }}
-                    </a>
+                    <div class="d-flex gap-2">
+                        @if(auth()->user()->role == 'admin')
+                        <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">
+                            <i class="fas fa-print"></i> {{ __('In danh sách') }}
+                        </button>
+                        @endif
+                        <a href="{{ route('students.create') }}" class="btn btn-primary btn-sm no-print">
+                            <i class="fas fa-plus"></i> {{ __('Thêm sinh viên mới') }}
+                        </a>
+                    </div>
                     @endif
                 </div>
 
@@ -30,7 +37,7 @@
                     @include('partials.instructions', ['guideline' => 'Sử dụng bộ lọc và ô tìm kiếm để lọc danh sách. Bạn có thể thêm, chỉnh sửa hoặc xoá bản ghi.'])
 
                     @if(auth()->user()->role == 'admin')
-                    <div class="card border border-2 border-light-subtle shadow-sm mb-4">
+                    <div class="card border border-2 border-light-subtle shadow-sm mb-4 no-print">
                         <div class="card-body">
                             <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-start gap-3 mb-3">
                                 <div>
@@ -56,7 +63,7 @@
                     </div>
                     @endif
 
-                    <div class="mb-3">
+                    <div class="mb-3 no-print">
                         <form action="{{ route('students.index') }}" method="GET" class="row g-3">
                             <div class="col-md-2">
                                 <select name="faculty_id" class="form-select">
@@ -116,7 +123,7 @@
                                     <th width="10%">{{ __('Ngành') }}</th>
                                     <th width="10%">{{ __('Khoa') }}</th>
                                     <th width="10%">{{ __('Giới tính') }}</th>
-                                    <th width="15%">{{ __('Thao tác') }}</th>
+                                    <th width="15%" class="no-print">{{ __('Thao tác') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -130,7 +137,7 @@
                                     <td>{{ $student->class->major->name }}</td>
                                     <td>{{ $student->class->major->faculty->name }}</td>
                                     <td>{{ $student->gender }}</td>
-                                    <td>
+                                    <td class="no-print">
                                         <div class="d-flex">
                                             @if(auth()->user()->role == 'admin' || auth()->user()->role == 'teacher')
                                             <a href="{{ route('students.edit', $student->id) }}" class="btn btn-sm btn-info me-1">
