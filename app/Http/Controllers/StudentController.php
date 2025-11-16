@@ -303,7 +303,9 @@ class StudentController extends Controller
         }
 
         $normalizedHeader = array_map(function ($value) {
-            return Str::snake(strtolower(trim($value)));
+            $normalizedValue = preg_replace('/\s*\(.*?\)\s*/', '', $value);
+
+            return Str::snake(strtolower(trim($normalizedValue)));
         }, $header);
 
         $expectedHeaders = [
