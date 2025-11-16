@@ -123,6 +123,40 @@
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
         }
 
+        .no-print {
+            /* Elements with this class will be hidden when printing */
+        }
+
+        @media print {
+            body {
+                background-color: #fff;
+            }
+
+            nav.navbar,
+            .sidebar,
+            .no-print,
+            .pagination,
+            .alert,
+            #sidebarToggle {
+                display: none !important;
+            }
+
+            .content {
+                margin: 0 !important;
+                padding: 0 1rem !important;
+            }
+
+            .card {
+                box-shadow: none;
+                border: none;
+            }
+
+            .card-header {
+                border: none;
+                background-color: transparent;
+            }
+        }
+
         /* Sidebar collapse on small screens */
         @media (max-width: 768px) {
             body.sidebar-collapsed .sidebar {

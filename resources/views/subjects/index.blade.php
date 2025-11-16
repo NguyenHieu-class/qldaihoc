@@ -8,9 +8,14 @@
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <span>{{ __('Danh sách môn học') }}</span>
                     @if(auth()->user()->role == 'admin')
-                    <a href="{{ route('subjects.create') }}" class="btn btn-primary btn-sm">
-                        <i class="fas fa-plus"></i> {{ __('Thêm môn học mới') }}
-                    </a>
+                    <div class="d-flex gap-2">
+                        <button type="button" class="btn btn-outline-secondary btn-sm no-print" onclick="window.print()">
+                            <i class="fas fa-print"></i> {{ __('In danh sách') }}
+                        </button>
+                        <a href="{{ route('subjects.create') }}" class="btn btn-primary btn-sm no-print">
+                            <i class="fas fa-plus"></i> {{ __('Thêm môn học mới') }}
+                        </a>
+                    </div>
                     @endif
                 </div>
 
@@ -18,7 +23,7 @@
                     @include('partials.alerts')
                     @include('partials.instructions', ['guideline' => 'Sử dụng bộ lọc và ô tìm kiếm để lọc danh sách. Bạn có thể thêm, chỉnh sửa hoặc xoá bản ghi.'])
 
-                    <div class="mb-3">
+                    <div class="mb-3 no-print">
                         <form action="{{ route('subjects.index') }}" method="GET" class="row g-3">
                             <div class="col-md-3">
                                 <select name="credits" class="form-select">
@@ -65,7 +70,7 @@
                                     <th width="10%">{{ __('Hệ số học phần') }}</th>
                                     <th width="20%">{{ __('Khoa') }}</th>
                                     @if(auth()->user()->role == 'admin')
-                                    <th width="15%">{{ __('Thao tác') }}</th>
+                                    <th width="15%" class="no-print">{{ __('Thao tác') }}</th>
                                     @endif
                                 </tr>
                             </thead>
@@ -79,7 +84,7 @@
                                    <td>{{ $subject->coefficient }}</td>
                                    <td>{{ $subject->faculty->name ?? '' }}</td>
                                     @if(auth()->user()->role == 'admin')
-                                    <td>
+                                    <td class="no-print">
                                         <div class="d-flex">
                                             <a href="{{ route('subjects.edit', $subject->id) }}" class="btn btn-sm btn-info me-1">
                                                 <i class="fas fa-edit"></i>
