@@ -369,6 +369,11 @@
                                                     <i class="fas fa-chart-pie"></i> Báo cáo
                                                 </a>
                                             </li>
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request()->routeIs('password-reset-requests.*') ? 'active' : '' }}" href="{{ route('password-reset-requests.index') }}">
+                                                    <i class="fas fa-key"></i> Yêu cầu quên mật khẩu
+                                                </a>
+                                            </li>
                                         </ul>
                                     </div>
                                 </div>

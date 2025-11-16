@@ -21,6 +21,7 @@ use App\Http\Controllers\SemesterController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\TeacherClassController;
 use App\Http\Controllers\PasswordController;
+use App\Http\Controllers\PasswordResetRequestController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -41,7 +42,11 @@ Route::get('/', function () {
 });
 
 // Xác thực
-Auth::routes();
+Auth::routes(['reset' => false]);
+
+// Quên mật khẩu cho giáo viên và sinh viên
+Route::get('password/forgot', [PasswordResetRequestController::class, 'create'])->name('password.request');
+Route::post('password/forgot', [PasswordResetRequestController::class, 'store'])->name('password.request.store');
 
 // Dashboard
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
@@ -96,6 +101,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Nhập sinh viên từ file CSV
     Route::get('students/template', [StudentController::class, 'downloadTemplate'])->name('students.template');
     Route::post('students/import', [StudentController::class, 'import'])->name('students.import');
+
+    // Yêu cầu đặt lại mật khẩu
+    Route::get('password-reset-requests', [PasswordResetRequestController::class, 'index'])->name('password-reset-requests.index');
+    Route::post('password-reset-requests/process', [PasswordResetRequestController::class, 'process'])->name('password-reset-requests.process');
 });
 
 // Nhóm route yêu cầu xác thực và quyền admin hoặc giáo viên
