@@ -20,6 +20,7 @@ use App\Http\Controllers\AcademicYearController;
 use App\Http\Controllers\SemesterController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\TeacherClassController;
+use App\Http\Controllers\PasswordController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -128,6 +129,12 @@ Route::middleware(['auth', 'role:admin,teacher,student'])->group(function () {
 // Nhóm route dành riêng cho giáo viên
 Route::middleware(['auth', 'role:teacher'])->group(function () {
     Route::get('teacher/classes', [TeacherClassController::class, 'index'])->name('teacher.classes.index');
+});
+
+// Đổi mật khẩu cho giáo viên và sinh viên
+Route::middleware(['auth', 'role:teacher,student'])->group(function () {
+    Route::get('password/change', [PasswordController::class, 'edit'])->name('password.change');
+    Route::put('password/change', [PasswordController::class, 'update'])->name('password.update');
 });
 
 // Route xem bảng điểm sinh viên (cho admin, giáo viên và sinh viên đó)
