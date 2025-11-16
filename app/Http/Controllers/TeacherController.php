@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class TeacherController extends Controller
 {
@@ -145,11 +146,17 @@ class TeacherController extends Controller
             'last_name' => 'required|string|max:255',
             'date_of_birth' => 'required|date',
             'gender' => 'required|in:Nam,Nữ,Khác',
-            'email' => 'required|email|unique:teachers,email,' . $teacher->id,
+            'email' => [
+                'required',
+                'email',
+                Rule::unique('teachers', 'email')->ignore($teacher->id),
+                Rule::unique('users', 'email')->ignore($teacher->user_id),
+            ],
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string',
             'faculty_id' => 'required|exists:faculties,id',
             'degree_id' => 'required|exists:degrees,id',
+            'password' => 'nullable|min:8|confirmed',
         ]);
 
         if ($validator->fails()) {
@@ -158,13 +165,31 @@ class TeacherController extends Controller
                 ->withInput();
         }
 
-        $teacher->update($request->all());
+        $teacherData = $request->except('password', 'password_confirmation');
+        $teacher->update($teacherData);
 
         // Cập nhật thông tin người dùng nếu có
         if ($teacher->user_id) {
             $teacher->user->update([
                 'name' => $request->first_name . ' ' . $request->last_name,
                 'email' => $request->email,
+            ]);
+
+            if ($request->filled('password')) {
+                $teacher->user->update([
+                    'password' => Hash::make($request->password),
+                ]);
+            }
+        } elseif ($request->filled('password')) {
+            $user = User::create([
+                'name' => $request->first_name . ' ' . $request->last_name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'role' => 'teacher',
+            ]);
+
+            $teacher->update([
+                'user_id' => $user->id,
             ]);
         }
 
