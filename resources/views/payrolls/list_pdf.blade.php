@@ -15,7 +15,7 @@
                 <th>#</th>
                 <th>Mã GV</th>
                 <th>Họ tên</th>
-                <th>Tổng lương</th>
+                <th>Tổng Thù Lao Giảng Dạy</th>
             </tr>
         </thead>
         <tbody>

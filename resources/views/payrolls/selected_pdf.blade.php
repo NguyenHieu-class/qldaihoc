@@ -56,7 +56,7 @@
     @endforeach
 
     <div class="total">
-        Tổng lương: {{ number_format($total, 2) }}
+        Tổng Thù Lao Giảng Dạy: {{ number_format($total, 2) }}
     </div>
 </body>
 </html>

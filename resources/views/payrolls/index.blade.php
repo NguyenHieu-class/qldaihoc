@@ -89,7 +89,7 @@
                                             <th>Môn học</th>
                                             <th>Số tiết</th>
                                             <th>Sĩ số</th>
-                                            <th>Lương</th>
+                                            <th>Thù Lao Giảng Dạy</th>
                                             <th>Trạng thái</th>
                                             <th width="10%">Thao tác</th>
                                         </tr>
@@ -150,7 +150,7 @@
                                                 <th>Môn học</th>
                                                 <th>Số tiết</th>
                                                 <th>Sĩ số</th>
-                                                <th>Lương</th>
+                                                <th>Thù Lao Giảng Dạy</th>
                                                 <th>Trạng thái</th>
                                                 <th width="10%">Thao tác</th>
                                             </tr>
@@ -182,7 +182,7 @@
                                 </div>
                                 <div class="d-flex justify-content-between align-items-center mt-3">
                                     <div class="fw-bold">
-                                        Tổng lương: {{ number_format($total, 2) }}
+                                        Tổng Thù Lao Giảng Dạy: {{ number_format($total, 2) }}
                                     </div>
                                     <button type="submit" class="btn btn-primary">
                                         <i class="fas fa-print me-1"></i> In lương đã chọn
