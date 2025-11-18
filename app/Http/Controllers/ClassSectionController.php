@@ -9,6 +9,7 @@ use App\Models\Teacher;
 use App\Models\Faculty;
 use App\Models\TeachingRate;
 use App\Models\Student;
+use App\Models\Major;
 use App\Services\EnrollmentService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -122,17 +123,10 @@ class ClassSectionController extends Controller
 
         $user = auth()->user();
         $backRoute = null;
-        $availableStudents = collect();
 
         if ($user) {
             if ($user->isAdmin()) {
                 $backRoute = route('class-sections.index');
-                $enrolledIds = $classSection->students->pluck('id');
-                $availableStudents = Student::orderBy('student_id')
-                    ->when($enrolledIds->isNotEmpty(), function ($query) use ($enrolledIds) {
-                        $query->whereNotIn('id', $enrolledIds);
-                    })
-                    ->get();
             } elseif ($user->isTeacher()) {
                 $backRoute = route('teacher.classes.index');
             } elseif ($user->isStudent()) {
@@ -140,7 +134,49 @@ class ClassSectionController extends Controller
             }
         }
 
-        return view('class_sections.show', compact('classSection', 'courseOffering', 'semester', 'academicYear', 'backRoute', 'availableStudents'));
+        return view('class_sections.show', compact('classSection', 'courseOffering', 'semester', 'academicYear', 'backRoute'));
+    }
+
+    public function createStudentSelection(Request $request, ClassSection $classSection)
+    {
+        $classSection->load(['subject', 'courseOffering.semester.academicYear']);
+
+        $studentsQuery = Student::with('class.major.faculty')
+            ->whereDoesntHave('classSections', function ($query) use ($classSection) {
+                $query->where('class_section_id', $classSection->id);
+            });
+
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $studentsQuery->where(function ($query) use ($search) {
+                $query->where('first_name', 'like', "%{$search}%")
+                    ->orWhere('last_name', 'like', "%{$search}%")
+                    ->orWhere('student_id', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('faculty_id')) {
+            $studentsQuery->whereHas('class.major', function ($query) use ($request) {
+                $query->where('faculty_id', $request->faculty_id);
+            });
+        }
+
+        if ($request->filled('major_id')) {
+            $studentsQuery->whereHas('class', function ($query) use ($request) {
+                $query->where('major_id', $request->major_id);
+            });
+        }
+
+        $students = $studentsQuery
+            ->orderBy('student_id')
+            ->paginate(15)
+            ->withQueryString();
+
+        $faculties = Faculty::orderBy('name')->get();
+        $majors = Major::with('faculty')->orderBy('name')->get();
+
+        return view('class_sections.select_students', compact('classSection', 'students', 'faculties', 'majors'));
     }
 
     public function edit(ClassSection $classSection)
@@ -194,18 +230,36 @@ class ClassSectionController extends Controller
     public function addStudent(Request $request, ClassSection $classSection): RedirectResponse
     {
         $data = $request->validate([
-            'student_id' => 'required|exists:students,id',
+            'student_ids' => 'required|array|min:1',
+            'student_ids.*' => 'exists:students,id',
+        ], [
+            'student_ids.required' => 'Vui lòng chọn ít nhất một sinh viên.',
+            'student_ids.array' => 'Danh sách sinh viên không hợp lệ.',
         ]);
 
-        $student = Student::findOrFail($data['student_id']);
+        $students = Student::whereIn('id', $data['student_ids'])->get();
+        $successCount = 0;
+        $errors = [];
 
-        try {
-            $this->enrollmentService->enroll($student, $classSection);
-        } catch (EnrollmentException $exception) {
-            return back()->with('error', $exception->getMessage());
+        foreach ($students as $student) {
+            try {
+                $this->enrollmentService->enroll($student, $classSection);
+                $successCount++;
+            } catch (EnrollmentException $exception) {
+                $errors[] = $student->student_id . ': ' . $exception->getMessage();
+            }
         }
 
-        return back()->with('success', 'Đã thêm sinh viên vào lớp học phần.');
+        $response = [];
+        if ($successCount > 0) {
+            $response['success'] = "Đã thêm {$successCount} sinh viên vào lớp học phần.";
+        }
+
+        if (!empty($errors)) {
+            $response['error'] = implode(' ', $errors);
+        }
+
+        return back()->with($response);
     }
 
     /**
