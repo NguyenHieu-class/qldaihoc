@@ -100,4 +100,46 @@ class EnrollmentTest extends TestCase
 
         $this->assertDatabaseMissing('enrollments', ['id' => $enrollment->id]);
     }
+
+    public function test_student_cannot_register_class_from_other_faculty(): void
+    {
+        $facultyA = Faculty::factory()->create();
+        $facultyB = Faculty::factory()->create();
+        $major = Major::factory()->create(['faculty_id' => $facultyA->id]);
+        $class = Classes::factory()->create(['major_id' => $major->id]);
+
+        $user = User::factory()->create(['role' => 'student']);
+        $student = Student::factory()->create([
+            'class_id' => $class->id,
+            'user_id' => $user->id,
+        ]);
+
+        $degree = Degree::factory()->create();
+        $teacher = Teacher::factory()->create([
+            'faculty_id' => $facultyB->id,
+            'degree_id' => $degree->id,
+        ]);
+
+        $subject = Subject::factory()->create(['faculty_id' => $facultyB->id]);
+        $year = AcademicYear::factory()->create();
+        $semester = Semester::factory()->create(['academic_year_id' => $year->id]);
+        $offering = CourseOffering::factory()->create([
+            'subject_id' => $subject->id,
+            'semester_id' => $semester->id,
+        ]);
+        $section = ClassSection::factory()->create([
+            'course_offering_id' => $offering->id,
+            'subject_id' => $subject->id,
+            'teacher_id' => $teacher->id,
+        ]);
+
+        $this->actingAs($user)
+            ->post(route('enrollments.store', $section->id))
+            ->assertSessionHas('error');
+
+        $this->assertDatabaseMissing('enrollments', [
+            'student_id' => $student->id,
+            'class_section_id' => $section->id,
+        ]);
+    }
 }

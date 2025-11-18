@@ -20,6 +20,14 @@ class EnrollmentService
         }
 
         $classSection->loadMissing('courseOffering.semester', 'subject');
+        $student->loadMissing('class.major');
+
+        $studentFacultyId = $student->class?->major?->faculty_id;
+        $sectionFacultyId = $classSection->subject?->faculty_id;
+
+        if ($studentFacultyId && $sectionFacultyId && $studentFacultyId !== $sectionFacultyId) {
+            throw new EnrollmentException('Sinh viên không thể đăng ký lớp học phần thuộc khoa khác.');
+        }
 
         if ($classSection->status !== ClassSection::STATUS_OPEN) {
             throw new EnrollmentException('Lớp học phần hiện không mở để đăng ký.');
