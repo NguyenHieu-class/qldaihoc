@@ -96,6 +96,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get("reports/sections", [\App\Http\Controllers\ReportController::class, "sectionsBySemester"])->name("reports.sections");
     Route::get("reports/workload", [\App\Http\Controllers\ReportController::class, "teacherWorkload"])->name("reports.workload");
     Route::get("reports/open-rate", [\App\Http\Controllers\ReportController::class, "subjectOpenRate"])->name("reports.open_rate");
+    Route::post('class-sections/{classSection}/students', [ClassSectionController::class, 'addStudent'])
+        ->name('class-sections.students.store');
     Route::resource('class-sections', ClassSectionController::class)->except(['show']);
     Route::resource('tuitions', TuitionController::class);
 

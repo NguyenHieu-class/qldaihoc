@@ -4,19 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\AcademicYear;
 use App\Models\ClassSection;
-use App\Models\CourseOffering;
 use App\Models\Enrollment;
 use App\Models\Tuition;
-use App\Models\TuitionSetting;
 use App\Models\Semester;
-use App\Models\Student;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Exceptions\EnrollmentException;
+use App\Services\EnrollmentService;
 
 class EnrollmentController extends Controller
 {
-    public function __construct()
+    public function __construct(protected EnrollmentService $enrollmentService)
     {
         $this->middleware(['auth', 'role:student']);
     }
@@ -61,32 +60,11 @@ class EnrollmentController extends Controller
     {
         $student = auth()->user()->student;
 
-        if ($classSection->students()->where('enrollments.student_id', $student->id)->exists()) {
-            return back()->with('error', 'Bạn đã đăng ký lớp này.');
+        try {
+            $this->enrollmentService->enroll($student, $classSection);
+        } catch (EnrollmentException $exception) {
+            return back()->with('error', $exception->getMessage());
         }
-
-        $classSection->loadMissing('courseOffering.semester', 'subject');
-
-        if ($classSection->status !== ClassSection::STATUS_OPEN) {
-            return back()->with('error', 'Lớp học phần hiện không mở để đăng ký.');
-        }
-
-        if ($classSection->courseOffering && $classSection->courseOffering->status !== CourseOffering::STATUS_OPEN) {
-            return back()->with('error', 'Môn học này hiện không mở để đăng ký.');
-        }
-
-        if ($classSection->students()->count() >= $classSection->student_count) {
-            return back()->with('error', 'Lớp đã đủ số lượng.');
-        }
-
-        DB::transaction(function () use ($student, $classSection) {
-            Enrollment::create([
-                'student_id' => $student->id,
-                'class_section_id' => $classSection->id,
-            ]);
-
-            $this->createTuitionForEnrollment($student, $classSection);
-        });
 
         return back()->with('success', 'Đăng ký thành công.');
     }
@@ -119,31 +97,4 @@ class EnrollmentController extends Controller
         return back()->with('success', 'Đã hủy đăng ký.');
     }
 
-    protected function createTuitionForEnrollment(Student $student, ClassSection $classSection): void
-    {
-        $setting = TuitionSetting::first();
-        $perCreditAmount = $setting?->per_credit_amount ?? 0;
-
-        $subject = $classSection->subject;
-        if (! $subject) {
-            return;
-        }
-
-        $coefficient = $subject->coefficient ?: 1;
-        $credits = $subject->credits ?: 0;
-
-        $amount = round($perCreditAmount * $coefficient * $credits, 2);
-
-        Tuition::updateOrCreate(
-            [
-                'student_id' => $student->id,
-                'class_section_id' => $classSection->id,
-            ],
-            [
-                'semester_id' => optional($classSection->courseOffering)->semester_id,
-                'amount' => $amount,
-                'status' => Tuition::STATUS_PENDING,
-            ]
-        );
-    }
 }
