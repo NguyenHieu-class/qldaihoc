@@ -7,6 +7,7 @@ use App\Models\ClassSection;
 use App\Models\Enrollment;
 use App\Models\Tuition;
 use App\Models\Semester;
+use App\Models\CourseOffering;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
