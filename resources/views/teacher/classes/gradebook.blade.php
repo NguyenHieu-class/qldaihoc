@@ -27,7 +27,9 @@
                 <div class="card-body">
                     @include('partials.alerts')
 
-                    @php($gradeInputsDisabled = !$semester || !$academicYear || $isClassClosed)
+                    @php
+                        $gradeInputsDisabled = !$semester || !$academicYear || $isClassClosed;
+                    @endphp
 
                     @if ($isClassClosed)
                         <div class="alert alert-info">
