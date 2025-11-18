@@ -27,6 +27,15 @@
                 <div class="card-body">
                     @include('partials.alerts')
 
+                    @php($gradeInputsDisabled = !$semester || !$academicYear || $isClassClosed)
+
+                    @if ($isClassClosed)
+                        <div class="alert alert-info">
+                            <i class="fas fa-lock me-2"></i>
+                            {{ __('Lớp học phần đã đóng, bạn chỉ có thể xem lại điểm và không thể chỉnh sửa thêm.') }}
+                        </div>
+                    @endif
+
                     @if (!$semester || !$academicYear)
                         <div class="alert alert-warning">
                             <i class="fas fa-exclamation-triangle me-2"></i>
@@ -70,19 +79,19 @@
                                             <td>{{ $student->full_name }}</td>
                                             <td>{{ optional($student->class)->name ?? __('Chưa cập nhật') }}</td>
                                             <td>
-                                                <input type="number" step="0.1" min="0" max="10" name="midterm_score" form="{{ $formId }}" class="form-control form-control-sm @if($isCurrentForm && $errors->has('midterm_score')) is-invalid @endif" placeholder="{{ __('Nhập điểm') }}" value="{{ $midtermValue }}" {{ !$semester || !$academicYear ? 'disabled' : '' }}>
+                                                <input type="number" step="0.1" min="0" max="10" name="midterm_score" form="{{ $formId }}" class="form-control form-control-sm @if($isCurrentForm && $errors->has('midterm_score')) is-invalid @endif" placeholder="{{ __('Nhập điểm') }}" value="{{ $midtermValue }}" {{ $gradeInputsDisabled ? 'disabled' : '' }}>
                                                 @if ($isCurrentForm && $errors->has('midterm_score'))
                                                     <div class="invalid-feedback">{{ $errors->first('midterm_score') }}</div>
                                                 @endif
                                             </td>
                                             <td>
-                                                <input type="number" step="0.1" min="0" max="10" name="final_score" form="{{ $formId }}" class="form-control form-control-sm @if($isCurrentForm && $errors->has('final_score')) is-invalid @endif" placeholder="{{ __('Nhập điểm') }}" value="{{ $finalValue }}" {{ !$semester || !$academicYear ? 'disabled' : '' }}>
+                                                <input type="number" step="0.1" min="0" max="10" name="final_score" form="{{ $formId }}" class="form-control form-control-sm @if($isCurrentForm && $errors->has('final_score')) is-invalid @endif" placeholder="{{ __('Nhập điểm') }}" value="{{ $finalValue }}" {{ $gradeInputsDisabled ? 'disabled' : '' }}>
                                                 @if ($isCurrentForm && $errors->has('final_score'))
                                                     <div class="invalid-feedback">{{ $errors->first('final_score') }}</div>
                                                 @endif
                                             </td>
                                             <td>
-                                                <input type="number" step="0.1" min="0" max="10" name="assignment_score" form="{{ $formId }}" class="form-control form-control-sm @if($isCurrentForm && $errors->has('assignment_score')) is-invalid @endif" placeholder="{{ __('Nhập điểm') }}" value="{{ $assignmentValue }}" {{ !$semester || !$academicYear ? 'disabled' : '' }}>
+                                                <input type="number" step="0.1" min="0" max="10" name="assignment_score" form="{{ $formId }}" class="form-control form-control-sm @if($isCurrentForm && $errors->has('assignment_score')) is-invalid @endif" placeholder="{{ __('Nhập điểm') }}" value="{{ $assignmentValue }}" {{ $gradeInputsDisabled ? 'disabled' : '' }}>
                                                 @if ($isCurrentForm && $errors->has('assignment_score'))
                                                     <div class="invalid-feedback">{{ $errors->first('assignment_score') }}</div>
                                                 @endif
@@ -94,7 +103,7 @@
                                                 <form id="{{ $formId }}" action="{{ route('teacher.classes.gradebook.store', [$classSection, $student]) }}" method="POST" class="d-inline">
                                                     @csrf
                                                     <input type="hidden" name="form_student_id" value="{{ $student->id }}">
-                                                    <button type="submit" class="btn btn-primary btn-sm" {{ !$semester || !$academicYear ? 'disabled' : '' }}>
+                                                    <button type="submit" class="btn btn-primary btn-sm" {{ $gradeInputsDisabled ? 'disabled' : '' }}>
                                                         <i class="fas fa-save me-1"></i>{{ __('Lưu') }}
                                                     </button>
                                                 </form>
