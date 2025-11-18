@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ClassController;
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\FacultyController;
 use App\Http\Controllers\GradeController;
@@ -105,6 +106,9 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     // Yêu cầu đặt lại mật khẩu
     Route::get('password-reset-requests', [PasswordResetRequestController::class, 'index'])->name('password-reset-requests.index');
     Route::post('password-reset-requests/process', [PasswordResetRequestController::class, 'process'])->name('password-reset-requests.process');
+
+    // Nhật ký hệ thống
+    Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
 });
 
 // Nhóm route yêu cầu xác thực và quyền admin hoặc giáo viên
