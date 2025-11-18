@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\ClassSection;
 use App\Models\Grade;
 use App\Models\Student;
 use App\Models\Subject;
@@ -95,6 +96,12 @@ class GradeController extends Controller
         $semester = Semester::with('academicYear')->find($request->semester_id);
         $year = (int) substr($semester->academicYear->name, 0, 4);
 
+        if ($this->isClassSectionClosedForGrade($request->student_id, $request->subject_id, $semester->id)) {
+            return redirect()->back()
+                ->with('error', 'Không thể thêm hoặc chỉnh sửa điểm vì lớp học phần tương ứng đã đóng.')
+                ->withInput();
+        }
+
         // Kiểm tra xem đã có điểm cho sinh viên, môn học, học kỳ và năm học này chưa
         $existingGrade = Grade::where('student_id', $request->student_id)
             ->where('subject_id', $request->subject_id)
@@ -142,7 +149,11 @@ class GradeController extends Controller
         $subjects = Subject::all();
         $semesters = Semester::with('academicYear')->get();
 
-        return view('grades.edit', compact('grade', 'students', 'subjects', 'semesters'));
+        $isLocked = $grade->semester_id
+            ? $this->isClassSectionClosedForGrade($grade->student_id, $grade->subject_id, $grade->semester_id)
+            : false;
+
+        return view('grades.edit', compact('grade', 'students', 'subjects', 'semesters', 'isLocked'));
     }
 
     /**
@@ -168,6 +179,12 @@ class GradeController extends Controller
 
         $semester = Semester::with('academicYear')->find($request->semester_id);
         $year = (int) substr($semester->academicYear->name, 0, 4);
+
+        if ($this->isClassSectionClosedForGrade($request->student_id, $request->subject_id, $semester->id)) {
+            return redirect()->back()
+                ->with('error', 'Không thể thêm hoặc chỉnh sửa điểm vì lớp học phần tương ứng đã đóng.')
+                ->withInput();
+        }
 
         // Kiểm tra xem đã có điểm cho sinh viên, môn học, học kỳ và năm học này chưa (trừ điểm hiện tại)
         $existingGrade = Grade::where('student_id', $request->student_id)
@@ -196,6 +213,19 @@ class GradeController extends Controller
 
         return redirect()->route('grades.index')
             ->with('success', 'Điểm đã được cập nhật thành công.');
+    }
+
+    private function isClassSectionClosedForGrade(int $studentId, int $subjectId, int $semesterId): bool
+    {
+        return ClassSection::where('subject_id', $subjectId)
+            ->where('status', ClassSection::STATUS_CLOSED)
+            ->whereHas('courseOffering', function ($query) use ($semesterId) {
+                $query->where('semester_id', $semesterId);
+            })
+            ->whereHas('students', function ($query) use ($studentId) {
+                $query->where('students.id', $studentId);
+            })
+            ->exists();
     }
 
     /**

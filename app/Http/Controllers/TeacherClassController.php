@@ -101,6 +101,8 @@ class TeacherClassController extends Controller
                 ->keyBy('student_id');
         }
 
+        $isClassClosed = $classSection->status === ClassSection::STATUS_CLOSED;
+
         return view('teacher.classes.gradebook', [
             'classSection' => $classSection,
             'students' => $students,
@@ -109,6 +111,7 @@ class TeacherClassController extends Controller
             'semester' => $semester,
             'academicYear' => $academicYear,
             'academicYearNumber' => $academicYearNumber,
+            'isClassClosed' => $isClassClosed,
         ]);
     }
 
@@ -131,6 +134,11 @@ class TeacherClassController extends Controller
         if (!$isStudentOfSection) {
             return redirect()->route('teacher.classes.gradebook', $classSection)
                 ->with('error', 'Sinh viên không thuộc lớp học phần này.');
+        }
+
+        if ($classSection->status === ClassSection::STATUS_CLOSED) {
+            return redirect()->route('teacher.classes.gradebook', $classSection)
+                ->with('error', 'Lớp học phần đã đóng, không thể cập nhật điểm.');
         }
 
         $courseOffering = $classSection->courseOffering;
