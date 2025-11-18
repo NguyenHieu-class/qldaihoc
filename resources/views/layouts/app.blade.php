@@ -404,6 +404,11 @@
                                                 </a>
                                             </li>
                                             <li class="nav-item">
+                                                <a class="nav-link {{ request()->routeIs('audit-logs.*') ? 'active' : '' }}" href="{{ route('audit-logs.index') }}">
+                                                    <i class="fas fa-clipboard-list"></i> Nhật ký hệ thống
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
                                                 <a class="nav-link {{ request()->routeIs('password-reset-requests.*') ? 'active' : '' }}" href="{{ route('password-reset-requests.index') }}">
                                                     <i class="fas fa-key"></i> Yêu cầu quên mật khẩu
                                                 </a>
