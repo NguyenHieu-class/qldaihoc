@@ -4,14 +4,22 @@ namespace App\Http\Controllers;
 
 use App\Models\ClassSection;
 use App\Models\CourseOffering;
+use App\Exceptions\EnrollmentException;
 use App\Models\Teacher;
 use App\Models\Faculty;
 use App\Models\TeachingRate;
+use App\Models\Student;
+use App\Services\EnrollmentService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class ClassSectionController extends Controller
 {
+    public function __construct(protected EnrollmentService $enrollmentService)
+    {
+    }
+
     public function index()
     {
         $sections = ClassSection::with(['subject', 'teacher.faculty', 'courseOffering.subject'])->paginate(10);
@@ -114,10 +122,17 @@ class ClassSectionController extends Controller
 
         $user = auth()->user();
         $backRoute = null;
+        $availableStudents = collect();
 
         if ($user) {
             if ($user->isAdmin()) {
                 $backRoute = route('class-sections.index');
+                $enrolledIds = $classSection->students->pluck('id');
+                $availableStudents = Student::orderBy('student_id')
+                    ->when($enrolledIds->isNotEmpty(), function ($query) use ($enrolledIds) {
+                        $query->whereNotIn('id', $enrolledIds);
+                    })
+                    ->get();
             } elseif ($user->isTeacher()) {
                 $backRoute = route('teacher.classes.index');
             } elseif ($user->isStudent()) {
@@ -125,7 +140,7 @@ class ClassSectionController extends Controller
             }
         }
 
-        return view('class_sections.show', compact('classSection', 'courseOffering', 'semester', 'academicYear', 'backRoute'));
+        return view('class_sections.show', compact('classSection', 'courseOffering', 'semester', 'academicYear', 'backRoute', 'availableStudents'));
     }
 
     public function edit(ClassSection $classSection)
@@ -174,6 +189,23 @@ class ClassSectionController extends Controller
     {
         $classSection->delete();
         return redirect()->route('class-sections.index')->with('success', 'Đã xóa lớp học phần.');
+    }
+
+    public function addStudent(Request $request, ClassSection $classSection): RedirectResponse
+    {
+        $data = $request->validate([
+            'student_id' => 'required|exists:students,id',
+        ]);
+
+        $student = Student::findOrFail($data['student_id']);
+
+        try {
+            $this->enrollmentService->enroll($student, $classSection);
+        } catch (EnrollmentException $exception) {
+            return back()->with('error', $exception->getMessage());
+        }
+
+        return back()->with('success', 'Đã thêm sinh viên vào lớp học phần.');
     }
 
     /**

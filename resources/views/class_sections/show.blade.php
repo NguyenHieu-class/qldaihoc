@@ -102,6 +102,31 @@
                     </div>
 
                     <div>
+                        @if($user && $user->isAdmin())
+                            <div class="mb-4">
+                                <h6 class="text-uppercase text-muted fw-semibold mb-3">{{ __('Thêm sinh viên vào lớp học phần') }}</h6>
+                                <form method="POST" action="{{ route('class-sections.students.store', $classSection) }}" class="row g-3 align-items-end">
+                                    @csrf
+                                    <div class="col-md-8">
+                                        <label class="form-label fw-semibold" for="student_id">{{ __('Chọn sinh viên') }}</label>
+                                        <select name="student_id" id="student_id" class="form-select" required>
+                                            <option value="">{{ __('-- Chọn sinh viên --') }}</option>
+                                            @forelse($availableStudents as $student)
+                                                <option value="{{ $student->id }}">{{ $student->student_id }} - {{ $student->full_name }}</option>
+                                            @empty
+                                                <option value="" disabled>{{ __('Tất cả sinh viên đã đăng ký lớp này.') }}</option>
+                                            @endforelse
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 d-flex align-items-end">
+                                        <button class="btn btn-success w-100" type="submit" @if($availableStudents->isEmpty()) disabled @endif>
+                                            <i class="fas fa-user-plus"></i> {{ __('Thêm sinh viên') }}
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        @endif
+
                         <h5 class="mb-3">{{ __('Danh sách sinh viên đăng ký') }}</h5>
                         @if($classSection->students->isNotEmpty())
                             <div class="table-responsive">
