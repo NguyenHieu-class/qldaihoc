@@ -103,27 +103,14 @@
 
                     <div>
                         @if($user && $user->isAdmin())
-                            <div class="mb-4">
-                                <h6 class="text-uppercase text-muted fw-semibold mb-3">{{ __('Thêm sinh viên vào lớp học phần') }}</h6>
-                                <form method="POST" action="{{ route('class-sections.students.store', $classSection) }}" class="row g-3 align-items-end">
-                                    @csrf
-                                    <div class="col-md-8">
-                                        <label class="form-label fw-semibold" for="student_id">{{ __('Chọn sinh viên') }}</label>
-                                        <select name="student_id" id="student_id" class="form-select" required>
-                                            <option value="">{{ __('-- Chọn sinh viên --') }}</option>
-                                            @forelse($availableStudents as $student)
-                                                <option value="{{ $student->id }}">{{ $student->student_id }} - {{ $student->full_name }}</option>
-                                            @empty
-                                                <option value="" disabled>{{ __('Tất cả sinh viên đã đăng ký lớp này.') }}</option>
-                                            @endforelse
-                                        </select>
-                                    </div>
-                                    <div class="col-md-4 d-flex align-items-end">
-                                        <button class="btn btn-success w-100" type="submit" @if($availableStudents->isEmpty()) disabled @endif>
-                                            <i class="fas fa-user-plus"></i> {{ __('Thêm sinh viên') }}
-                                        </button>
-                                    </div>
-                                </form>
+                            <div class="mb-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                                <div>
+                                    <h6 class="text-uppercase text-muted fw-semibold mb-1">{{ __('Thêm sinh viên vào lớp học phần') }}</h6>
+                                    <p class="text-muted small mb-0">{{ __('Mở danh sách sinh viên để tìm kiếm và chọn nhiều sinh viên cùng lúc.') }}</p>
+                                </div>
+                                <a href="{{ route('class-sections.students.create', $classSection) }}" class="btn btn-success">
+                                    <i class="fas fa-user-plus me-1"></i> {{ __('Thêm sinh viên') }}
+                                </a>
                             </div>
                         @endif
 
