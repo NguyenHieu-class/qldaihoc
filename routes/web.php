@@ -138,6 +138,8 @@ Route::middleware(['auth', 'role:admin,teacher,student'])->group(function () {
 // Nhóm route dành riêng cho giáo viên
 Route::middleware(['auth', 'role:teacher'])->group(function () {
     Route::get('teacher/classes', [TeacherClassController::class, 'index'])->name('teacher.classes.index');
+    Route::get('teacher/classes/{classSection}/grades', [TeacherClassController::class, 'gradebook'])->name('teacher.classes.gradebook');
+    Route::post('teacher/classes/{classSection}/grades/{student}', [TeacherClassController::class, 'storeGrade'])->name('teacher.classes.gradebook.store');
 });
 
 // Đổi mật khẩu cho giáo viên và sinh viên
