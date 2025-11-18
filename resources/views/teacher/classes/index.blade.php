@@ -82,6 +82,7 @@
                                     <th scope="col">{{ __('Số sinh viên') }}</th>
                                     <th scope="col">{{ __('Phòng học') }}</th>
                                     <th scope="col">{{ __('Trạng thái') }}</th>
+                                    <th scope="col" class="text-center">{{ __('Nhập điểm') }}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -110,6 +111,11 @@
                                             <span class="badge bg-{{ $section->status === 'active' ? 'success' : ($section->status === 'closed' ? 'secondary' : 'info') }}">
                                                 {{ $section->status_label }}
                                             </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <a href="{{ route('teacher.classes.gradebook', $section) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="fas fa-pen"></i> {{ __('Nhập điểm') }}
+                                            </a>
                                         </td>
                                     </tr>
                                 @empty

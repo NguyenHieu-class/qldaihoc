@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\AcademicYear;
 use App\Models\ClassSection;
+use App\Models\Grade;
 use App\Models\Semester;
+use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -63,5 +65,111 @@ class TeacherClassController extends Controller
         $statuses = ClassSection::STATUS_LABELS;
 
         return view('teacher.classes.index', compact('sections', 'academicYears', 'semesters', 'teacher', 'statuses'));
+    }
+
+    public function gradebook(ClassSection $classSection)
+    {
+        $user = Auth::user();
+
+        if (!$user->isTeacher()) {
+            return redirect()->route('dashboard.index')->with('error', 'Bạn không có quyền truy cập trang này.');
+        }
+
+        $teacher = $user->teacher;
+
+        if (!$teacher || $classSection->teacher_id !== $teacher->id) {
+            return redirect()->route('teacher.classes.index')->with('error', 'Bạn không có quyền truy cập lớp học phần này.');
+        }
+
+        $classSection->load(['subject', 'courseOffering.semester.academicYear', 'students.class']);
+
+        $students = $classSection->students->sortBy('student_id')->values();
+
+        $courseOffering = $classSection->courseOffering;
+        $semester = $courseOffering ? $courseOffering->semester : null;
+        $academicYear = $semester ? $semester->academicYear : null;
+        $academicYearNumber = $academicYear ? (int) substr($academicYear->name, 0, 4) : null;
+
+        $grades = collect();
+
+        if ($students->isNotEmpty() && $semester && $academicYearNumber) {
+            $grades = Grade::whereIn('student_id', $students->pluck('id'))
+                ->where('subject_id', $classSection->subject_id)
+                ->where('semester', $semester->name)
+                ->where('academic_year', $academicYearNumber)
+                ->get()
+                ->keyBy('student_id');
+        }
+
+        return view('teacher.classes.gradebook', [
+            'classSection' => $classSection,
+            'students' => $students,
+            'grades' => $grades,
+            'teacher' => $teacher,
+            'semester' => $semester,
+            'academicYear' => $academicYear,
+            'academicYearNumber' => $academicYearNumber,
+        ]);
+    }
+
+    public function storeGrade(Request $request, ClassSection $classSection, Student $student)
+    {
+        $user = Auth::user();
+
+        if (!$user->isTeacher()) {
+            return redirect()->route('dashboard.index')->with('error', 'Bạn không có quyền truy cập trang này.');
+        }
+
+        $teacher = $user->teacher;
+
+        if (!$teacher || $classSection->teacher_id !== $teacher->id) {
+            return redirect()->route('teacher.classes.index')->with('error', 'Bạn không có quyền truy cập lớp học phần này.');
+        }
+
+        $isStudentOfSection = $classSection->students()->where('students.id', $student->id)->exists();
+
+        if (!$isStudentOfSection) {
+            return redirect()->route('teacher.classes.gradebook', $classSection)
+                ->with('error', 'Sinh viên không thuộc lớp học phần này.');
+        }
+
+        $courseOffering = $classSection->courseOffering;
+        $semester = $courseOffering ? $courseOffering->semester : null;
+        $academicYear = $semester ? $semester->academicYear : null;
+
+        if (!$semester || !$academicYear) {
+            return redirect()->route('teacher.classes.gradebook', $classSection)
+                ->with('error', 'Lớp học phần chưa được cấu hình học kỳ hoặc năm học, không thể nhập điểm.');
+        }
+
+        $academicYearNumber = (int) substr($academicYear->name, 0, 4);
+
+        $validated = $request->validate([
+            'midterm_score' => 'nullable|numeric|min:0|max:10',
+            'final_score' => 'nullable|numeric|min:0|max:10',
+            'assignment_score' => 'nullable|numeric|min:0|max:10',
+            'form_student_id' => 'nullable|integer',
+        ]);
+
+        $grade = Grade::updateOrCreate(
+            [
+                'student_id' => $student->id,
+                'subject_id' => $classSection->subject_id,
+                'semester' => $semester->name,
+                'academic_year' => $academicYearNumber,
+            ],
+            [
+                'semester_id' => $semester->id,
+                'midterm_score' => $validated['midterm_score'] ?? null,
+                'final_score' => $validated['final_score'] ?? null,
+                'assignment_score' => $validated['assignment_score'] ?? null,
+            ]
+        );
+
+        $grade->total_score = $grade->calculateTotalScore();
+        $grade->save();
+
+        return redirect()->route('teacher.classes.gradebook', $classSection)
+            ->with('success', 'Đã lưu điểm cho ' . $student->full_name . '.');
     }
 }
