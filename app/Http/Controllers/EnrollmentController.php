@@ -27,6 +27,9 @@ class EnrollmentController extends Controller
     public function index()
     {
         $student = auth()->user()->student;
+        $student->loadMissing('class.major');
+
+        $studentFacultyId = $student->class?->major?->faculty_id;
 
         $latestYear = AcademicYear::orderBy('id', 'desc')->first();
         $semesterIds = [];
@@ -43,6 +46,11 @@ class EnrollmentController extends Controller
                     $q->whereIn('semester_id', $semesterIds);
                 }
                 $q->where('status', CourseOffering::STATUS_OPEN);
+            })
+            ->when($studentFacultyId, function ($query) use ($studentFacultyId) {
+                $query->whereHas('subject', function ($subjectQuery) use ($studentFacultyId) {
+                    $subjectQuery->where('faculty_id', $studentFacultyId);
+                });
             })
             ->whereNotIn('id', $registeredIds)
             ->get();
