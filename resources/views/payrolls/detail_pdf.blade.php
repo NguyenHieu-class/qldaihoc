@@ -22,7 +22,7 @@
                 <th>Hs môn</th>
                 <th>Trạng thái</th>
                 <th>Tiền mỗi tiết</th>
-                <th>Lương</th>
+                <th>Thù Lao Giảng Dạy</th>
             </tr>
         </thead>
         <tbody>
@@ -43,6 +43,6 @@
             @endforeach
         </tbody>
     </table>
-    <p style="text-align: right; font-weight: bold;">Tổng lương: {{ number_format($total, 2) }}</p>
+    <p style="text-align: right; font-weight: bold;">Tổng Thù Lao Giảng Dạy: {{ number_format($total, 2) }}</p>
 </body>
 </html>

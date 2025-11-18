@@ -65,7 +65,7 @@
                                     <th>Hs môn</th>
                                     <th>Trạng thái</th>
                                     <th>Tiền mỗi tiết</th>
-                                    <th>Lương</th>
+                                    <th>Thù Lao Giảng Dạy</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -109,7 +109,7 @@
                         </table>
                     </div>
                     <div class="text-end fw-bold">
-                        Tổng lương: {{ number_format($total, 2) }}
+                        Tổng Thù Lao Giảng Dạy: {{ number_format($total, 2) }}
                     </div>
                 </div>
             </div>

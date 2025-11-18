@@ -71,7 +71,7 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th>Lương</th>
+                                <th>Thù Lao Giảng Dạy</th>
                                 <td>{{ number_format($detail['salary'], 2) }}</td>
                             </tr>
                         </tbody>
