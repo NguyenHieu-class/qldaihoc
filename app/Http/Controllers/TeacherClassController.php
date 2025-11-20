@@ -6,7 +6,6 @@ use App\Models\AcademicYear;
 use App\Models\ClassSection;
 use App\Models\Grade;
 use App\Models\Semester;
-use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -115,7 +114,7 @@ class TeacherClassController extends Controller
         ]);
     }
 
-    public function storeGrade(Request $request, ClassSection $classSection, Student $student)
+    public function storeGrades(Request $request, ClassSection $classSection)
     {
         $user = Auth::user();
 
@@ -127,13 +126,6 @@ class TeacherClassController extends Controller
 
         if (!$teacher || $classSection->teacher_id !== $teacher->id) {
             return redirect()->route('teacher.classes.index')->with('error', 'Bạn không có quyền truy cập lớp học phần này.');
-        }
-
-        $isStudentOfSection = $classSection->students()->where('students.id', $student->id)->exists();
-
-        if (!$isStudentOfSection) {
-            return redirect()->route('teacher.classes.gradebook', $classSection)
-                ->with('error', 'Sinh viên không thuộc lớp học phần này.');
         }
 
         if ($classSection->status === ClassSection::STATUS_CLOSED) {
@@ -150,34 +142,48 @@ class TeacherClassController extends Controller
                 ->with('error', 'Lớp học phần chưa được cấu hình học kỳ hoặc năm học, không thể nhập điểm.');
         }
 
+        $students = $classSection->students()->orderBy('student_id')->get();
+        $studentIds = $students->pluck('id');
+
+        if ($students->isEmpty()) {
+            return redirect()->route('teacher.classes.gradebook', $classSection)
+                ->with('error', 'Chưa có sinh viên nào trong lớp học phần này để lưu điểm.');
+        }
+
         $academicYearNumber = (int) substr($academicYear->name, 0, 4);
 
         $validated = $request->validate([
-            'midterm_score' => 'nullable|numeric|min:0|max:10',
-            'final_score' => 'nullable|numeric|min:0|max:10',
-            'assignment_score' => 'nullable|numeric|min:0|max:10',
-            'form_student_id' => 'nullable|integer',
+            'grades' => 'required|array',
+            'grades.*.midterm_score' => 'nullable|numeric|min:0|max:10',
+            'grades.*.final_score' => 'nullable|numeric|min:0|max:10',
+            'grades.*.assignment_score' => 'nullable|numeric|min:0|max:10',
         ]);
 
-        $grade = Grade::updateOrCreate(
-            [
-                'student_id' => $student->id,
-                'subject_id' => $classSection->subject_id,
-                'semester' => $semester->name,
-                'academic_year' => $academicYearNumber,
-            ],
-            [
-                'semester_id' => $semester->id,
-                'midterm_score' => $validated['midterm_score'] ?? null,
-                'final_score' => $validated['final_score'] ?? null,
-                'assignment_score' => $validated['assignment_score'] ?? null,
-            ]
-        );
+        $gradesInput = collect($validated['grades'])->only($studentIds);
 
-        $grade->total_score = $grade->calculateTotalScore();
-        $grade->save();
+        foreach ($students as $student) {
+            $scores = $gradesInput->get($student->id, []);
+
+            $grade = Grade::updateOrCreate(
+                [
+                    'student_id' => $student->id,
+                    'subject_id' => $classSection->subject_id,
+                    'semester' => $semester->name,
+                    'academic_year' => $academicYearNumber,
+                ],
+                [
+                    'semester_id' => $semester->id,
+                    'midterm_score' => $scores['midterm_score'] ?? null,
+                    'final_score' => $scores['final_score'] ?? null,
+                    'assignment_score' => $scores['assignment_score'] ?? null,
+                ]
+            );
+
+            $grade->total_score = $grade->calculateTotalScore();
+            $grade->save();
+        }
 
         return redirect()->route('teacher.classes.gradebook', $classSection)
-            ->with('success', 'Đã lưu điểm cho ' . $student->full_name . '.');
+            ->with('success', 'Đã lưu điểm cho tất cả sinh viên trong lớp.');
     }
 }
