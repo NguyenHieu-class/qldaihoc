@@ -123,6 +123,9 @@
                                             <th width="10%">{{ __('STT') }}</th>
                                             <th width="20%">{{ __('Mã sinh viên') }}</th>
                                             <th>{{ __('Họ và tên') }}</th>
+                                            @if($user && $user->isAdmin())
+                                                <th width="15%" class="text-center">{{ __('Thao tác') }}</th>
+                                            @endif
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -131,6 +134,17 @@
                                                 <td>{{ $index + 1 }}</td>
                                                 <td>{{ $student->student_id }}</td>
                                                 <td>{{ $student->full_name }}</td>
+                                                @if($user && $user->isAdmin())
+                                                    <td class="text-center">
+                                                        <form action="{{ route('class-sections.students.destroy', [$classSection, $student]) }}" method="POST" class="d-inline" onsubmit="return confirm('{{ __('Bạn có chắc chắn muốn xóa sinh viên này khỏi lớp học phần?') }}')">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                                <i class="fas fa-user-times me-1"></i> {{ __('Xóa') }}
+                                                            </button>
+                                                        </form>
+                                                    </td>
+                                                @endif
                                             </tr>
                                         @endforeach
                                     </tbody>

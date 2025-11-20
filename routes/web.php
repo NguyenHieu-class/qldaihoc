@@ -102,6 +102,8 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
         ->name('class-sections.students.create');
     Route::post('class-sections/{classSection}/students', [ClassSectionController::class, 'addStudent'])
         ->name('class-sections.students.store');
+    Route::delete('class-sections/{classSection}/students/{student}', [ClassSectionController::class, 'removeStudent'])
+        ->name('class-sections.students.destroy');
     Route::resource('class-sections', ClassSectionController::class)->except(['show']);
     Route::resource('tuitions', TuitionController::class);
 
