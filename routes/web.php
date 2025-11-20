@@ -7,6 +7,7 @@ use App\Http\Controllers\FacultyController;
 use App\Http\Controllers\GradeController;
 use App\Http\Controllers\MajorController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\StudentClassController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\CourseOfferingController;
@@ -173,5 +174,6 @@ Route::middleware(['auth', 'role:student'])->group(function () {
     Route::get('enrollments', [\App\Http\Controllers\EnrollmentController::class, 'index'])->name('enrollments.index');
     Route::post('class-sections/{classSection}/enroll', [\App\Http\Controllers\EnrollmentController::class, 'store'])->name('enrollments.store');
     Route::delete('enrollments/{enrollment}', [\App\Http\Controllers\EnrollmentController::class, 'destroy'])->name('enrollments.destroy');
+    Route::get('my-classes', [StudentClassController::class, 'index'])->name('student.classes.index');
     Route::get('my-tuitions', [StudentTuitionController::class, 'index'])->name('student.tuitions.index');
 });
