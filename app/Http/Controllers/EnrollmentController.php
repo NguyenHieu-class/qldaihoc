@@ -37,9 +37,7 @@ class EnrollmentController extends Controller
             $semesterIds = Semester::where('academic_year_id', $latestYear->id)->pluck('id');
         }
 
-        $registeredIds = $student->classSections()->pluck('class_sections.id');
-
-        $availableSections = ClassSection::with(['subject', 'teacher', 'courseOffering.semester.academicYear'])
+        $openSections = ClassSection::with(['subject', 'teacher', 'courseOffering.semester.academicYear'])
             ->where('status', ClassSection::STATUS_OPEN)
             ->whereHas('courseOffering', function ($q) use ($semesterIds) {
                 if (count($semesterIds)) {
@@ -52,14 +50,39 @@ class EnrollmentController extends Controller
                     $subjectQuery->where('faculty_id', $studentFacultyId);
                 });
             })
-            ->whereNotIn('id', $registeredIds)
             ->get();
 
         $registrations = Enrollment::with('classSection.subject', 'classSection.teacher', 'classSection.courseOffering.semester.academicYear')
             ->where('student_id', $student->id)
             ->get();
 
-        return view('enrollments.index', compact('availableSections', 'registrations'));
+        $sectionsBySubject = $openSections->groupBy('subject_id');
+
+        $subjects = $sectionsBySubject->map(fn ($sections) => $sections->first()->subject)
+            ->filter()
+            ->sortBy('code');
+
+        $selectedSubjectId = request()->integer('subject_id');
+        if (! $selectedSubjectId || ! $subjects->has($selectedSubjectId)) {
+            $selectedSubjectId = $subjects->keys()->first();
+        }
+
+        $registeredSubjectEnrollments = $registrations
+            ->filter(fn ($enrollment) => $enrollment->classSection?->subject_id)
+            ->keyBy(fn ($enrollment) => $enrollment->classSection->subject_id);
+
+        $selectedSections = $selectedSubjectId
+            ? $sectionsBySubject->get($selectedSubjectId, collect())
+            : collect();
+
+        return view('enrollments.index', [
+            'sectionsBySubject' => $sectionsBySubject,
+            'subjects' => $subjects,
+            'selectedSubjectId' => $selectedSubjectId,
+            'selectedSections' => $selectedSections,
+            'registrations' => $registrations,
+            'registeredSubjectEnrollments' => $registeredSubjectEnrollments,
+        ]);
     }
 
     /**
