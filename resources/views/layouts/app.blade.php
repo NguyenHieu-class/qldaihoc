@@ -430,6 +430,9 @@
                             @endif
 
                             @if(Auth::user()->role == 'student' && Auth::user()->student)
+                                <a class="nav-link {{ request()->routeIs('student.classes.*') ? 'active' : '' }}" href="{{ route('student.classes.index') }}">
+                                    <i class="fas fa-chalkboard"></i> Lớp học của tôi
+                                </a>
                                 <a class="nav-link {{ request()->routeIs('students.transcript') ? 'active' : '' }}" href="{{ route('students.transcript', Auth::user()->student->id) }}">
                                     <i class="fas fa-chart-line"></i> Bảng điểm
                                 </a>
