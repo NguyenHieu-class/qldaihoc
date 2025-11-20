@@ -409,6 +409,11 @@
                                                 </a>
                                             </li>
                                             <li class="nav-item">
+                                                <a class="nav-link {{ request()->routeIs('grade-unlock-requests.*') ? 'active' : '' }}" href="{{ route('grade-unlock-requests.index') }}">
+                                                    <i class="fas fa-unlock-alt"></i> Yêu cầu mở khoá điểm
+                                                </a>
+                                            </li>
+                                            <li class="nav-item">
                                                 <a class="nav-link {{ request()->routeIs('password-reset-requests.*') ? 'active' : '' }}" href="{{ route('password-reset-requests.index') }}">
                                                     <i class="fas fa-key"></i> Yêu cầu quên mật khẩu
                                                 </a>

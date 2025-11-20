@@ -28,13 +28,42 @@
                     @include('partials.alerts')
 
                     @php
-                        $gradeInputsDisabled = !$semester || !$academicYear || $isClassClosed;
+                        $gradeInputsDisabled = !$semester || !$academicYear || $isClassClosed || $isGradesLocked;
                     @endphp
 
                     @if ($isClassClosed)
                         <div class="alert alert-info">
                             <i class="fas fa-lock me-2"></i>
                             {{ __('Lớp học phần đã đóng, bạn chỉ có thể xem lại điểm và không thể chỉnh sửa thêm.') }}
+                        </div>
+                    @endif
+
+                    @if ($isGradesLocked && !$isClassClosed)
+                        <div class="alert alert-warning d-flex justify-content-between align-items-center" role="alert">
+                            <div>
+                                <i class="fas fa-shield-alt me-2"></i>
+                                {{ __('Điểm đã được khóa, bạn không thể chỉnh sửa cho đến khi được mở khóa.') }}
+                                @if ($classSection->grades_locked_at)
+                                    <span class="ms-2 text-muted">{{ __('Khoá lúc:') }} {{ $classSection->grades_locked_at->format('d/m/Y H:i') }}</span>
+                                @endif
+                                @if ($latestUnlockRequest && $latestUnlockRequest->status !== \App\Models\GradeUnlockRequest::STATUS_PENDING)
+                                    <span class="ms-2 text-muted">
+                                        {{ __('Kết quả yêu cầu trước:') }} {{ ucfirst($latestUnlockRequest->status) }}
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="d-flex gap-2">
+                                @if (!$pendingUnlockRequest)
+                                    <form method="POST" action="{{ route('teacher.classes.gradebook.unlock_request', $classSection) }}">
+                                        @csrf
+                                        <button type="submit" class="btn btn-outline-primary btn-sm">
+                                            <i class="fas fa-unlock"></i> {{ __('Gửi yêu cầu mở khóa') }}
+                                        </button>
+                                    </form>
+                                @else
+                                    <span class="badge bg-warning text-dark">{{ __('Đang chờ duyệt') }}</span>
+                                @endif
+                            </div>
                         </div>
                     @endif
 
@@ -50,12 +79,26 @@
                             <i class="fas fa-user-graduate me-2"></i>{{ __('Chưa có sinh viên nào đăng ký lớp học phần này.') }}
                         </p>
                     @else
+                        <form id="lock-form" action="{{ route('teacher.classes.gradebook.lock', $classSection) }}" method="POST" class="d-none">
+                            @csrf
+                        </form>
+
                         <form id="gradebook-form" action="{{ route('teacher.classes.gradebook.store', $classSection) }}" method="POST">
                             @csrf
-                            <div class="d-flex justify-content-end mb-3">
-                                <button type="submit" class="btn btn-primary" {{ $gradeInputsDisabled ? 'disabled' : '' }}>
-                                    <i class="fas fa-save me-1"></i>{{ __('Lưu tất cả') }}
-                                </button>
+                            <div class="d-flex justify-content-between align-items-center mb-3 gap-2 flex-wrap">
+                                <div class="d-flex gap-2">
+                                    <button type="submit" class="btn btn-primary" {{ $gradeInputsDisabled ? 'disabled' : '' }}>
+                                        <i class="fas fa-save me-1"></i>{{ __('Lưu tất cả') }}
+                                    </button>
+                                    @if (!$isClassClosed)
+                                        <button type="submit" form="lock-form" class="btn btn-outline-danger" {{ ($isGradesLocked || !$semester || !$academicYear || $students->isEmpty()) ? 'disabled' : '' }} onclick="return confirm('{{ __('Bạn chắc chắn muốn khóa điểm?') }}')">
+                                            <i class="fas fa-lock"></i> {{ __('Khoá điểm') }}
+                                        </button>
+                                    @endif
+                                </div>
+                                @if ($pendingUnlockRequest && !$isClassClosed)
+                                    <span class="badge bg-warning text-dark">{{ __('Đã gửi yêu cầu mở khóa, vui lòng chờ duyệt') }}</span>
+                                @endif
                             </div>
                             <div class="table-responsive">
                                 <table class="table table-striped align-middle">

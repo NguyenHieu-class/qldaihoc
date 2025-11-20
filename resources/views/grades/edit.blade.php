@@ -21,7 +21,7 @@
                     @if ($isLocked)
                         <div class="alert alert-info">
                             <i class="fas fa-lock me-2"></i>
-                            {{ __('Lớp học phần liên quan đã đóng, bạn chỉ có thể xem lại thông tin điểm số.') }}
+                            {{ __('Lớp học phần liên quan đã đóng hoặc đang bị khóa điểm, bạn chỉ có thể xem lại thông tin điểm số.') }}
                         </div>
                     @endif
 

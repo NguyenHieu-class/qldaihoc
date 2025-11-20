@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\ClassSection;
+use App\Models\GradeUnlockRequest;
 
 class Teacher extends Model
 {
@@ -68,5 +69,10 @@ class Teacher extends Model
     public function classSections(): HasMany
     {
         return $this->hasMany(ClassSection::class);
+    }
+
+    public function gradeUnlockRequests(): HasMany
+    {
+        return $this->hasMany(GradeUnlockRequest::class);
     }
 }

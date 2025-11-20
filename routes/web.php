@@ -23,6 +23,7 @@ use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\TeacherClassController;
 use App\Http\Controllers\PasswordController;
 use App\Http\Controllers\PasswordResetRequestController;
+use App\Http\Controllers\GradeUnlockRequestController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
@@ -111,6 +112,10 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('password-reset-requests', [PasswordResetRequestController::class, 'index'])->name('password-reset-requests.index');
     Route::post('password-reset-requests/process', [PasswordResetRequestController::class, 'process'])->name('password-reset-requests.process');
 
+    Route::get('grade-unlock-requests', [GradeUnlockRequestController::class, 'index'])->name('grade-unlock-requests.index');
+    Route::post('grade-unlock-requests/{gradeUnlockRequest}/approve', [GradeUnlockRequestController::class, 'approve'])->name('grade-unlock-requests.approve');
+    Route::post('grade-unlock-requests/{gradeUnlockRequest}/reject', [GradeUnlockRequestController::class, 'reject'])->name('grade-unlock-requests.reject');
+
     // Nhật ký hệ thống
     Route::get('audit-logs', [AuditLogController::class, 'index'])->name('audit-logs.index');
 });
@@ -148,6 +153,8 @@ Route::middleware(['auth', 'role:teacher'])->group(function () {
     Route::get('teacher/classes', [TeacherClassController::class, 'index'])->name('teacher.classes.index');
     Route::get('teacher/classes/{classSection}/grades', [TeacherClassController::class, 'gradebook'])->name('teacher.classes.gradebook');
     Route::post('teacher/classes/{classSection}/grades', [TeacherClassController::class, 'storeGrades'])->name('teacher.classes.gradebook.store');
+    Route::post('teacher/classes/{classSection}/grades/lock', [TeacherClassController::class, 'lockGrades'])->name('teacher.classes.gradebook.lock');
+    Route::post('teacher/classes/{classSection}/grades/unlock-request', [TeacherClassController::class, 'requestUnlock'])->name('teacher.classes.gradebook.unlock_request');
 });
 
 // Đổi mật khẩu cho giáo viên và sinh viên

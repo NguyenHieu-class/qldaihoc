@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\Student;
 use App\Models\Enrollment;
 use App\Models\TeachingRate;
+use App\Models\GradeUnlockRequest;
 
 class ClassSection extends Model
 {
@@ -26,6 +27,13 @@ class ClassSection extends Model
         'student_count',
         'status',
         'payment_status',
+        'grades_locked',
+        'grades_locked_at',
+    ];
+
+    protected $casts = [
+        'grades_locked' => 'boolean',
+        'grades_locked_at' => 'datetime',
     ];
 
     public const STATUS_OPEN = 'open';
@@ -84,6 +92,11 @@ class ClassSection extends Model
     public function enrollments(): HasMany
     {
         return $this->hasMany(Enrollment::class);
+    }
+
+    public function gradeUnlockRequests(): HasMany
+    {
+        return $this->hasMany(GradeUnlockRequest::class);
     }
 
     public function getStatusLabelAttribute(): string
