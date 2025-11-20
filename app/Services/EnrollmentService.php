@@ -33,6 +33,18 @@ class EnrollmentService
             throw new EnrollmentException('Lớp học phần hiện không mở để đăng ký.');
         }
 
+        $subjectId = $classSection->subject?->id;
+
+        if ($subjectId) {
+            $existingSubjectEnrollment = Enrollment::where('student_id', $student->id)
+                ->whereHas('classSection', fn ($query) => $query->where('subject_id', $subjectId))
+                ->exists();
+
+            if ($existingSubjectEnrollment) {
+                throw new EnrollmentException('Bạn đã đăng ký một lớp khác của học phần này.');
+            }
+        }
+
         $courseOffering = $classSection->courseOffering;
         if ($courseOffering && $courseOffering->status !== CourseOffering::STATUS_OPEN) {
             throw new EnrollmentException('Môn học này hiện không mở để đăng ký.');
