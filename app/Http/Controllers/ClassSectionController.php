@@ -11,6 +11,8 @@ use App\Models\TeachingRate;
 use App\Models\Student;
 use App\Models\Major;
 use App\Services\EnrollmentService;
+use App\Models\Tuition;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -260,6 +262,32 @@ class ClassSectionController extends Controller
         }
 
         return back()->with($response);
+    }
+
+    public function removeStudent(ClassSection $classSection, Student $student): RedirectResponse
+    {
+        $enrollment = $classSection->enrollments()
+            ->where('student_id', $student->id)
+            ->first();
+
+        if (! $enrollment) {
+            return back()->with('error', 'Sinh viên này không thuộc lớp học phần.');
+        }
+
+        if (in_array($classSection->status, [ClassSection::STATUS_ACTIVE, ClassSection::STATUS_CLOSED], true)) {
+            return back()->with('error', 'Không thể xóa sinh viên khỏi lớp học phần đang hoạt động hoặc đã đóng.');
+        }
+
+        DB::transaction(function () use ($student, $classSection, $enrollment) {
+            Tuition::where('student_id', $student->id)
+                ->where('class_section_id', $classSection->id)
+                ->where('status', Tuition::STATUS_PENDING)
+                ->delete();
+
+            $enrollment->delete();
+        });
+
+        return back()->with('success', 'Đã xóa sinh viên khỏi lớp học phần.');
     }
 
     /**
