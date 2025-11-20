@@ -50,71 +50,70 @@
                             <i class="fas fa-user-graduate me-2"></i>{{ __('Chưa có sinh viên nào đăng ký lớp học phần này.') }}
                         </p>
                     @else
-                        <div class="table-responsive">
-                            <table class="table table-striped align-middle">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th scope="col" width="5%">#</th>
-                                        <th scope="col" width="12%">{{ __('Mã sinh viên') }}</th>
-                                        <th scope="col">{{ __('Họ và tên') }}</th>
-                                        <th scope="col" width="15%">{{ __('Lớp') }}</th>
-                                        <th scope="col" width="12%">{{ __('Điểm giữa kỳ') }}</th>
-                                        <th scope="col" width="12%">{{ __('Điểm cuối kỳ') }}</th>
-                                        <th scope="col" width="12%">{{ __('Điểm bài tập') }}</th>
-                                        <th scope="col" width="10%">{{ __('Điểm tổng') }}</th>
-                                        <th scope="col" width="10%" class="text-center">{{ __('Thao tác') }}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach ($students as $index => $student)
-                                        @php
-                                            $grade = $grades[$student->id] ?? null;
-                                            $isCurrentForm = old('form_student_id') == $student->id;
-                                            $midtermValue = $isCurrentForm ? old('midterm_score') : ($grade->midterm_score ?? null);
-                                            $finalValue = $isCurrentForm ? old('final_score') : ($grade->final_score ?? null);
-                                            $assignmentValue = $isCurrentForm ? old('assignment_score') : ($grade->assignment_score ?? null);
-                                            $formId = 'grade-form-' . $student->id;
-                                        @endphp
+                        <form id="gradebook-form" action="{{ route('teacher.classes.gradebook.store', $classSection) }}" method="POST">
+                            @csrf
+                            <div class="d-flex justify-content-end mb-3">
+                                <button type="submit" class="btn btn-primary" {{ $gradeInputsDisabled ? 'disabled' : '' }}>
+                                    <i class="fas fa-save me-1"></i>{{ __('Lưu tất cả') }}
+                                </button>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-striped align-middle">
+                                    <thead class="table-light">
                                         <tr>
-                                            <td>{{ $index + 1 }}</td>
-                                            <td class="fw-semibold">{{ $student->student_id }}</td>
-                                            <td>{{ $student->full_name }}</td>
-                                            <td>{{ optional($student->class)->name ?? __('Chưa cập nhật') }}</td>
-                                            <td>
-                                                <input type="number" step="0.1" min="0" max="10" name="midterm_score" form="{{ $formId }}" class="form-control form-control-sm @if($isCurrentForm && $errors->has('midterm_score')) is-invalid @endif" placeholder="{{ __('Nhập điểm') }}" value="{{ $midtermValue }}" {{ $gradeInputsDisabled ? 'disabled' : '' }}>
-                                                @if ($isCurrentForm && $errors->has('midterm_score'))
-                                                    <div class="invalid-feedback">{{ $errors->first('midterm_score') }}</div>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <input type="number" step="0.1" min="0" max="10" name="final_score" form="{{ $formId }}" class="form-control form-control-sm @if($isCurrentForm && $errors->has('final_score')) is-invalid @endif" placeholder="{{ __('Nhập điểm') }}" value="{{ $finalValue }}" {{ $gradeInputsDisabled ? 'disabled' : '' }}>
-                                                @if ($isCurrentForm && $errors->has('final_score'))
-                                                    <div class="invalid-feedback">{{ $errors->first('final_score') }}</div>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <input type="number" step="0.1" min="0" max="10" name="assignment_score" form="{{ $formId }}" class="form-control form-control-sm @if($isCurrentForm && $errors->has('assignment_score')) is-invalid @endif" placeholder="{{ __('Nhập điểm') }}" value="{{ $assignmentValue }}" {{ $gradeInputsDisabled ? 'disabled' : '' }}>
-                                                @if ($isCurrentForm && $errors->has('assignment_score'))
-                                                    <div class="invalid-feedback">{{ $errors->first('assignment_score') }}</div>
-                                                @endif
-                                            </td>
-                                            <td>
-                                                <span class="badge bg-light text-dark">{{ $grade?->total_score !== null ? number_format($grade->total_score, 1) : __('--') }}</span>
-                                            </td>
-                                            <td class="text-center">
-                                                <form id="{{ $formId }}" action="{{ route('teacher.classes.gradebook.store', [$classSection, $student]) }}" method="POST" class="d-inline">
-                                                    @csrf
-                                                    <input type="hidden" name="form_student_id" value="{{ $student->id }}">
-                                                    <button type="submit" class="btn btn-primary btn-sm" {{ $gradeInputsDisabled ? 'disabled' : '' }}>
-                                                        <i class="fas fa-save me-1"></i>{{ __('Lưu') }}
-                                                    </button>
-                                                </form>
-                                            </td>
+                                            <th scope="col" width="5%">#</th>
+                                            <th scope="col" width="12%">{{ __('Mã sinh viên') }}</th>
+                                            <th scope="col">{{ __('Họ và tên') }}</th>
+                                            <th scope="col" width="15%">{{ __('Lớp') }}</th>
+                                            <th scope="col" width="12%">{{ __('Điểm giữa kỳ') }}</th>
+                                            <th scope="col" width="12%">{{ __('Điểm cuối kỳ') }}</th>
+                                            <th scope="col" width="12%">{{ __('Điểm bài tập') }}</th>
+                                            <th scope="col" width="10%">{{ __('Điểm tổng') }}</th>
                                         </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                                    </thead>
+                                    <tbody>
+                                        @foreach ($students as $index => $student)
+                                            @php
+                                                $grade = $grades[$student->id] ?? null;
+                                                $midtermKey = 'grades.' . $student->id . '.midterm_score';
+                                                $finalKey = 'grades.' . $student->id . '.final_score';
+                                                $assignmentKey = 'grades.' . $student->id . '.assignment_score';
+                                                $midtermValue = old($midtermKey, $grade->midterm_score ?? null);
+                                                $finalValue = old($finalKey, $grade->final_score ?? null);
+                                                $assignmentValue = old($assignmentKey, $grade->assignment_score ?? null);
+                                            @endphp
+                                            <tr>
+                                                <td>{{ $index + 1 }}</td>
+                                                <td class="fw-semibold">{{ $student->student_id }}</td>
+                                                <td>{{ $student->full_name }}</td>
+                                                <td>{{ optional($student->class)->name ?? __('Chưa cập nhật') }}</td>
+                                                <td>
+                                                    <input type="number" step="0.1" min="0" max="10" name="grades[{{ $student->id }}][midterm_score]" class="form-control form-control-sm @error($midtermKey) is-invalid @enderror" placeholder="{{ __('Nhập điểm') }}" value="{{ $midtermValue }}" {{ $gradeInputsDisabled ? 'disabled' : '' }}>
+                                                    @error($midtermKey)
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </td>
+                                                <td>
+                                                    <input type="number" step="0.1" min="0" max="10" name="grades[{{ $student->id }}][final_score]" class="form-control form-control-sm @error($finalKey) is-invalid @enderror" placeholder="{{ __('Nhập điểm') }}" value="{{ $finalValue }}" {{ $gradeInputsDisabled ? 'disabled' : '' }}>
+                                                    @error($finalKey)
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </td>
+                                                <td>
+                                                    <input type="number" step="0.1" min="0" max="10" name="grades[{{ $student->id }}][assignment_score]" class="form-control form-control-sm @error($assignmentKey) is-invalid @enderror" placeholder="{{ __('Nhập điểm') }}" value="{{ $assignmentValue }}" {{ $gradeInputsDisabled ? 'disabled' : '' }}>
+                                                    @error($assignmentKey)
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </td>
+                                                <td>
+                                                    <span class="badge bg-light text-dark">{{ $grade?->total_score !== null ? number_format($grade->total_score, 1) : __('--') }}</span>
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form>
                     @endif
                 </div>
             </div>
