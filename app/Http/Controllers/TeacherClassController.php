@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\AcademicYear;
 use App\Models\ClassSection;
 use App\Models\Grade;
+use App\Models\GradeUnlockRequest;
 use App\Models\Semester;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -101,6 +102,12 @@ class TeacherClassController extends Controller
         }
 
         $isClassClosed = $classSection->status === ClassSection::STATUS_CLOSED;
+        $isGradesLocked = (bool) $classSection->grades_locked;
+        $latestUnlockRequest = $classSection->gradeUnlockRequests()->latest()->first();
+        $pendingUnlockRequest = $classSection->gradeUnlockRequests()
+            ->where('status', GradeUnlockRequest::STATUS_PENDING)
+            ->latest()
+            ->first();
 
         return view('teacher.classes.gradebook', [
             'classSection' => $classSection,
@@ -111,6 +118,9 @@ class TeacherClassController extends Controller
             'academicYear' => $academicYear,
             'academicYearNumber' => $academicYearNumber,
             'isClassClosed' => $isClassClosed,
+            'isGradesLocked' => $isGradesLocked,
+            'latestUnlockRequest' => $latestUnlockRequest,
+            'pendingUnlockRequest' => $pendingUnlockRequest,
         ]);
     }
 
@@ -126,6 +136,11 @@ class TeacherClassController extends Controller
 
         if (!$teacher || $classSection->teacher_id !== $teacher->id) {
             return redirect()->route('teacher.classes.index')->with('error', 'Bạn không có quyền truy cập lớp học phần này.');
+        }
+
+        if ($classSection->grades_locked) {
+            return redirect()->route('teacher.classes.gradebook', $classSection)
+                ->with('error', 'Điểm đã bị khóa, hãy gửi yêu cầu mở khóa tới quản trị viên.');
         }
 
         if ($classSection->status === ClassSection::STATUS_CLOSED) {
@@ -185,5 +200,80 @@ class TeacherClassController extends Controller
 
         return redirect()->route('teacher.classes.gradebook', $classSection)
             ->with('success', 'Đã lưu điểm cho tất cả sinh viên trong lớp.');
+    }
+
+    public function lockGrades(ClassSection $classSection)
+    {
+        $user = Auth::user();
+
+        if (!$user->isTeacher()) {
+            return redirect()->route('dashboard.index')->with('error', 'Bạn không có quyền truy cập trang này.');
+        }
+
+        $teacher = $user->teacher;
+
+        if (!$teacher || $classSection->teacher_id !== $teacher->id) {
+            return redirect()->route('teacher.classes.index')->with('error', 'Bạn không có quyền truy cập lớp học phần này.');
+        }
+
+        if ($classSection->grades_locked) {
+            return redirect()->route('teacher.classes.gradebook', $classSection)
+                ->with('info', 'Điểm lớp học phần đã được khóa trước đó.');
+        }
+
+        $classSection->update([
+            'grades_locked' => true,
+            'grades_locked_at' => now(),
+        ]);
+
+        $classSection->gradeUnlockRequests()
+            ->where('status', GradeUnlockRequest::STATUS_PENDING)
+            ->update([
+                'status' => GradeUnlockRequest::STATUS_REJECTED,
+                'processed_by' => Auth::id(),
+                'processed_at' => now(),
+            ]);
+
+        return redirect()->route('teacher.classes.gradebook', $classSection)
+            ->with('success', 'Bạn đã khóa điểm. Muốn chỉnh sửa lại cần gửi yêu cầu mở khóa cho quản trị viên.');
+    }
+
+    public function requestUnlock(ClassSection $classSection)
+    {
+        $user = Auth::user();
+
+        if (!$user->isTeacher()) {
+            return redirect()->route('dashboard.index')->with('error', 'Bạn không có quyền truy cập trang này.');
+        }
+
+        $teacher = $user->teacher;
+
+        if (!$teacher || $classSection->teacher_id !== $teacher->id) {
+            return redirect()->route('teacher.classes.index')->with('error', 'Bạn không có quyền truy cập lớp học phần này.');
+        }
+
+        if (!$classSection->grades_locked) {
+            return redirect()->route('teacher.classes.gradebook', $classSection)
+                ->with('info', 'Lớp học phần chưa bị khóa điểm.');
+        }
+
+        $existingRequest = $classSection->gradeUnlockRequests()
+            ->where('status', GradeUnlockRequest::STATUS_PENDING)
+            ->where('teacher_id', $teacher->id)
+            ->first();
+
+        if ($existingRequest) {
+            return redirect()->route('teacher.classes.gradebook', $classSection)
+                ->with('info', 'Bạn đã gửi yêu cầu mở khóa và đang chờ duyệt.');
+        }
+
+        GradeUnlockRequest::create([
+            'class_section_id' => $classSection->id,
+            'teacher_id' => $teacher->id,
+            'status' => GradeUnlockRequest::STATUS_PENDING,
+        ]);
+
+        return redirect()->route('teacher.classes.gradebook', $classSection)
+            ->with('success', 'Đã gửi yêu cầu mở khóa điểm tới quản trị viên.');
     }
 }
