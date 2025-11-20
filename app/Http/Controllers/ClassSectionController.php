@@ -148,6 +148,18 @@ class ClassSectionController extends Controller
                 $query->where('class_section_id', $classSection->id);
             });
 
+        $subjectId = $classSection->subject?->id;
+
+        if ($subjectId) {
+            $studentsQuery->whereDoesntHave('enrollments', function ($query) use ($subjectId) {
+                $query->whereHas('classSection', function ($sectionQuery) use ($subjectId) {
+                    $sectionQuery->where('subject_id', $subjectId);
+                });
+            })->whereDoesntHave('grades', function ($query) use ($subjectId) {
+                $query->where('subject_id', $subjectId);
+            });
+        }
+
         if ($request->filled('search')) {
             $search = $request->input('search');
             $studentsQuery->where(function ($query) use ($search) {
